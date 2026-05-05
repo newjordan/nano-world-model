@@ -1,5 +1,5 @@
 {
-  "created_at_utc": "2026-05-05T22:40:06.013664+00:00",
+  "created_at_utc": "2026-05-05T22:43:50.819365+00:00",
   "feature_names": [
     "t_norm",
     "action_value_norm",
@@ -21,7 +21,7 @@
     "same_action_streak_norm",
     "same_action_low_change_streak_norm"
   ],
-  "git_commit": "865259cd32900d3baca4313619de73b7b5c31ee6",
+  "git_commit": "a1f6b495c9335c4d17376fb82049499bc0a7a361",
   "git_dirty": false,
   "manifest": "experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl",
   "manifest_sha256": "0bed73704f5ed373b2eec1119d86f5688ce035228d9e9b8e1fc709006eb8c7e1",
