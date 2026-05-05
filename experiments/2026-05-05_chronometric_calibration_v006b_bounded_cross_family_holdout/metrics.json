@@ -1,0 +1,245 @@
+{
+  "baseline": {
+    "family_mse": 0.1795525699853897,
+    "positive_progress_best_rank": null,
+    "positive_progress_count": 25,
+    "positive_progress_mean_rank": null,
+    "positive_progress_rank": null,
+    "progress_accuracy": 0.9893344640731812,
+    "progress_bce": 4.502917766571045,
+    "signed_mae": 0.19957992434501648,
+    "signed_mse": 0.11811856925487518,
+    "total": 4.665924549102783
+  },
+  "checkpoints": [
+    {
+      "family_mse": 0.20022588968276978,
+      "progress_bce": 1.1961071491241455,
+      "signed_mse": 0.13137781620025635,
+      "step": 1,
+      "total": 1.377541422843933
+    },
+    {
+      "family_mse": 0.14034107327461243,
+      "progress_bce": 0.0007188777672126889,
+      "signed_mse": 0.05263717845082283,
+      "step": 100,
+      "total": 0.08844132721424103
+    },
+    {
+      "family_mse": 0.13470236957073212,
+      "progress_bce": 0.0003132295678369701,
+      "signed_mse": 0.0475706122815609,
+      "step": 200,
+      "total": 0.0815594345331192
+    },
+    {
+      "family_mse": 0.13319994509220123,
+      "progress_bce": 0.00015676123439334333,
+      "signed_mse": 0.04376237839460373,
+      "step": 300,
+      "total": 0.07721912860870361
+    },
+    {
+      "family_mse": 0.1322934776544571,
+      "progress_bce": 6.995320291025564e-05,
+      "signed_mse": 0.04012143984436989,
+      "step": 400,
+      "total": 0.07326476275920868
+    },
+    {
+      "family_mse": 0.13111406564712524,
+      "progress_bce": 4.077960693393834e-05,
+      "signed_mse": 0.03547636419534683,
+      "step": 500,
+      "total": 0.06829565763473511
+    },
+    {
+      "family_mse": 0.13004884123802185,
+      "progress_bce": 2.6301331672584638e-05,
+      "signed_mse": 0.0313643254339695,
+      "step": 600,
+      "total": 0.0639028400182724
+    },
+    {
+      "family_mse": 0.1298050880432129,
+      "progress_bce": 1.7812675650930032e-05,
+      "signed_mse": 0.03076029382646084,
+      "step": 700,
+      "total": 0.06322938203811646
+    },
+    {
+      "family_mse": 0.12863659858703613,
+      "progress_bce": 1.3628438864543568e-05,
+      "signed_mse": 0.025839004665613174,
+      "step": 800,
+      "total": 0.05801178514957428
+    }
+  ],
+  "condition": {
+    "bounded_outputs": true,
+    "created_at_utc": "2026-05-05T19:41:26.448155+00:00",
+    "device_fallback_reason": "auto CUDA fallback after AcceleratorError: CUDA error: out of memory",
+    "device_requested": "auto",
+    "device_resolved": "cpu",
+    "eval_scope": "group_holdout_by_source_condition_artifact",
+    "feature_names": [
+      "t_norm",
+      "action_value_norm",
+      "has_action_data",
+      "action_data_x_norm",
+      "action_data_y_norm",
+      "changed_cells_norm",
+      "movement_dx_norm",
+      "movement_dy_norm",
+      "phase_sin",
+      "phase_cos",
+      "transition_changed_eta",
+      "time_phase_eta"
+    ],
+    "git_commit": "6e330fd6be7bbd3a2ed62389e77ad8733b784439",
+    "git_dirty": false,
+    "heldout_positive_records": 1,
+    "heldout_records": 400,
+    "hidden_size": 64,
+    "leakage_excluded_fields": [
+      "signed_outcome_y",
+      "progress_label",
+      "control_label",
+      "level_delta",
+      "levels_completed",
+      "next_levels_completed",
+      "event_mu[2]",
+      "branch_direction_n[2]",
+      "action_context[5]",
+      "action_context[6]",
+      "action_context[7]",
+      "goal_progress.level_delta"
+    ],
+    "loss_weights": {
+      "family": 0.25,
+      "progress": 1.0,
+      "signed": 1.0
+    },
+    "lr": 0.003,
+    "manifest": "experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl",
+    "manifest_sha256": "0bed73704f5ed373b2eec1119d86f5688ce035228d9e9b8e1fc709006eb8c7e1",
+    "progress_positive_records": 26,
+    "quarantine_status_preserved": true,
+    "records": 2744,
+    "run_kind": "group_holdout_calibration_smoke",
+    "run_label": "chronometric_calibration_v006b_bounded_cross_family_holdout",
+    "script": "scripts/train_chronometric_calibrator.py",
+    "seed": 20260505,
+    "split_strategy": {
+      "explicit_heldout_group_values": [
+        "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md"
+      ],
+      "heldout_group_values": [
+        "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md"
+      ],
+      "heldout_groups": 1,
+      "holdout_fraction": 0.0,
+      "key": "source_condition_artifact",
+      "seed": 20260505,
+      "train_groups": 1
+    },
+    "steps": 800,
+    "train_positive_records": 25,
+    "train_records": 2344,
+    "training_data_promoted": false,
+    "weight_decay": 0.0001
+  },
+  "feature_mean": [
+    0.4702218174934387,
+    0.28050345182418823,
+    0.0,
+    0.0,
+    0.0,
+    0.021234402433037758,
+    2.0621648218366317e-05,
+    -0.0060404264368116856,
+    0.05379611998796463,
+    0.03387485444545746,
+    0.021234402433037758,
+    0.017704777419567108
+  ],
+  "feature_std": [
+    0.27753138542175293,
+    0.10438141971826553,
+    9.999999974752427e-07,
+    9.999999974752427e-07,
+    9.999999974752427e-07,
+    0.07377886027097702,
+    0.008070899173617363,
+    0.06010279431939125,
+    0.7065278887748718,
+    0.704823911190033,
+    0.07377886027097702,
+    0.06413061171770096
+  ],
+  "final": {
+    "family_mse": 0.12871207296848297,
+    "positive_progress_best_rank": 1,
+    "positive_progress_count": 25,
+    "positive_progress_mean_rank": 13.0,
+    "positive_progress_rank": 5,
+    "progress_accuracy": 1.0,
+    "progress_bce": 1.3738062989432365e-05,
+    "signed_mae": 0.10258574783802032,
+    "signed_mse": 0.025969013571739197,
+    "total": 0.05816077068448067
+  },
+  "heldout_baseline": {
+    "family_mse": 0.08866344392299652,
+    "positive_progress_best_rank": null,
+    "positive_progress_count": 1,
+    "positive_progress_mean_rank": null,
+    "positive_progress_rank": null,
+    "progress_accuracy": 0.9975000023841858,
+    "progress_bce": 1.0636929273605347,
+    "signed_mae": 0.35364601016044617,
+    "signed_mse": 0.28220459818840027,
+    "total": 1.3680634498596191
+  },
+  "heldout_final": {
+    "family_mse": 0.34233084321022034,
+    "positive_progress_best_rank": 1,
+    "positive_progress_count": 1,
+    "positive_progress_mean_rank": 1.0,
+    "positive_progress_rank": 1,
+    "progress_accuracy": 1.0,
+    "progress_bce": 1.2114302307963953e-06,
+    "signed_mae": 0.7257595658302307,
+    "signed_mse": 0.9870945811271667,
+    "total": 1.0726784467697144
+  },
+  "heldout_initial": {
+    "family_mse": 0.35119327902793884,
+    "positive_progress_best_rank": 1,
+    "positive_progress_count": 1,
+    "positive_progress_mean_rank": 1.0,
+    "positive_progress_rank": 1,
+    "progress_accuracy": 0.6899999976158142,
+    "progress_bce": 0.6604241132736206,
+    "signed_mae": 0.2037830501794815,
+    "signed_mse": 0.13148722052574158,
+    "total": 0.8797096610069275
+  },
+  "heldout_loss_reduction_vs_baseline": 0.2953850030899048,
+  "heldout_loss_reduction_vs_initial": -0.19296878576278687,
+  "initial": {
+    "family_mse": 0.20022588968276978,
+    "positive_progress_best_rank": 1,
+    "positive_progress_count": 25,
+    "positive_progress_mean_rank": 13.0,
+    "positive_progress_rank": 10,
+    "progress_accuracy": 0.7909556031227112,
+    "progress_bce": 1.1961071491241455,
+    "signed_mae": 0.22716465592384338,
+    "signed_mse": 0.13137781620025635,
+    "total": 1.377541422843933
+  },
+  "loss_reduction_vs_baseline": 4.6077637784183025,
+  "loss_reduction_vs_initial": 1.3193806521594524
+}
