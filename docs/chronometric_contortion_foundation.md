@@ -6,6 +6,9 @@ model primitive, not as an ARC-side planning note.
 The implementation lives in `src/models/chronometric_contortion.py` and is
 enabled from the model configs under `model.chronometric`.
 
+Important: this is the V0 anchor implementation. The stricter design audit and
+next-stage gates are in `docs/chronometric_foundation_review_v002.md`.
+
 ## Installed Equations
 
 The layer maps temporal hidden tokens into a learned 4D event system:
