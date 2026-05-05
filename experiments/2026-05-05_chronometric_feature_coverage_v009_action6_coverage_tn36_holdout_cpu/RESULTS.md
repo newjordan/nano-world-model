@@ -8,7 +8,7 @@ This is not a new training run and not ARC solve evidence. It compares heldout f
 
 - run label: `chronometric_feature_coverage_v009_action6_coverage_tn36_holdout_cpu`
 - run kind: `diagnostic_analysis_no_training`
-- git commit: `8b9275163f733fa9ba70e6a5f810f3c5c4c148d8`
+- git commit: `d82c1834f510cefc49eebe2506451fb064eda314`
 - git dirty at run: `False`
 - manifest: `experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl`
 - predictions: `experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_tn36_holdout_cpu/predictions.jsonl`
