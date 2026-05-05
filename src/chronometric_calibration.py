@@ -146,6 +146,7 @@ def split_examples_by_group(
     key: str = "source_artifact_path",
     holdout_fraction: float = 0.0,
     seed: int = 20260505,
+    heldout_group_values: list[str] | None = None,
 ) -> CalibrationExampleSplit:
     """Deterministically split examples by group, preserving positive-bearing groups when possible."""
     if not examples:
@@ -162,6 +163,26 @@ def split_examples_by_group(
             group = f"row:{index}"
         example_groups[id(example)] = group
         groups.setdefault(group, []).append(example)
+
+    explicit_heldout = set(heldout_group_values or [])
+    missing_explicit = sorted(explicit_heldout - set(groups))
+    if missing_explicit:
+        raise ValueError(f"explicit heldout groups were not present for key {key!r}: {missing_explicit}")
+
+    if explicit_heldout:
+        train = [example for example in examples if example_groups[id(example)] not in explicit_heldout]
+        heldout = [example for example in examples if example_groups[id(example)] in explicit_heldout]
+        if not train or not heldout:
+            raise ValueError("explicit group holdout produced an empty train or heldout split")
+        return CalibrationExampleSplit(
+            train=train,
+            heldout=heldout,
+            key=key,
+            holdout_fraction=holdout_fraction,
+            seed=seed,
+            train_groups=sorted(set(groups) - explicit_heldout),
+            heldout_groups=sorted(explicit_heldout),
+        )
 
     if holdout_fraction <= 0.0:
         return CalibrationExampleSplit(

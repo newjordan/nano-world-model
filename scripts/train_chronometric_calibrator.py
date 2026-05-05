@@ -253,6 +253,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         key=args.holdout_key,
         holdout_fraction=args.holdout_fraction,
         seed=args.holdout_seed,
+        heldout_group_values=args.heldout_group_value,
     )
     train_x_raw, train_signed_y, train_progress, train_families = examples_to_tensors(split.train, device=device)
     train_x, feature_mean, feature_std = _standardize(train_x_raw)
@@ -372,6 +373,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             "key": split.key,
             "holdout_fraction": split.holdout_fraction,
             "seed": split.seed,
+            "explicit_heldout_group_values": list(args.heldout_group_value or []),
             "train_groups": len(split.train_groups),
             "heldout_groups": len(split.heldout_groups),
             "heldout_group_values": split.heldout_groups,
@@ -568,6 +570,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--holdout-key", default="source_artifact_path")
     parser.add_argument("--holdout-fraction", type=float, default=0.0)
     parser.add_argument("--holdout-seed", type=int, default=20260505)
+    parser.add_argument(
+        "--heldout-group-value",
+        action="append",
+        default=None,
+        help="Explicit group value for --holdout-key. Can be repeated.",
+    )
     parser.add_argument("--steps", type=int, default=800)
     parser.add_argument("--hidden-size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=3e-3)

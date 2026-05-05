@@ -204,6 +204,47 @@ This is a no-training diagnostic. It joins V004 predictions back to bridge rows
 and reports errors by split, control label, action, dominant group, signed-Y
 band, movement axis, time window, and changed-cell bucket.
 
+## V006 Cross-Family Holdout
+
+V006 keeps the V031B replay family as the training family and holds out the
+V019B ten-task current-state family by `source_condition_artifact`.
+
+V019B family bridge:
+
+```bash
+python scripts/build_arc_bridge_manifest.py \
+  --run-label arc_bridge_manifest_v006_v019b_ten_task_family \
+  --source-condition-artifact experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md \
+  --source-transition-glob 'experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/*.jsonl' \
+  --split arc_sprint0_v019b_ten_task_family_v006 \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v006_v019b_ten_task_family
+```
+
+Merged cross-family bridge:
+
+```bash
+python scripts/merge_chronometric_bridge_manifests.py \
+  --run-label arc_bridge_manifest_v006_cross_family \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v004_controlled_batch/arc_bridge_manifest.jsonl \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_v019b_ten_task_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v006_cross_family
+```
+
+Cross-family calibration:
+
+```bash
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v006_cross_family_holdout \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v006_cross_family_holdout \
+  --holdout-key source_condition_artifact \
+  --heldout-group-value experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md
+```
+
+This is a family-transfer diagnostic. A good result means the progress head
+stays calibrated outside the V031B replay family; it still does not establish
+general ARC competence.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality

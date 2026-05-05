@@ -71,3 +71,37 @@ def test_split_examples_by_group_holds_out_whole_groups():
     assert heldout_groups
     assert any(example.progress == 1.0 for example in split.train)
     assert any(example.progress == 1.0 for example in split.heldout)
+
+
+def test_split_examples_by_group_accepts_explicit_heldout_group():
+    records = []
+    for group in ("train_family", "heldout_family"):
+        record = copy.deepcopy(synthetic_bridge_records()[0])
+        record["source_condition_artifact"] = group
+        records.append(record)
+
+    split = split_examples_by_group(
+        [calibration_example(record) for record in records],
+        key="source_condition_artifact",
+        holdout_fraction=0.0,
+        heldout_group_values=["heldout_family"],
+    )
+
+    assert {example.record["source_condition_artifact"] for example in split.train} == {"train_family"}
+    assert {example.record["source_condition_artifact"] for example in split.heldout} == {"heldout_family"}
+
+
+def test_split_examples_by_group_rejects_missing_explicit_heldout_group():
+    records = [copy.deepcopy(synthetic_bridge_records()[0])]
+    records[0]["source_condition_artifact"] = "present_family"
+
+    try:
+        split_examples_by_group(
+            [calibration_example(record) for record in records],
+            key="source_condition_artifact",
+            heldout_group_values=["missing_family"],
+        )
+    except ValueError as exc:
+        assert "missing_family" in str(exc)
+    else:
+        raise AssertionError("missing explicit heldout group should fail")
