@@ -1,0 +1,92 @@
+{
+  "auxiliary_objectives": {
+    "heldout_negative_control_records": 126,
+    "negative_control_labels": [
+      "stasis_no_change",
+      "dominant_group:stasis_loop"
+    ],
+    "negative_control_margin": -0.5,
+    "negative_control_weight": 1.0,
+    "train_negative_control_records": 251
+  },
+  "bounded_outputs": true,
+  "created_at_utc": "2026-05-05T22:28:49.495896+00:00",
+  "device_fallback_reason": null,
+  "device_requested": "auto",
+  "device_resolved": "cuda",
+  "eval_scope": "group_holdout_by_source_condition_artifact",
+  "feature_names": [
+    "t_norm",
+    "action_value_norm",
+    "has_action_data",
+    "action_data_x_norm",
+    "action_data_y_norm",
+    "changed_cells_norm",
+    "movement_dx_norm",
+    "movement_dy_norm",
+    "phase_sin",
+    "phase_cos",
+    "transition_changed_eta",
+    "time_phase_eta",
+    "stasis_no_change_eta",
+    "loop_repeated_action_eta",
+    "mirror_progress_path_eta",
+    "mirror_progress_blocker_eta",
+    "hazard_env_failure_eta",
+    "same_action_streak_norm",
+    "same_action_low_change_streak_norm"
+  ],
+  "git_commit": "86b08d18840e44ced6ef84066670bd4e84376f6c",
+  "git_dirty": false,
+  "heldout_positive_records": 1,
+  "heldout_records": 400,
+  "hidden_size": 64,
+  "leakage_excluded_fields": [
+    "signed_outcome_y",
+    "progress_label",
+    "control_label",
+    "level_delta",
+    "levels_completed",
+    "next_levels_completed",
+    "event_mu[2]",
+    "branch_direction_n[2]",
+    "action_context[5]",
+    "action_context[6]",
+    "action_context[7]",
+    "goal_progress.level_delta"
+  ],
+  "loss_weights": {
+    "family": 0.25,
+    "negative_control": 1.0,
+    "progress": 1.0,
+    "signed": 1.0
+  },
+  "lr": 0.003,
+  "manifest": "experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl",
+  "manifest_sha256": "0bed73704f5ed373b2eec1119d86f5688ce035228d9e9b8e1fc709006eb8c7e1",
+  "progress_positive_records": 26,
+  "quarantine_status_preserved": true,
+  "records": 2744,
+  "run_kind": "group_holdout_calibration_smoke",
+  "run_label": "chronometric_calibration_v008b_negative_control_temporal_loop_context",
+  "script": "scripts/train_chronometric_calibrator.py",
+  "seed": 20260505,
+  "split_strategy": {
+    "explicit_heldout_group_values": [
+      "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md"
+    ],
+    "heldout_group_values": [
+      "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md"
+    ],
+    "heldout_groups": 1,
+    "holdout_fraction": 0.0,
+    "key": "source_condition_artifact",
+    "seed": 20260505,
+    "train_groups": 1
+  },
+  "steps": 800,
+  "train_positive_records": 25,
+  "train_records": 2344,
+  "training_data_promoted": false,
+  "weight_decay": 0.0001
+}
