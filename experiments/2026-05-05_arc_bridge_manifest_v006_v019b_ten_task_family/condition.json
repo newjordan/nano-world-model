@@ -1,0 +1,83 @@
+{
+  "arc_data_used": true,
+  "created_at_utc": "2026-05-05T19:38:03.778507+00:00",
+  "family_order": [
+    "transition.changed_cells",
+    "time_phase.repeated_effect_size",
+    "goal_progress.level_delta",
+    "stasis.no_change",
+    "loop.repeated_action",
+    "mirror.progress_path",
+    "mirror.progress_blocker",
+    "hazard.env_failure"
+  ],
+  "generator_commit": "3339500445e2ec1fc23afb94fb4d2cc18927c016",
+  "generator_dirty": false,
+  "generator_repo": "/home/frosty40/nano-world-model",
+  "max_records_per_source": 0,
+  "output_manifest": "experiments/2026-05-05_arc_bridge_manifest_v006_v019b_ten_task_family/arc_bridge_manifest.jsonl",
+  "quarantine_status": "control_source: arc_scaffold_non_chronometric",
+  "run_kind": "bridge_manifest_generation",
+  "run_label": "arc_bridge_manifest_v006_v019b_ten_task_family",
+  "script": "scripts/build_arc_bridge_manifest.py",
+  "source_artifacts": [
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_dc22_seed0.transitions.jsonl",
+      "sha256": "40875b0ac742993d825ab4eaa8c5d52d1407c3e2b1d68ef4fa75cd4de33f90e0"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_ft09_seed0.transitions.jsonl",
+      "sha256": "c99358729096b20ca90eec68d887958d4408a18e5542dcc0c304e59b63d8147d"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_g50t_seed0.transitions.jsonl",
+      "sha256": "5278120de09e8e87c98b57520398313b9a7970cdcc56e393755f08552e0972d0"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_ka59_seed0.transitions.jsonl",
+      "sha256": "b16eaedf555a16c421823bd1a9da7ab0a15457a00d98570264623c11bdf1df66"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_m0r0_seed0.transitions.jsonl",
+      "sha256": "47d0680c6a5f81d651dfe1d1ef4de8db5fe385d35fd49263750d6fc7145839e1"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_sb26_seed0.transitions.jsonl",
+      "sha256": "5661db2751689fb58ae39aea01f3dfab875932a49fbf07220788dce708186c2d"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_sc25_seed0.transitions.jsonl",
+      "sha256": "e6e8624bfa16eb6f81b2d57173ca60d744bab8da855e09a0b739c5deb45d0ea5"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_tn36_seed0.transitions.jsonl",
+      "sha256": "61c0f1fb21512bf64d048d0b8042201515dad6e2660f940be016a5ef6f225f79"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_tr87_seed0.transitions.jsonl",
+      "sha256": "4af65a74e95c97a9700da5e9dfc5928dcf35daaf714d1d3c1ee5f9ac44cc702f"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_tu93_seed0.transitions.jsonl",
+      "sha256": "718705c433a2b5d40b48f40f2758e606b769e49572f020923a6e1d714b5a88e1"
+    }
+  ],
+  "source_commit": "9c850edf476bc5363a3c7de43b6d73f28a2eb5a8",
+  "source_condition_artifact": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md",
+  "source_condition_sha256": "3493c18de3e8f5e16be4959c1c1c6a1567b2d1c4f6e05a0b5d650d5bde204cfd",
+  "source_dirty": true,
+  "source_repo": "https://github.com/newjordan/arc-agi-3-worldmodel.git",
+  "source_repo_path": "/home/frosty40/world_model_1",
+  "split": "arc_sprint0_v019b_ten_task_family_v006",
+  "training_data_promoted": false
+}
