@@ -1,0 +1,38 @@
+{
+  "arc_data_used": true,
+  "created_at_utc": "2026-05-05T23:35:19.519489+00:00",
+  "family_order": [
+    "transition.changed_cells",
+    "time_phase.repeated_effect_size",
+    "goal_progress.level_delta",
+    "stasis.no_change",
+    "loop.repeated_action",
+    "mirror.progress_path",
+    "mirror.progress_blocker",
+    "hazard.env_failure"
+  ],
+  "generator_commit": "917a033cf354f9b995fbb318d6c4931a84096aa9",
+  "generator_dirty": false,
+  "generator_repo": "/home/frosty40/nano-world-model",
+  "max_records_per_source": 0,
+  "output_manifest": "experiments/2026-05-05_arc_bridge_manifest_v010_ft09_action6_affordance/arc_bridge_manifest.jsonl",
+  "quarantine_status": "control_source: arc_scaffold_non_chronometric",
+  "run_kind": "bridge_manifest_generation",
+  "run_label": "arc_bridge_manifest_v010_ft09_action6_affordance",
+  "script": "scripts/build_arc_bridge_manifest.py",
+  "source_artifacts": [
+    {
+      "input_rows": 322,
+      "path": "experiments/2026-05-04_v009_ft09_action6_affordance_sweep/grid/transition_events/v009_action6_affordance_ft09_stride4_seed0.transitions.jsonl",
+      "sha256": "7c87e7f3ef04f7783e9e4d50d460b4df3612dad6e935e2b11c662833ed26ee2e"
+    }
+  ],
+  "source_commit": "9c850edf476bc5363a3c7de43b6d73f28a2eb5a8",
+  "source_condition_artifact": "experiments/2026-05-04_v009_ft09_action6_affordance_sweep/CONDITION.md",
+  "source_condition_sha256": "1b4f9bb1dc4a72392c5d7fd447e370afabd3f09a4c0491459d8e85c81c3d602c",
+  "source_dirty": true,
+  "source_repo": "https://github.com/newjordan/arc-agi-3-worldmodel.git",
+  "source_repo_path": "/home/frosty40/world_model_1",
+  "split": "arc_sprint0_v009_ft09_action6_affordance_v010_train_coverage",
+  "training_data_promoted": false
+}
