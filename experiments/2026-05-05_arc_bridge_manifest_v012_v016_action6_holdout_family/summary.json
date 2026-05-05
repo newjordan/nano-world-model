@@ -1,0 +1,112 @@
+{
+  "action_counts": {
+    "ACTION1": 51,
+    "ACTION2": 69,
+    "ACTION3": 58,
+    "ACTION4": 61,
+    "ACTION5": 58,
+    "ACTION6": 103
+  },
+  "condition": {
+    "arc_data_used": true,
+    "created_at_utc": "2026-05-05T23:54:58.597674+00:00",
+    "family_order": [
+      "transition.changed_cells",
+      "time_phase.repeated_effect_size",
+      "goal_progress.level_delta",
+      "stasis.no_change",
+      "loop.repeated_action",
+      "mirror.progress_path",
+      "mirror.progress_blocker",
+      "hazard.env_failure"
+    ],
+    "generator_commit": "471382a23eb16832a8bd85fb7534d5d147c1b6a2",
+    "generator_dirty": false,
+    "generator_repo": "/home/frosty40/nano-world-model",
+    "max_records_per_source": 0,
+    "output_manifest": "experiments/2026-05-05_arc_bridge_manifest_v012_v016_action6_holdout_family/arc_bridge_manifest.jsonl",
+    "quarantine_status": "control_source: arc_scaffold_non_chronometric",
+    "run_kind": "bridge_manifest_generation",
+    "run_label": "arc_bridge_manifest_v012_v016_action6_holdout_family",
+    "script": "scripts/build_arc_bridge_manifest.py",
+    "source_artifacts": [
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_dc22_seed0.transitions.jsonl",
+        "sha256": "15a5db1cccb451ad47be9c22a290b4b1605150a51e6c2206d3dbaed1d0b912e8"
+      },
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_ft09_seed0.transitions.jsonl",
+        "sha256": "76dc0c4cbfc22d2f774a4af04065011d263b2b4fef14eb50f5ad43713f3a896f"
+      },
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_g50t_seed0.transitions.jsonl",
+        "sha256": "abf8ec5a79a86f4e150830fd9d96a2100389cd86bdbea3abf1b4f0848b954fb6"
+      },
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_ka59_seed0.transitions.jsonl",
+        "sha256": "43ad624534332352167f52f4c1c4e5bb2461c3c7a81c5916c388424862680ec9"
+      },
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_m0r0_seed0.transitions.jsonl",
+        "sha256": "ff75aef9710bd187d98d27b813cbc0a3048535722f9eca6a5f21134a1113df03"
+      },
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_sb26_seed0.transitions.jsonl",
+        "sha256": "8a7308b2d7121f1d4a727c8c7d034c2ab72462846f9077c0b9b96b45162f00fe"
+      },
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_sc25_seed0.transitions.jsonl",
+        "sha256": "1f30a61509fcfaa6db494d7e999597c2a0bfc66c75b449097e50610e026315ed"
+      },
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_tn36_seed0.transitions.jsonl",
+        "sha256": "508d33a5b6cbe62bc0495eba706f0b737d61f5c47b286adacaae23b8910e5966"
+      },
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_tr87_seed0.transitions.jsonl",
+        "sha256": "2bb06fd25d3228c159270d394baa9375aa95be8fad82440e1ac989306c7d6012"
+      },
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_tu93_seed0.transitions.jsonl",
+        "sha256": "ac151c0d534acd83b7beb232a003fe8b2c71def4fbfce8db4a7c4af5936b47b9"
+      }
+    ],
+    "source_commit": "9c850edf476bc5363a3c7de43b6d73f28a2eb5a8",
+    "source_condition_artifact": "experiments/2026-05-04_v016_controllability_movement_scout/CONDITION.md",
+    "source_condition_sha256": "cffc5be99bfb59226fb478f041482cea986ccfd41d6912343f4a7d49cac4eaf7",
+    "source_dirty": true,
+    "source_repo": "https://github.com/newjordan/arc-agi-3-worldmodel.git",
+    "source_repo_path": "/home/frosty40/world_model_1",
+    "split": "arc_sprint0_v016_controllability_family_v012_heldout",
+    "training_data_promoted": false
+  },
+  "control_labels": {
+    "dominant_group:stasis_loop": 76,
+    "dominant_group:time_phase": 22,
+    "dominant_group:translation": 237,
+    "stasis_no_change": 65
+  },
+  "negative_signed_outcome_records": 141,
+  "positive_signed_outcome_records": 259,
+  "progress_labels": {
+    "no_level_progress": 400
+  },
+  "progress_records": 0,
+  "records": 400,
+  "validation": {
+    "errors": [],
+    "path": "/home/frosty40/nano-world-model/experiments/2026-05-05_arc_bridge_manifest_v012_v016_action6_holdout_family/arc_bridge_manifest.jsonl",
+    "records": 400,
+    "valid": true
+  }
+}
