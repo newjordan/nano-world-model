@@ -15,6 +15,8 @@ import numpy as np
 from einops import rearrange, repeat
 from timm.models.vision_transformer import Mlp, PatchEmbed
 
+from .chronometric_contortion import ChronometricConfig, ChronometricContortionLayer
+
 def modulate(x, shift, scale):
     # Support both 2D (batch-wise) and 3D (token-wise) shift/scale
     if shift.ndim == 2:
@@ -397,6 +399,7 @@ class NanoWM(nn.Module):
         action_dim=None,
         action_injection_type='additive',
         causal=False,
+        chronometric=None,
     ):
         super().__init__()
         self.in_channels = in_channels
@@ -407,6 +410,7 @@ class NanoWM(nn.Module):
         self.num_frames = num_frames
         self.action_injection_type = action_injection_type
         self.causal = causal
+        self.use_chronometric = False
 
         # Action conditioning
         self.use_action = use_action
@@ -414,6 +418,18 @@ class NanoWM(nn.Module):
         if self.use_action:
             assert action_dim is not None, "action_dim must be specified when use_action=True"
             self.action_embedder = ActionEmbedder(action_dim, hidden_size)
+
+        if chronometric is not None and bool(chronometric.get("enabled", False)):
+            chrono_kwargs = {
+                key: value
+                for key, value in chronometric.items()
+                if key not in {"enabled", "loss_weights"}
+            }
+            self.chronometric = ChronometricContortionLayer(
+                hidden_size,
+                ChronometricConfig(**chrono_kwargs),
+            )
+            self.use_chronometric = True
 
         self.x_embedder = PatchEmbed(input_size, patch_size, in_channels, hidden_size)
         self.t_embedder = TimestepEmbedder(hidden_size)
@@ -620,6 +636,9 @@ class NanoWM(nn.Module):
             if i == 0:
                 x = x + self.temp_embed
 
+            if self.use_chronometric:
+                x = self.chronometric(x)
+
             if self.extras == 2:
                 raise ValueError("extras == 2 is not supported for Compression Forcing's purpose")
             elif self.extras == 78:
@@ -685,6 +704,16 @@ class NanoWM(nn.Module):
         half_eps = uncond_eps + cfg_scale * (cond_eps - uncond_eps)
         eps = torch.cat([half_eps, half_eps], dim=0) 
         return torch.cat([eps, rest], dim=2)
+
+    def get_chronometric_metrics(self):
+        if not self.use_chronometric:
+            return {}
+        return self.chronometric.last_metrics
+
+    def get_chronometric_losses(self):
+        if not self.use_chronometric:
+            return {}
+        return self.chronometric.last_losses
 
 
 #################################################################################

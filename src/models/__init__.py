@@ -36,6 +36,10 @@ def get_models(args):
         raise ValueError(f"{args.model.arch} Model Not Supported!")
 
     action_dim = args.dataset.spec.action_dim * args.dataset.frame_interval
+    chronometric = args.model.get("chronometric", None)
+    if chronometric is not None:
+        chronometric = dict(chronometric)
+
     return NanoWM_models[args.model.arch](
         input_size=args.model.latent_size,
         num_classes=args.model.num_classes,
@@ -45,5 +49,5 @@ def get_models(args):
         action_dim=action_dim,
         action_injection_type=args.model.action_injection.type,
         causal=args.model.causal,
+        chronometric=chronometric,
     )
-    

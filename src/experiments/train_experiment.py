@@ -224,6 +224,24 @@ class NanoWMTrainingModule(LightningModule):
         loss_dict = self.diffusion.training_losses(self.model, x, t, model_kwargs)
         loss = loss_dict["loss"].mean()
 
+        chrono_model = getattr(self.model, "_orig_mod", self.model)
+        chrono_losses = {}
+        if hasattr(chrono_model, "get_chronometric_losses"):
+            chrono_losses = chrono_model.get_chronometric_losses()
+        if chrono_losses:
+            weights = self.args.model.chronometric.loss_weights
+            for name, term in chrono_losses.items():
+                weight = float(weights.get(name, 0.0))
+                if weight != 0.0:
+                    loss = loss + weight * term
+                self.log(
+                    f"chrono/{name}",
+                    term.detach(),
+                    logger=True,
+                    sync_dist=True,
+                    batch_size=x.shape[0],
+                )
+
         if self.global_step < self.args.experiment.training.gradient_clip_start_step:
             gradient_norm = clip_grad_norm_(self.model.parameters(), self.args.experiment.training.gradient_clip_norm, clip_grad=False)
         else:

@@ -8,6 +8,22 @@ use_action: true
 action_injection:
   type: additive  # one of: additive, adaln_fuse, adaln, film, cross_attention
 causal: true  # temporal self-attn and cross-attn use causal mask (frame t attends only to <= t)
+chronometric:
+  enabled: true
+  c: 1.0
+  mass: 1.0
+  dtau: 1.0
+  tau_c: 1.0
+  t0: 1.0
+  beta: 0.0
+  phase_eps: 1.0
+  phase_xi: 1.0
+  residual_scale: 0.01
+  potential_families: 16
+  init_std: 0.02
+  loss_weights:
+    invariant_norm: 1.0
+    orthogonality: 1.0
 image_size: 256
 latent_size: 32
 extras: 1

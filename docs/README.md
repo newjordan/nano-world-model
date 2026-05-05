@@ -22,6 +22,7 @@ docs/
 
 - **[Configuration system](config_system.md)** — Hydra layout, composition, environment variables, common overrides, debugging.
 - **[Training](training.md)** — workflow + the four design axes (prediction target, action injection, model scale, EMA) with ablation tables and pretrained checkpoints.
+- **[Chronometric Contortion Foundation](chronometric_contortion_foundation.md)** — installed 4D event-state, learned 4x4 K tensor, log-time phase, projector constraint, and potential-family hook.
 - **[Evaluation](evaluation.md)** — `experiment=evaluate_only`, scheduling modes, metric definitions, headline numbers on each domain.
 - **[Datasets](datasets/README.md)** — DINO-WM (5 envs), RT-1 fractal, CSGO. Download / split / format / config.
 - **[Planning](applications/planning.md)** — MPC + CEM over the diffusion world model. point_maze and PushT recipes.
