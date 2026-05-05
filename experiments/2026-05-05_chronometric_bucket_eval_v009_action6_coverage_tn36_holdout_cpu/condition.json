@@ -1,0 +1,21 @@
+{
+  "calibration_metrics": "experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_tn36_holdout_cpu/metrics.json",
+  "calibration_metrics_sha256": "ea1304c7a8aee20e1a50d3b996edba55dbb44057d993ebce2adfee5daabba7e6",
+  "created_at_utc": "2026-05-05T22:37:12.454115+00:00",
+  "eval_scope": "posthoc_bucket_analysis",
+  "git_commit": "2865cfff9204c83f443813a84950968723025e33",
+  "git_dirty": false,
+  "manifest": "experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl",
+  "manifest_sha256": "0bed73704f5ed373b2eec1119d86f5688ce035228d9e9b8e1fc709006eb8c7e1",
+  "predictions": "experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_tn36_holdout_cpu/predictions.jsonl",
+  "predictions_sha256": "3d760ee065df41db40e068910a82b9def0e4a5850bd8057b851e5d51f8a4eaf9",
+  "records": 2744,
+  "run_kind": "diagnostic_analysis_no_training",
+  "run_label": "chronometric_bucket_eval_v009_action6_coverage_tn36_holdout_cpu",
+  "script": "scripts/analyze_chronometric_error_buckets.py",
+  "splits": {
+    "heldout": 80,
+    "train": 2664
+  },
+  "training_data_promoted": false
+}
