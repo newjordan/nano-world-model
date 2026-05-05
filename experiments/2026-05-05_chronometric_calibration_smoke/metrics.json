@@ -1,0 +1,180 @@
+{
+  "baseline": {
+    "family_mse": 0.3514387309551239,
+    "positive_progress_rank": null,
+    "progress_accuracy": 0.9750000238418579,
+    "progress_bce": 3.621342420578003,
+    "signed_mae": 0.1891137808561325,
+    "signed_mse": 0.12404561042785645,
+    "total": 3.833247661590576
+  },
+  "checkpoints": [
+    {
+      "family_mse": 0.3758050799369812,
+      "progress_bce": 1.2382200956344604,
+      "signed_mse": 0.1352417767047882,
+      "step": 1,
+      "total": 1.467413067817688
+    },
+    {
+      "family_mse": 0.025538761168718338,
+      "progress_bce": 0.0008098680409602821,
+      "signed_mse": 0.04678637534379959,
+      "step": 100,
+      "total": 0.053980931639671326
+    },
+    {
+      "family_mse": 0.015888528898358345,
+      "progress_bce": 0.0003096250584349036,
+      "signed_mse": 0.029150722548365593,
+      "step": 200,
+      "total": 0.033432479947805405
+    },
+    {
+      "family_mse": 0.005182445049285889,
+      "progress_bce": 0.0001422878121957183,
+      "signed_mse": 0.007162132300436497,
+      "step": 300,
+      "total": 0.008600031957030296
+    },
+    {
+      "family_mse": 0.0009470441727899015,
+      "progress_bce": 6.561334885191172e-05,
+      "signed_mse": 0.001131529570557177,
+      "step": 400,
+      "total": 0.0014339039335027337
+    },
+    {
+      "family_mse": 0.0006206922116689384,
+      "progress_bce": 4.8054353101179004e-05,
+      "signed_mse": 0.0011144941672682762,
+      "step": 500,
+      "total": 0.0013177215587347746
+    },
+    {
+      "family_mse": 0.0002651250979397446,
+      "progress_bce": 4.010219709016383e-05,
+      "signed_mse": 0.0002644846390467137,
+      "step": 600,
+      "total": 0.00037086810334585607
+    },
+    {
+      "family_mse": 0.00011439326772233471,
+      "progress_bce": 3.168461626046337e-05,
+      "signed_mse": 2.033691998803988e-06,
+      "step": 700,
+      "total": 6.231662700884044e-05
+    },
+    {
+      "family_mse": 8.492169581586495e-05,
+      "progress_bce": 2.815536572597921e-05,
+      "signed_mse": 1.2789017773684463e-06,
+      "step": 800,
+      "total": 5.066469020675868e-05
+    }
+  ],
+  "condition": {
+    "created_at_utc": "2026-05-05T18:53:06.874861+00:00",
+    "device_fallback_reason": null,
+    "device_requested": "auto",
+    "device_resolved": "cuda",
+    "eval_scope": "train_fit_only_all_records",
+    "feature_names": [
+      "t_norm",
+      "action_value_norm",
+      "has_action_data",
+      "action_data_x_norm",
+      "action_data_y_norm",
+      "changed_cells_norm",
+      "movement_dx_norm",
+      "movement_dy_norm",
+      "phase_sin",
+      "phase_cos",
+      "transition_changed_eta",
+      "time_phase_eta"
+    ],
+    "git_commit": "9400860ab458fab16b255cebb6793ca1dbf5abcf",
+    "git_dirty": false,
+    "hidden_size": 64,
+    "leakage_excluded_fields": [
+      "signed_outcome_y",
+      "progress_label",
+      "control_label",
+      "level_delta",
+      "levels_completed",
+      "next_levels_completed",
+      "event_mu[2]",
+      "branch_direction_n[2]",
+      "action_context[5]",
+      "action_context[6]",
+      "action_context[7]",
+      "goal_progress.level_delta"
+    ],
+    "loss_weights": {
+      "family": 0.25,
+      "progress": 1.0,
+      "signed": 1.0
+    },
+    "lr": 0.003,
+    "manifest": "experiments/2026-05-05_arc_bridge_manifest_smoke/arc_bridge_manifest.jsonl",
+    "manifest_sha256": "5e916c9bc477916b9dca08d8768f20936e0dc4b801239aa6ff9b0efc300caf18",
+    "progress_positive_records": 1,
+    "quarantine_status_preserved": true,
+    "records": 40,
+    "run_kind": "fit_smoke_no_generalization_claim",
+    "run_label": "chronometric_calibration_smoke",
+    "script": "scripts/train_chronometric_calibrator.py",
+    "seed": 20260505,
+    "steps": 800,
+    "training_data_promoted": false,
+    "weight_decay": 0.0001
+  },
+  "feature_mean": [
+    0.19500000774860382,
+    0.2825000286102295,
+    0.0,
+    0.0,
+    0.0,
+    0.03251953050494194,
+    4.874253863818012e-05,
+    -0.018535632640123367,
+    0.07286327332258224,
+    -0.05960487946867943,
+    0.03251953050494194,
+    0.0062500000931322575
+  ],
+  "feature_std": [
+    0.1154339537024498,
+    0.12626858055591583,
+    9.999999974752427e-07,
+    9.999999974752427e-07,
+    9.999999974752427e-07,
+    0.11174227297306061,
+    0.012356593273580074,
+    0.029946520924568176,
+    0.6784780621528625,
+    0.7285640835762024,
+    0.11174227297306061,
+    0.039031241089105606
+  ],
+  "final": {
+    "family_mse": 8.45704780658707e-05,
+    "positive_progress_rank": 1,
+    "progress_accuracy": 1.0,
+    "progress_bce": 2.8107670004828833e-05,
+    "signed_mae": 0.000916401797439903,
+    "signed_mse": 1.1497626246637083e-06,
+    "total": 5.0400052714394405e-05
+  },
+  "initial": {
+    "family_mse": 0.3758050799369812,
+    "positive_progress_rank": 1,
+    "progress_accuracy": 0.800000011920929,
+    "progress_bce": 1.2382200956344604,
+    "signed_mae": 0.22221319377422333,
+    "signed_mse": 0.1352417767047882,
+    "total": 1.467413067817688
+  },
+  "loss_reduction_vs_baseline": 3.8331972615378618,
+  "loss_reduction_vs_initial": 1.4673626677649736
+}
