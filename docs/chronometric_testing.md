@@ -81,6 +81,36 @@ should enter, if at all, with a quarantine status such as:
 control_source: arc_scaffold_non_chronometric
 ```
 
+## V002 ARC Bridge Manifest Smoke
+
+Runner:
+
+```bash
+python scripts/build_arc_bridge_manifest.py
+```
+
+Default source:
+
+```text
+/home/frosty40/world_model_1/
+  experiments/2026-05-04_v019b_target_discriminated_scorer_scout/
+    grid/transition_events/v019b_current_state_v019b_target_discriminated_m0r0_seed0.transitions.jsonl
+```
+
+Default output:
+
+```text
+experiments/2026-05-05_arc_bridge_manifest_smoke/
+  arc_bridge_manifest.jsonl
+  condition.json
+  summary.json
+  RESULTS.md
+```
+
+This converts grid transition rows into the required bridge schema. It preserves
+`control_source: arc_scaffold_non_chronometric` and does not promote the output
+to training data.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality

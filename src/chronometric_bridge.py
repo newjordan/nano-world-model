@@ -8,6 +8,7 @@ the record instead of letting old harness rows silently become training samples.
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -37,6 +38,16 @@ REQUIRED_BRIDGE_FIELDS = (
 
 VECTOR4_FIELDS = ("event_mu", "branch_direction_n")
 SEQUENCE_FIELDS = ("observation_shape", "action_context", "potential_family_vector")
+DEFAULT_POTENTIAL_FAMILY_ORDER = (
+    "transition.changed_cells",
+    "time_phase.repeated_effect_size",
+    "goal_progress.level_delta",
+    "stasis.no_change",
+    "loop.repeated_action",
+    "mirror.progress_path",
+    "mirror.progress_blocker",
+    "hazard.env_failure",
+)
 
 
 def _is_number(value: Any) -> bool:
@@ -86,6 +97,8 @@ def validate_bridge_record(record: dict[str, Any], *, row_index: int | None = No
         value = record[field]
         if not isinstance(value, list) or len(value) == 0:
             errors.append(f"{prefix}{field!r} must be a non-empty list")
+        elif field != "observation_shape" and not all(_is_number(v) for v in value):
+            errors.append(f"{prefix}{field!r} must contain only numeric values")
 
     if "quarantine" not in record["quarantine_status"] and "control_source" not in record["quarantine_status"]:
         errors.append(f"{prefix}'quarantine_status' must explicitly preserve quarantine/control status")
@@ -121,6 +134,172 @@ def validate_bridge_manifest(path: Path) -> dict[str, Any]:
         "valid": len(errors) == 0 and len(records) > 0,
         "errors": errors,
     }
+
+
+def clamp(value: float, low: float = -1.0, high: float = 1.0) -> float:
+    return min(high, max(low, value))
+
+
+def normalized_grid_delta(value: Any, span: int | float | None) -> float:
+    if not _is_number(value):
+        return 0.0
+    denominator = float(span or 64)
+    if denominator <= 0:
+        denominator = 64.0
+    return clamp(float(value) / denominator)
+
+
+def signed_outcome_from_arc_transition(row: dict[str, Any]) -> float:
+    level_delta = row.get("level_delta", 0) or 0
+    if level_delta > 0:
+        return 1.0
+    if level_delta < 0:
+        return -1.0
+    next_state = str(row.get("next_state", "")).upper()
+    if next_state in {"GAME_OVER", "FAILED", "LOST"}:
+        return -1.0
+    eta_total = row.get("eta_total", 0.0) or 0.0
+    if _is_number(eta_total) and abs(float(eta_total)) > 0:
+        return clamp(float(eta_total))
+    changed_cells = row.get("changed_cells", 0) or 0
+    if changed_cells == 0:
+        return -0.25
+    return 0.0
+
+
+def dominant_movement_vector(row: dict[str, Any]) -> tuple[float, float]:
+    movement = row.get("movement") or {}
+    vector = movement.get("dominant_vector") or {}
+    dx = vector.get("dx", 0.0)
+    dy = vector.get("dy", 0.0)
+    return (float(dx) if _is_number(dx) else 0.0, float(dy) if _is_number(dy) else 0.0)
+
+
+def branch_direction_from_arc_transition(row: dict[str, Any], signed_outcome_y: float) -> list[float]:
+    width = row.get("width", 64)
+    height = row.get("height", 64)
+    dx, dy = dominant_movement_vector(row)
+    x = normalized_grid_delta(dx, width)
+    z = normalized_grid_delta(dy, height)
+    spatial_norm = math.sqrt(x * x + signed_outcome_y * signed_outcome_y + z * z)
+    if spatial_norm <= 1e-8:
+        return [0.0, 0.0, 1.0, 0.0]
+    return [0.0, x / spatial_norm, signed_outcome_y / spatial_norm, z / spatial_norm]
+
+
+def event_mu_from_arc_transition(row: dict[str, Any], signed_outcome_y: float) -> list[float]:
+    width = row.get("width", 64)
+    height = row.get("height", 64)
+    dx, dy = dominant_movement_vector(row)
+    return [
+        float(row.get("step_idx", 0) or 0),
+        normalized_grid_delta(dx, width),
+        signed_outcome_y,
+        normalized_grid_delta(dy, height),
+    ]
+
+
+def action_context_from_arc_transition(row: dict[str, Any]) -> list[float]:
+    width = row.get("width", 64)
+    height = row.get("height", 64)
+    action_data = row.get("action_data") if isinstance(row.get("action_data"), dict) else {}
+    changed_cells = row.get("changed_cells", 0) or 0
+    cell_events = row.get("cell_events", (width or 64) * (height or 64)) or 4096
+    action_value = row.get("action_value", 0) or 0
+    level_delta = row.get("level_delta", 0) or 0
+    eta_total = row.get("eta_total", 0.0) or 0.0
+    outcome_sign = row.get("outcome_sign", 0) or 0
+    return [
+        clamp(float(action_value) / 10.0) if _is_number(action_value) else 0.0,
+        1.0 if action_data else 0.0,
+        normalized_grid_delta(action_data.get("x"), width),
+        normalized_grid_delta(action_data.get("y"), height),
+        clamp(float(changed_cells) / float(cell_events)) if _is_number(changed_cells) else 0.0,
+        clamp(float(level_delta)) if _is_number(level_delta) else 0.0,
+        clamp(float(eta_total)) if _is_number(eta_total) else 0.0,
+        clamp(float(outcome_sign)) if _is_number(outcome_sign) else 0.0,
+    ]
+
+
+def potential_family_vector_from_arc_transition(
+    row: dict[str, Any],
+    family_order: Iterable[str] = DEFAULT_POTENTIAL_FAMILY_ORDER,
+) -> list[float]:
+    family_eta = row.get("family_eta") if isinstance(row.get("family_eta"), dict) else {}
+    return [float(family_eta.get(name, 0.0) or 0.0) for name in family_order]
+
+
+def progress_label_from_arc_transition(row: dict[str, Any]) -> str:
+    level_delta = row.get("level_delta", 0) or 0
+    if level_delta > 0:
+        return "progress_level_delta_positive"
+    if level_delta < 0:
+        return "progress_level_delta_negative"
+    return "no_level_progress"
+
+
+def control_label_from_arc_transition(row: dict[str, Any]) -> str:
+    next_state = str(row.get("next_state", "")).upper()
+    if next_state in {"GAME_OVER", "FAILED", "LOST"}:
+        return "terminal_or_failure"
+    if (row.get("changed_cells", 0) or 0) == 0:
+        return "stasis_no_change"
+    dominant_group = row.get("dominant_group")
+    if isinstance(dominant_group, str) and dominant_group:
+        return f"dominant_group:{dominant_group}"
+    return "arc_transition_control"
+
+
+def bridge_record_from_arc_transition(
+    row: dict[str, Any],
+    *,
+    source_repo: str,
+    source_commit: str,
+    source_artifact_path: str,
+    source_condition_artifact: str,
+    quarantine_status: str = "control_source: arc_scaffold_non_chronometric",
+    split: str = "arc_sprint0_bridge_v001",
+    family_order: Iterable[str] = DEFAULT_POTENTIAL_FAMILY_ORDER,
+    transform_version: str = "arc_grid_transition_to_chronometric_bridge_v001",
+) -> dict[str, Any]:
+    signed_outcome_y = signed_outcome_from_arc_transition(row)
+    family_names = list(family_order)
+    record = {
+        "source_repo": source_repo,
+        "source_commit": source_commit,
+        "source_artifact_path": source_artifact_path,
+        "source_condition_artifact": source_condition_artifact,
+        "quarantine_status": quarantine_status,
+        "split": split,
+        "task_id": str(row.get("task_id", "")),
+        "attempt_id": str(row.get("attempt_id", "")),
+        "t": int(row.get("step_idx", 0) or 0),
+        "observation_shape": [int(row.get("height", 0) or 0), int(row.get("width", 0) or 0), 1],
+        "action_id": str(row.get("action", "")),
+        "action_context": action_context_from_arc_transition(row),
+        "event_mu": event_mu_from_arc_transition(row, signed_outcome_y),
+        "branch_direction_n": branch_direction_from_arc_transition(row, signed_outcome_y),
+        "potential_family_vector": potential_family_vector_from_arc_transition(row, family_names),
+        "signed_outcome_y": signed_outcome_y,
+        "progress_label": progress_label_from_arc_transition(row),
+        "control_label": control_label_from_arc_transition(row),
+        "chronometric_transform_version": transform_version,
+        "source_schema": row.get("schema"),
+        "transition_id": row.get("transition_id"),
+        "frame_hash": row.get("frame_hash"),
+        "next_frame_hash": row.get("next_frame_hash"),
+        "phase_theta": row.get("phase_theta"),
+        "changed_cells": row.get("changed_cells"),
+        "level_delta": row.get("level_delta"),
+        "levels_completed": row.get("levels_completed"),
+        "next_levels_completed": row.get("next_levels_completed"),
+        "dominant_family": row.get("dominant_family"),
+        "dominant_group": row.get("dominant_group"),
+        "dominant_movement_vector": list(dominant_movement_vector(row)),
+        "potential_family_names": family_names,
+        "raw_scores": row.get("scores", []),
+    }
+    return record
 
 
 def write_jsonl(path: Path, records: Iterable[dict[str, Any]]) -> None:
