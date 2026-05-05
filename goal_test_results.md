@@ -2,6 +2,66 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V009 ACTION6 Coverage Proxy
+
+Artifacts:
+
+- `experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_ft09_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v009_action6_coverage_ft09_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v009_action6_coverage_ft09_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_tn36_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v009_action6_coverage_tn36_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v009_action6_coverage_tn36_holdout_cpu/`
+
+Condition:
+
+- same V006/V007 cross-family manifest
+- split key: `source_artifact_path`
+- ft09 probe: held out ft09 ACTION6 `stasis_no_change` plus m0r0 progress row;
+  trained with tn36 ACTION6 in train
+- tn36 probe: held out tn36 ACTION6 `dominant_group:stasis_loop` plus m0r0
+  progress row; trained with ft09 ACTION6 in train
+- requested device: `cpu`
+- training data promoted: `False`
+- run kind: coverage proxy, not clean cross-family promotion
+
+Metrics:
+
+- ft09 heldout total: `0.05827900767326355`
+- ft09 heldout signed-Y MAE: `0.008341473527252674`
+- ft09 heldout progress accuracy: `1.0`
+- ft09 heldout positive best rank: `1`
+- ft09 heldout ACTION6 signed-Y MAE: `0.00453176349401474`
+- ft09 heldout stasis/no-change signed-Y MAE: `0.004146914590488781`
+- ft09 top heldout false-progress probability: `0.00024259850033558905`
+- tn36 heldout total: `0.08591418713331223`
+- tn36 heldout signed-Y MAE: `0.04159923642873764`
+- tn36 heldout progress accuracy: `1.0`
+- tn36 heldout positive best rank: `1`
+- tn36 heldout ACTION6 signed-Y MAE: `0.06988269835710526`
+- tn36 heldout stasis-loop signed-Y MAE: `0.014360490598176656`
+- tn36 top heldout false-progress probability: `0.0014863506658002734`
+
+Feature coverage findings:
+
+- ft09 ACTION6 `stasis_no_change` bucket had no same-label train rows but still
+  transferred from the sibling coordinate-action coverage with signed-Y MAE
+  `0.00453176349401474`.
+- tn36 main stasis-loop block transferred well: `38` rows at signed-Y MAE
+  `0.014360490598176656`.
+- tn36 still has two tiny ACTION6 coordinate buckets outside same-label train
+  coverage: one `dominant_group:time_phase` row at signed-Y MAE
+  `1.2501307129859924` and one `dominant_group:translation` row at signed-Y MAE
+  `0.9994785785675049`.
+
+Decision:
+
+V009 validates the coverage-gap hypothesis behind the V008 ACTION6 regression,
+but it is not promoted as the clean cross-family best because the split includes
+a sibling V019B ACTION6 artifact in train. V007 remains the current best clean
+cross-family checkpoint. Next step: build broader coordinate-action coverage
+with a separate heldout family.
+
 ## V008 Temporal Loop Context Line
 
 Artifacts:

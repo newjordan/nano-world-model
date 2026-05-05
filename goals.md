@@ -53,3 +53,16 @@ best rank `1`.
 V008/V008B/V008C are recorded as non-promoted follow-up diagnostics. They fixed
 the ACTION5 bucket but regressed unseen coordinate-bearing ACTION6 stasis rows,
 so V007 remains the current best checkpoint.
+
+V009 ACTION6 coverage probes are recorded as coverage diagnostics, not clean
+cross-family promotions. They hold out one V019B ACTION6 artifact while putting
+the sibling ACTION6 artifact in train. This repaired the main ACTION6 polarity
+failure under the proxy condition:
+
+- ft09 heldout ACTION6 signed-Y MAE: `0.00453176`
+- tn36 heldout ACTION6 signed-Y MAE: `0.0698827`
+- tn36 heldout stasis-loop signed-Y MAE: `0.0143605`
+
+The remaining V009 tn36 errors are tiny missing-coverage coordinate ACTION6
+time/translation buckets, so the next target is broader coordinate-action
+coverage with a separate heldout family.

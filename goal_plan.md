@@ -24,15 +24,19 @@ iteration.
   restore ACTION6 polarity under comparable CPU conditions, so not promoted.
 - V008C: Gated temporal loop context to non-coordinate actions. Result: same
   aggregate regression as V008, so not promoted.
+- V009: ACTION6 coverage proxy. Held out ft09 and tn36 ACTION6 artifacts in
+  separate runs while including the sibling ACTION6 artifact in train. Result:
+  repaired main ACTION6 polarity under proxy coverage, but exposed tiny
+  missing-coverage coordinate ACTION6 time/translation buckets, so not promoted
+  as a clean cross-family checkpoint.
 
 ## Active Queue
 
-1. V009: build an action-coverage diagnostic or bridge batch that includes
-   coordinate-bearing ACTION6 negative/stasis examples in train.
-   Goal: test whether the ACTION6 regression is a coverage gap before adding
-   more objective machinery.
+1. V010: build a broader coordinate-action bridge batch with more ACTION6
+   coordinate/stasis/time examples while reserving a separate heldout family.
+   Goal: turn the V009 coverage-proxy finding into a cleaner transfer test.
 
-2. V010: expand cross-task coverage with a second heldout family.
+2. V011: expand cross-task coverage with a second heldout family.
    Goal: check whether safe potential inputs generalize beyond the current
    V031B to V019B family split.
 

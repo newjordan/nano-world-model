@@ -364,6 +364,72 @@ python scripts/train_chronometric_calibrator.py \
   --negative-control-margin -0.5
 ```
 
+## V009 ACTION6 Coverage Proxy
+
+V009 tests whether the V008 ACTION6 regression is a coverage failure. It is not
+a clean cross-family promotion: one V019B ACTION6 artifact is held out while the
+sibling V019B ACTION6 artifact remains in train.
+
+ft09 holdout:
+
+```bash
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v009_action6_coverage_ft09_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_ft09_holdout_cpu \
+  --holdout-key source_artifact_path \
+  --heldout-group-value experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_ft09_seed0.transitions.jsonl \
+  --heldout-group-value experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_m0r0_seed0.transitions.jsonl \
+  --device cpu
+```
+
+tn36 holdout:
+
+```bash
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v009_action6_coverage_tn36_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_tn36_holdout_cpu \
+  --holdout-key source_artifact_path \
+  --heldout-group-value experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_tn36_seed0.transitions.jsonl \
+  --heldout-group-value experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_m0r0_seed0.transitions.jsonl \
+  --device cpu
+```
+
+Posthoc diagnostics:
+
+```bash
+python scripts/analyze_chronometric_error_buckets.py \
+  --run-label chronometric_bucket_eval_v009_action6_coverage_ft09_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --predictions experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_ft09_holdout_cpu/predictions.jsonl \
+  --calibration-metrics experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_ft09_holdout_cpu/metrics.json \
+  --out-dir experiments/2026-05-05_chronometric_bucket_eval_v009_action6_coverage_ft09_holdout_cpu
+
+python scripts/analyze_chronometric_feature_coverage.py \
+  --run-label chronometric_feature_coverage_v009_action6_coverage_ft09_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --predictions experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_ft09_holdout_cpu/predictions.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_feature_coverage_v009_action6_coverage_ft09_holdout_cpu
+
+python scripts/analyze_chronometric_error_buckets.py \
+  --run-label chronometric_bucket_eval_v009_action6_coverage_tn36_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --predictions experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_tn36_holdout_cpu/predictions.jsonl \
+  --calibration-metrics experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_tn36_holdout_cpu/metrics.json \
+  --out-dir experiments/2026-05-05_chronometric_bucket_eval_v009_action6_coverage_tn36_holdout_cpu
+
+python scripts/analyze_chronometric_feature_coverage.py \
+  --run-label chronometric_feature_coverage_v009_action6_coverage_tn36_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --predictions experiments/2026-05-05_chronometric_calibration_v009_action6_coverage_tn36_holdout_cpu/predictions.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_feature_coverage_v009_action6_coverage_tn36_holdout_cpu
+```
+
+Promotion rule: V009 can support the coverage-gap hypothesis, but V007 remains
+the clean cross-family checkpoint until a broader coordinate-action batch uses a
+separate heldout family.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality
