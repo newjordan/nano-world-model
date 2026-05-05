@@ -2,6 +2,39 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V007B Feature Coverage Diagnostic
+
+Artifacts:
+
+- `experiments/2026-05-05_chronometric_feature_coverage_v007b_safe_potential_inputs/`
+
+Condition:
+
+- diagnostic over V007 predictions
+- no new training
+- manifest: `experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl`
+- predictions: `experiments/2026-05-05_chronometric_calibration_v007_safe_potential_inputs_cross_family_holdout/predictions.jsonl`
+- training data promoted: `False`
+
+Findings:
+
+- worst heldout action/control bucket:
+  `action:ACTION5|control_label:dominant_group:stasis_loop`
+- rows: `38`
+- signed-Y MAE: `1.3801347401581312`
+- signed bias: `1.3801347401581312`
+- nearest train bucket:
+  `action:ACTION4|control_label:dominant_group:translation`
+- nearest distance: `0.09656388286876233`
+- same-label train rows: `3`
+- same-label distance: `0.13204518981801616`
+
+Decision:
+
+V008 should not be a scalar knob change. The next issue is loop/stasis
+representation and data coverage: heldout ACTION5/stasis-loop has sparse
+same-label training support and aliases toward translation-like features.
+
 ## V007 Safe Potential Inputs
 
 Artifacts:

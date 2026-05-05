@@ -16,23 +16,23 @@ iteration.
   cross-family output explosion.
 - V007: Added safe non-outcome potential-family inputs for stasis, loop, mirror,
   and hazard while continuing to exclude direct outcome/progress fields.
+- V007B: Added feature-coverage diagnostics over V007 predictions to separate
+  train/heldout coverage gaps from objective failures.
 
 ## Active Queue
 
-1. V007B: diagnose ACTION5/stasis-loop after V007.
-   Evidence: V007 fixed ACTION6/stasis-no-change but ACTION5 stasis-loop remains
-   the largest heldout signed-Y error bucket.
-
-2. V008: add a loop/stasis branch-consistency objective or paired contrastive
+1. V008: add a loop/stasis branch-consistency objective or paired contrastive
    diagnostic.
    Goal: distinguish repeated-action loops from single-step stasis without
    leaking direct signed outcomes.
+   Evidence: V007B found only 3 same-label train rows for heldout
+   ACTION5/stasis-loop, under different time-phase and movement conditions.
 
-3. V009: expand cross-task coverage with a second heldout family.
+2. V009: expand cross-task coverage with a second heldout family.
    Goal: check whether safe potential inputs generalize beyond the current
    V031B to V019B family split.
 
-4. C-model integration: route the calibration head output back into NanoWM
+3. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.
    Goal: move from posthoc calibration to world-model-planner scoring.
 

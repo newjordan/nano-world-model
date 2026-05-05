@@ -1,0 +1,33 @@
+{
+  "created_at_utc": "2026-05-05T19:52:07.516997+00:00",
+  "feature_names": [
+    "t_norm",
+    "action_value_norm",
+    "has_action_data",
+    "action_data_x_norm",
+    "action_data_y_norm",
+    "changed_cells_norm",
+    "movement_dx_norm",
+    "movement_dy_norm",
+    "phase_sin",
+    "phase_cos",
+    "transition_changed_eta",
+    "time_phase_eta",
+    "stasis_no_change_eta",
+    "loop_repeated_action_eta",
+    "mirror_progress_path_eta",
+    "mirror_progress_blocker_eta",
+    "hazard_env_failure_eta"
+  ],
+  "git_commit": "cab2791fcf72b31ae3c44e87687508c289136ec5",
+  "git_dirty": false,
+  "manifest": "experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl",
+  "manifest_sha256": "0bed73704f5ed373b2eec1119d86f5688ce035228d9e9b8e1fc709006eb8c7e1",
+  "predictions": "experiments/2026-05-05_chronometric_calibration_v007_safe_potential_inputs_cross_family_holdout/predictions.jsonl",
+  "predictions_sha256": "9c6365744f60cb982cd47b579db5d67d89213e066604f8cba9b46596127934a2",
+  "records": 2744,
+  "run_kind": "diagnostic_analysis_no_training",
+  "run_label": "chronometric_feature_coverage_v007b_safe_potential_inputs",
+  "script": "scripts/analyze_chronometric_feature_coverage.py",
+  "training_data_promoted": false
+}

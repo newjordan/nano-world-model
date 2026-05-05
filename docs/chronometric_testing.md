@@ -288,6 +288,26 @@ It still excludes direct outcome/progress fields:
 `next_levels_completed`, `eta_total`, `outcome_sign`, and
 `goal_progress.level_delta`.
 
+## V007B Feature Coverage Diagnostic
+
+V007B is a no-training diagnostic over V007 predictions. It compares heldout
+action/control feature means against train action/control feature means and
+reports nearest train buckets.
+
+Runner:
+
+```bash
+python scripts/analyze_chronometric_feature_coverage.py \
+  --run-label chronometric_feature_coverage_v007b_safe_potential_inputs \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --predictions experiments/2026-05-05_chronometric_calibration_v007_safe_potential_inputs_cross_family_holdout/predictions.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_feature_coverage_v007b_safe_potential_inputs
+```
+
+Use this diagnostic when a bucket remains wrong after a model/input change. A
+small nearest-train distance with poor signed-Y means an objective/model issue;
+sparse same-label rows or a high same-label distance means a coverage issue.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality
