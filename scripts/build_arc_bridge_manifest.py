@@ -47,6 +47,23 @@ def _git(repo: Path, args: list[str]) -> str:
         return "unknown"
 
 
+def _git_dirty(repo: Path, *, ignored_paths: list[Path] | None = None) -> bool:
+    status = _git(repo, ["status", "--short", "--untracked-files=all"])
+    if status == "unknown":
+        return True
+    ignored: list[str] = []
+    for path in ignored_paths or []:
+        ignored.append(_rel(repo, path).rstrip("/"))
+    for line in status.splitlines():
+        status_path = line[3:].strip()
+        if " -> " in status_path:
+            status_path = status_path.split(" -> ", 1)[1]
+        if any(status_path == item or status_path.startswith(f"{item}/") for item in ignored):
+            continue
+        return True
+    return False
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -95,9 +112,9 @@ def build_bridge(args: argparse.Namespace) -> dict[str, Any]:
     if source_repo == "unknown" or not source_repo:
         source_repo = str(arc_repo)
     source_commit = _git(arc_repo, ["rev-parse", "HEAD"])
-    source_dirty = _git(arc_repo, ["status", "--short", "--untracked-files=all"]) != ""
+    source_dirty = _git_dirty(arc_repo)
     generator_commit = _git(ROOT, ["rev-parse", "HEAD"])
-    generator_dirty = _git(ROOT, ["status", "--short", "--untracked-files=all"]) != ""
+    generator_dirty = _git_dirty(ROOT, ignored_paths=[out_dir])
 
     records: list[dict[str, Any]] = []
     source_artifacts: list[dict[str, Any]] = []

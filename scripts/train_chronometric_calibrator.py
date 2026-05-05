@@ -41,6 +41,28 @@ def _git(args: list[str]) -> str:
         return "unknown"
 
 
+def _rel_to_root(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def _git_dirty(*, ignored_paths: list[Path] | None = None) -> bool:
+    status = _git(["status", "--short", "--untracked-files=all"])
+    if status == "unknown":
+        return True
+    ignored = [_rel_to_root(path).rstrip("/") for path in ignored_paths or []]
+    for line in status.splitlines():
+        status_path = line[3:].strip()
+        if " -> " in status_path:
+            status_path = status_path.split(" -> ", 1)[1]
+        if any(status_path == item or status_path.startswith(f"{item}/") for item in ignored):
+            continue
+        return True
+    return False
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -332,7 +354,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "script": "scripts/train_chronometric_calibrator.py",
         "git_commit": _git(["rev-parse", "HEAD"]),
-        "git_dirty": _git(["status", "--short", "--untracked-files=all"]) != "",
+        "git_dirty": _git_dirty(ignored_paths=[out_dir]),
         "manifest": str(manifest.relative_to(ROOT)),
         "manifest_sha256": _sha256(manifest),
         "records": len(examples),
