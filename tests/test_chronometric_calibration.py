@@ -10,6 +10,7 @@ sys.path.insert(0, str(SRC))
 import torch
 
 from chronometric_calibration import (  # noqa: E402
+    FEATURE_NAMES,
     ChronometricCalibrationMLP,
     calibration_example,
     calibration_features,
@@ -28,8 +29,13 @@ def test_calibration_features_exclude_direct_outcome_labels():
                 "transition.changed_cells",
                 "time_phase.repeated_effect_size",
                 "goal_progress.level_delta",
+                "stasis.no_change",
+                "loop.repeated_action",
+                "mirror.progress_path",
+                "mirror.progress_blocker",
+                "hazard.env_failure",
             ],
-            "potential_family_vector": [0.25, 0.5, 10.0],
+            "potential_family_vector": [0.25, 0.5, 10.0, 1.0, 0.75, 0.125, 0.0625, 0.25],
             "action_context": [0.4, 1.0, 0.2, 0.3, 0.125, 1.0, 1.0, 1.0],
         }
     )
@@ -46,6 +52,32 @@ def test_calibration_features_exclude_direct_outcome_labels():
     assert calibration_features(record) == calibration_features(mutated)
 
 
+def test_calibration_features_include_safe_potential_family_inputs():
+    record = synthetic_bridge_records()[0]
+    record["potential_family_names"] = [
+        "transition.changed_cells",
+        "time_phase.repeated_effect_size",
+        "goal_progress.level_delta",
+        "stasis.no_change",
+        "loop.repeated_action",
+        "mirror.progress_path",
+        "mirror.progress_blocker",
+        "hazard.env_failure",
+    ]
+    record["potential_family_vector"] = [0.25, 0.5, 10.0, 1.0, 0.75, 0.125, 0.0625, 0.25]
+
+    features = dict(zip(FEATURE_NAMES, calibration_features(record), strict=True))
+
+    assert features["transition_changed_eta"] == 0.25
+    assert features["time_phase_eta"] == 0.5
+    assert features["stasis_no_change_eta"] == 1.0
+    assert features["loop_repeated_action_eta"] == 0.75
+    assert features["mirror_progress_path_eta"] == 0.125
+    assert features["mirror_progress_blocker_eta"] == 0.0625
+    assert features["hazard_env_failure_eta"] == 0.25
+    assert "goal_progress_level_delta" not in features
+
+
 def test_calibration_example_keeps_targets_separate_from_features():
     record = synthetic_bridge_records()[0]
     record["progress_label"] = "progress_level_delta_positive"
@@ -53,7 +85,7 @@ def test_calibration_example_keeps_targets_separate_from_features():
 
     assert example.progress == 1.0
     assert example.signed_y == record["signed_outcome_y"]
-    assert len(example.features) == 12
+    assert len(example.features) == len(FEATURE_NAMES)
 
 
 def test_split_examples_by_group_holds_out_whole_groups():

@@ -265,6 +265,29 @@ python scripts/train_chronometric_calibrator.py \
 The progress head remains a logit. The signed-Y and family heads are passed
 through `tanh` because their targets are bounded potential/outcome quantities.
 
+## V007 Safe Potential Inputs
+
+V006B stabilized the numeric failure, but its heldout bucket diagnostic still
+put signed-Y error on ACTION6/stasis rows. The manifest already contains
+non-outcome potential-family coordinates for stasis, loop, mirror, and hazard,
+but the V006 calibrator only exposed transition-change and time-phase terms to
+the MLP.
+
+V007 expands the calibrator input surface with:
+
+```text
+stasis.no_change
+loop.repeated_action
+mirror.progress_path
+mirror.progress_blocker
+hazard.env_failure
+```
+
+It still excludes direct outcome/progress fields:
+`signed_outcome_y`, `event_mu.y`, `branch_direction_n.y`, `level_delta`,
+`next_levels_completed`, `eta_total`, `outcome_sign`, and
+`goal_progress.level_delta`.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality

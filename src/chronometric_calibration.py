@@ -27,6 +27,11 @@ FEATURE_NAMES = (
     "phase_cos",
     "transition_changed_eta",
     "time_phase_eta",
+    "stasis_no_change_eta",
+    "loop_repeated_action_eta",
+    "mirror_progress_path_eta",
+    "mirror_progress_blocker_eta",
+    "hazard_env_failure_eta",
 )
 
 LEAKAGE_EXCLUDED_FIELDS = (
@@ -108,6 +113,11 @@ def calibration_features(record: dict[str, Any], *, max_steps: float = 100.0) ->
         math.cos(phase_theta),
         family.get("transition.changed_cells", 0.0),
         family.get("time_phase.repeated_effect_size", 0.0),
+        family.get("stasis.no_change", 0.0),
+        family.get("loop.repeated_action", 0.0),
+        family.get("mirror.progress_path", 0.0),
+        family.get("mirror.progress_blocker", 0.0),
+        family.get("hazard.env_failure", 0.0),
     ]
 
 
