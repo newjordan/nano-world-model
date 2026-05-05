@@ -1,0 +1,187 @@
+{
+  "action_counts": {
+    "ACTION1": 348,
+    "ACTION2": 96,
+    "ACTION3": 1283,
+    "ACTION4": 1313,
+    "ACTION5": 72
+  },
+  "condition": {
+    "arc_data_used": true,
+    "created_at_utc": "2026-05-05T23:51:39.848392+00:00",
+    "family_order": [
+      "transition.changed_cells",
+      "time_phase.repeated_effect_size",
+      "goal_progress.level_delta",
+      "stasis.no_change",
+      "loop.repeated_action",
+      "mirror.progress_path",
+      "mirror.progress_blocker",
+      "hazard.env_failure"
+    ],
+    "generator_commit": "970f88d56e33c055eec14d022f45f2e8998d5273",
+    "generator_dirty": false,
+    "generator_repo": "/home/frosty40/nano-world-model",
+    "max_records_per_source": 0,
+    "output_manifest": "experiments/2026-05-05_arc_bridge_manifest_v011_v033_nonlocal_holdout_family/arc_bridge_manifest.jsonl",
+    "quarantine_status": "control_source: arc_scaffold_non_chronometric",
+    "run_kind": "bridge_manifest_generation",
+    "run_label": "arc_bridge_manifest_v011_v033_nonlocal_holdout_family",
+    "script": "scripts/build_arc_bridge_manifest.py",
+    "source_artifacts": [
+      {
+        "input_rows": 40,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_baseline_replay.transitions.jsonl",
+        "sha256": "96ffbd2ed309cd87287a93b702e4e251a750c68a9a5567577d65a33f0c1da892"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s030_action1_action5_escape_s086_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "682418315af7c1d92297f6862a8023ef34dfd2697079c299389e01340a3d21ec"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s030_action1_action5_escape_s086_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "472c3112047a24b5901c97965da5ce835510eceb256839c935f17de326593aba"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s030_action1_action5_escape_s094_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "137ae84f8d947765a41149a5ecd72d42f9ba2bf1471eee26be63eb4107f7e204"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s030_action1_action5_escape_s094_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "9a4e3d927d24a5106b185d8b34d596edaff6bbd7067350d700ca97417e2c9fb5"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s030_action5_action1_return_s086_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "b3f64384b5e2ccb0cda4c251f16720806c260ae9a8939513bc1159afe376e8e2"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s030_action5_action1_return_s086_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "c0349614ad91c573cd2dce6e3b33bf96f1c3f8ac1be566826febcec9e4ebfeda"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s030_action5_action1_return_s094_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "2a4bd82ec352ac4b495d59f2542faae4e931f8f3f5a28bae466f8003f5a54ec6"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s030_action5_action1_return_s094_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "9401de6ca8a3ac743573c51ebc41fef21da3bd1de375ab93f5cb3dfa2261554a"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s038_action1_action5_escape_s086_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "35d51ccbbc05a07c8cfc0ca19a12d0d92a54500a38c32664c3911087ef15b28c"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s038_action1_action5_escape_s086_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "fe8a7e0a55a1a4dde68c3cae18421664dbd47b23c23db17175e0b3f25075e00d"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s038_action1_action5_escape_s094_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "4ba867ac4861c0a21db28426ce65829e7d24f7cb9523005f2a8ff4aa6ead4e01"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s038_action1_action5_escape_s094_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "2508e8ec90a3591194adfa7d2fee080605943b89204d22629b9f889c441f4c74"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s038_action5_action1_return_s086_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "72873b291be02f4296e3d594b6ec4dc814b3adb5fa6716eaf1ce0103455fee19"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s038_action5_action1_return_s086_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "1630f1f66b89122936c40eeb547283b271733d4fbc638b9520616f9d9a9f01a0"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s038_action5_action1_return_s094_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "ac5bec962ecc8ba0d6f8c77fc8aa3deedc932c0d7bb4354338788edcbb5a40ae"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s038_action5_action1_return_s094_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "6062e0809b6e7ecd68e608cb790645aefec0ef4d79a0e278e1f6e3e9dabdb6fb"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s046_action1_action5_escape_s086_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "d974e0cf9acbb26231c7ce02940cfc1f3821341f453737c6e27e6aaf6ebeff2f"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s046_action1_action5_escape_s086_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "942e22b98edc1dc139d7e32e7b9d1ebdce9e19395cceecbe5f94c6c9a51c4177"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s046_action1_action5_escape_s094_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "9ddda07356580c4b89172ecedb377df45d02d303a7e0f0a34f6da6d1a01516f1"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s046_action1_action5_escape_s094_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "c79f7c969810cdeb4c555457335f219f55afbf37939937f073f07f96cea722da"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s046_action5_action1_return_s086_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "08fd35a28dd4d46617b6291eaebeb44fc539743d02cd4fa5e72c673938d53ae8"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s046_action5_action1_return_s086_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "8e2e689159bf65d94a4129be6e6a216a7b99e1167240c93f962d7c3503d849ad"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s046_action5_action1_return_s094_axis_break_action2_action3_action4.transitions.jsonl",
+        "sha256": "053664766cfed143a87229039ce15b443effd97a9b8cb39326e257ba434b40e5"
+      },
+      {
+        "input_rows": 128,
+        "path": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/v033_m0r0_post_progress_nonlocal_v032_source_progress_action4_action3_s046_action5_action1_return_s094_wall_exit_action3_action4_action2.transitions.jsonl",
+        "sha256": "de97b87b27ad13f7b0874b0aea589a8c1ac5ebb3697544f7b19066432f4670af"
+      }
+    ],
+    "source_commit": "9c850edf476bc5363a3c7de43b6d73f28a2eb5a8",
+    "source_condition_artifact": "experiments/2026-05-05_v033_post_progress_nonlocal_replay/CONDITION.md",
+    "source_condition_sha256": "358d74fb0f36b8fd32af3f09cf8f40feb20a4e48e6d468d0550af105abd85369",
+    "source_dirty": true,
+    "source_repo": "https://github.com/newjordan/arc-agi-3-worldmodel.git",
+    "source_repo_path": "/home/frosty40/world_model_1",
+    "split": "arc_sprint0_v033_nonlocal_family_v011_heldout",
+    "training_data_promoted": false
+  },
+  "control_labels": {
+    "dominant_group:goal_progress": 25,
+    "dominant_group:time_phase": 319,
+    "dominant_group:translation": 2618,
+    "stasis_no_change": 150
+  },
+  "negative_signed_outcome_records": 150,
+  "positive_signed_outcome_records": 2962,
+  "progress_labels": {
+    "no_level_progress": 3087,
+    "progress_level_delta_positive": 25
+  },
+  "progress_records": 25,
+  "records": 3112,
+  "validation": {
+    "errors": [],
+    "path": "/home/frosty40/nano-world-model/experiments/2026-05-05_arc_bridge_manifest_v011_v033_nonlocal_holdout_family/arc_bridge_manifest.jsonl",
+    "records": 3112,
+    "valid": true
+  }
+}
