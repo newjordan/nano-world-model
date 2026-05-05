@@ -10,6 +10,16 @@
 
 A minimalist repository for training video world models based on diffusion-forcing.
 
+## Chronometric Fork Boundary
+
+This fork is being used as the active chronometric NanoWM model body. The ARC
+harness outputs in `/home/frosty40/world_model_1` are quarantined
+non-chronometric control data unless they are ingested through the bridge rules
+in [PROJECT_BOUNDARY.md](PROJECT_BOUNDARY.md) and
+[docs/project_intent_and_boundaries.md](docs/project_intent_and_boundaries.md).
+Do not treat Sprint 0 ARC scaffold artifacts as native chronometric training
+samples.
+
 <div align="center">
 
 ![3×4 rollout grid](assets/grid_video.gif)

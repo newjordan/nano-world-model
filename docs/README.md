@@ -10,6 +10,8 @@ docs/
 ├── config_system.md      (Hydra config: structure, overrides, paths, debugging)
 ├── training.md           (training workflow + design choices + ablation tables)
 ├── evaluation.md         (eval workflow + main result tables + sampling)
+├── project_intent_and_boundaries.md
+│                         (chronometric fork boundary + ARC quarantine rules)
 ├── datasets/
 │   └── README.md         (DINO-WM, RT-1, CSGO formats and configs)
 └── applications/
@@ -22,6 +24,7 @@ docs/
 
 - **[Configuration system](config_system.md)** — Hydra layout, composition, environment variables, common overrides, debugging.
 - **[Training](training.md)** — workflow + the four design axes (prediction target, action injection, model scale, EMA) with ablation tables and pretrained checkpoints.
+- **[Project Intent And Boundaries](project_intent_and_boundaries.md)** — canonical split between this chronometric model body and the quarantined ARC scaffold/control repo.
 - **[Chronometric Contortion Foundation](chronometric_contortion_foundation.md)** — installed 4D event-state, learned 4x4 K tensor, log-time phase, projector constraint, and potential-family hook.
 - **[Chronometric Foundation Review V002](chronometric_foundation_review_v002.md)** — stricter audit of what is installed, what is still placeholder, and the staged path before ARC/data integration.
 - **[Evaluation](evaluation.md)** — `experiment=evaluate_only`, scheduling modes, metric definitions, headline numbers on each domain.
