@@ -111,6 +111,40 @@ This converts grid transition rows into the required bridge schema. It preserves
 `control_source: arc_scaffold_non_chronometric` and does not promote the output
 to training data.
 
+## V003 Chronometric Calibration Smoke
+
+Runner:
+
+```bash
+python scripts/train_chronometric_calibrator.py
+```
+
+Default source:
+
+```text
+experiments/2026-05-05_arc_bridge_manifest_smoke/arc_bridge_manifest.jsonl
+```
+
+Default output:
+
+```text
+experiments/2026-05-05_chronometric_calibration_smoke/
+  condition.json
+  metrics.json
+  predictions.jsonl
+  RESULTS.md
+```
+
+This trains a small calibration MLP over bridge-manifest features. It predicts
+`signed_outcome_y`, progress probability, and potential-family activations.
+Inputs intentionally exclude direct outcome labels and post-outcome fields:
+`signed_outcome_y`, `event_mu.y`, `branch_direction_n.y`, `level_delta`,
+`next_levels_completed`, `eta_total`, `outcome_sign`, and
+`goal_progress.level_delta`.
+
+The default condition is train-fit only on the 40-row V019B bridge smoke. It is
+a learning-path verification, not a held-out model-quality claim.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality
