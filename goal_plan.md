@@ -23,13 +23,15 @@ iteration.
 - V008B: In progress. Add a named negative-control auxiliary objective for
   stasis/no-change and stasis-loop rows after V008 fixed ACTION5 but regressed
   ACTION6.
+- V008C: In progress. Gate temporal loop context to non-coordinate actions so
+  targeted ACTION6 rows do not inherit false repeated-action loop features.
 
 ## Active Queue
 
-1. V008B: run negative-control temporal loop-context calibration and bucket
+1. V008C: run non-coordinate temporal loop-context calibration and bucket
    diagnostics.
-   Goal: preserve the ACTION5 improvement while restoring ACTION6/stasis
-   signed-Y polarity.
+   Goal: keep the ACTION5 improvement while removing the false ACTION6 loop
+   signal introduced by V008.
 
 2. V009: expand cross-task coverage with a second heldout family.
    Goal: check whether safe potential inputs generalize beyond the current

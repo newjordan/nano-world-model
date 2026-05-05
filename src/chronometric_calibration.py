@@ -154,7 +154,12 @@ def records_with_temporal_context(
     max_streak: float = 40.0,
     low_change_threshold: float = 0.001,
 ) -> list[dict[str, Any]]:
-    """Add prior-only action streak features within each source branch."""
+    """Add prior-only action streak features within each source branch.
+
+    Streaks are limited to non-coordinate actions. Coordinate-bearing action
+    rows can repeat the action id while still pointing at different cells, so
+    treating them as a loop signal aliases unrelated targeted moves.
+    """
     annotated = [dict(record) for record in records]
     groups: dict[str, list[int]] = defaultdict(list)
     for index, record in enumerate(annotated):
@@ -168,8 +173,9 @@ def records_with_temporal_context(
         for index in sorted(indices, key=lambda row_index: int(annotated[row_index].get("t", 0) or 0)):
             record = annotated[index]
             action = str(record.get("action_id", ""))
+            has_action_data = _get_sequence_number(record.get("action_context"), 1) > 0.5
             changed_eta = _get_sequence_number(record.get("action_context"), 4)
-            if action and action == last_action:
+            if not has_action_data and action and action == last_action:
                 action_streak += 1
                 if abs(changed_eta) <= low_change_threshold:
                     low_change_streak += 1
@@ -180,7 +186,7 @@ def records_with_temporal_context(
                 low_change_streak = 0
             record["same_action_streak_norm"] = min(action_streak / max_streak, 1.0)
             record["same_action_low_change_streak_norm"] = min(low_change_streak / max_streak, 1.0)
-            last_action = action
+            last_action = None if has_action_data else action
     return annotated
 
 

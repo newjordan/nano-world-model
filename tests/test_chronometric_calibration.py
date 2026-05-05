@@ -108,6 +108,22 @@ def test_records_with_temporal_context_adds_prior_only_loop_features():
     assert calibration_features(mutated) == original_features
 
 
+def test_temporal_context_does_not_streak_coordinate_actions():
+    records = []
+    for index in range(3):
+        record = copy.deepcopy(synthetic_bridge_records()[0])
+        record["source_artifact_path"] = "coordinate_branch.jsonl"
+        record["t"] = index
+        record["action_id"] = "ACTION6"
+        record["action_context"] = [0.6, 1.0, 0.1 * index, 0.2, 0.000244140625, 0.0, 0.0, 0.0]
+        records.append(record)
+
+    annotated = records_with_temporal_context(records, max_streak=4.0)
+
+    assert [record["same_action_streak_norm"] for record in annotated] == [0.0, 0.0, 0.0]
+    assert [record["same_action_low_change_streak_norm"] for record in annotated] == [0.0, 0.0, 0.0]
+
+
 def test_calibration_example_keeps_targets_separate_from_features():
     record = synthetic_bridge_records()[0]
     record["progress_label"] = "progress_level_delta_positive"

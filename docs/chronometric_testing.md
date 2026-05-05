@@ -322,6 +322,11 @@ with lower or equal `t` only. They use action identity and low changed-cell
 ratios, not signed outcomes, progress labels, future rows, or post-outcome
 fields.
 
+After V008/V008B diagnostics, V008C gates these features to non-coordinate
+actions only. Coordinate-bearing rows can repeat an action id while pointing at
+different cells, so treating those repeats as loop evidence aliases targeted
+moves.
+
 The V008 cross-family condition reuses the V006/V007 manifest and heldout split:
 
 ```bash
