@@ -1,0 +1,79 @@
+{
+  "bounded_outputs": true,
+  "created_at_utc": "2026-05-05T19:47:19.742735+00:00",
+  "device_fallback_reason": "auto CUDA fallback after AcceleratorError: CUDA error: out of memory",
+  "device_requested": "auto",
+  "device_resolved": "cpu",
+  "eval_scope": "group_holdout_by_source_condition_artifact",
+  "feature_names": [
+    "t_norm",
+    "action_value_norm",
+    "has_action_data",
+    "action_data_x_norm",
+    "action_data_y_norm",
+    "changed_cells_norm",
+    "movement_dx_norm",
+    "movement_dy_norm",
+    "phase_sin",
+    "phase_cos",
+    "transition_changed_eta",
+    "time_phase_eta",
+    "stasis_no_change_eta",
+    "loop_repeated_action_eta",
+    "mirror_progress_path_eta",
+    "mirror_progress_blocker_eta",
+    "hazard_env_failure_eta"
+  ],
+  "git_commit": "1a816115a8f22a588a6f063a8a5e388eac4121d3",
+  "git_dirty": false,
+  "heldout_positive_records": 1,
+  "heldout_records": 400,
+  "hidden_size": 64,
+  "leakage_excluded_fields": [
+    "signed_outcome_y",
+    "progress_label",
+    "control_label",
+    "level_delta",
+    "levels_completed",
+    "next_levels_completed",
+    "event_mu[2]",
+    "branch_direction_n[2]",
+    "action_context[5]",
+    "action_context[6]",
+    "action_context[7]",
+    "goal_progress.level_delta"
+  ],
+  "loss_weights": {
+    "family": 0.25,
+    "progress": 1.0,
+    "signed": 1.0
+  },
+  "lr": 0.003,
+  "manifest": "experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl",
+  "manifest_sha256": "0bed73704f5ed373b2eec1119d86f5688ce035228d9e9b8e1fc709006eb8c7e1",
+  "progress_positive_records": 26,
+  "quarantine_status_preserved": true,
+  "records": 2744,
+  "run_kind": "group_holdout_calibration_smoke",
+  "run_label": "chronometric_calibration_v007_safe_potential_inputs_cross_family_holdout",
+  "script": "scripts/train_chronometric_calibrator.py",
+  "seed": 20260505,
+  "split_strategy": {
+    "explicit_heldout_group_values": [
+      "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md"
+    ],
+    "heldout_group_values": [
+      "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md"
+    ],
+    "heldout_groups": 1,
+    "holdout_fraction": 0.0,
+    "key": "source_condition_artifact",
+    "seed": 20260505,
+    "train_groups": 1
+  },
+  "steps": 800,
+  "train_positive_records": 25,
+  "train_records": 2344,
+  "training_data_promoted": false,
+  "weight_decay": 0.0001
+}
