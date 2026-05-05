@@ -52,6 +52,11 @@ LEAKAGE_EXCLUDED_FIELDS = (
     "goal_progress.level_delta",
 )
 
+NEGATIVE_CONTROL_LABELS = (
+    "stasis_no_change",
+    "dominant_group:stasis_loop",
+)
+
 
 @dataclass(frozen=True)
 class CalibrationExample:
@@ -284,6 +289,22 @@ def examples_to_tensors(
     progress = torch.tensor([[example.progress] for example in examples], dtype=torch.float32, device=device)
     families = torch.tensor([example.family_vector for example in examples], dtype=torch.float32, device=device)
     return x, signed_y, progress, families
+
+
+def examples_to_negative_control_mask(
+    examples: list[CalibrationExample],
+    *,
+    device: torch.device,
+) -> torch.Tensor:
+    return torch.tensor(
+        [[1.0 if is_negative_control_record(example.record) else 0.0] for example in examples],
+        dtype=torch.float32,
+        device=device,
+    )
+
+
+def is_negative_control_record(record: dict[str, Any]) -> bool:
+    return str(record.get("control_label", "")) in NEGATIVE_CONTROL_LABELS
 
 
 class ChronometricCalibrationMLP(nn.Module):

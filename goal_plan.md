@@ -20,13 +20,16 @@ iteration.
   train/heldout coverage gaps from objective failures.
 - V008: In progress. Add prior-only same-action streak features so loop/stasis
   rows have a temporal branch signal that is not copied from signed outcomes.
+- V008B: In progress. Add a named negative-control auxiliary objective for
+  stasis/no-change and stasis-loop rows after V008 fixed ACTION5 but regressed
+  ACTION6.
 
 ## Active Queue
 
-1. V008: run temporal loop-context cross-family calibration and bucket
+1. V008B: run negative-control temporal loop-context calibration and bucket
    diagnostics.
-   Goal: verify whether prior-only action streak features reduce the
-   ACTION5/stasis-loop signed-Y failure without damaging progress rank.
+   Goal: preserve the ACTION5 improvement while restoring ACTION6/stasis
+   signed-Y polarity.
 
 2. V009: expand cross-task coverage with a second heldout family.
    Goal: check whether safe potential inputs generalize beyond the current

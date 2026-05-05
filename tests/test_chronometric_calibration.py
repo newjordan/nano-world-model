@@ -14,6 +14,7 @@ from chronometric_calibration import (  # noqa: E402
     ChronometricCalibrationMLP,
     calibration_example,
     calibration_features,
+    examples_to_negative_control_mask,
     records_with_temporal_context,
     split_examples_by_group,
 )
@@ -115,6 +116,23 @@ def test_calibration_example_keeps_targets_separate_from_features():
     assert example.progress == 1.0
     assert example.signed_y == record["signed_outcome_y"]
     assert len(example.features) == len(FEATURE_NAMES)
+
+
+def test_negative_control_mask_marks_stasis_and_loop_labels():
+    records = []
+    for control_label in (
+        "stasis_no_change",
+        "dominant_group:stasis_loop",
+        "dominant_group:translation",
+    ):
+        record = copy.deepcopy(synthetic_bridge_records()[0])
+        record["control_label"] = control_label
+        records.append(record)
+
+    examples = [calibration_example(record) for record in records]
+    mask = examples_to_negative_control_mask(examples, device=torch.device("cpu"))
+
+    assert mask.squeeze(-1).tolist() == [1.0, 1.0, 0.0]
 
 
 def test_split_examples_by_group_holds_out_whole_groups():

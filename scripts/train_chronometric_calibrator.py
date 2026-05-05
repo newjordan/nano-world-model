@@ -24,6 +24,7 @@ from chronometric_calibration import (  # noqa: E402
     FEATURE_NAMES,
     LEAKAGE_EXCLUDED_FIELDS,
     ChronometricCalibrationMLP,
+    examples_to_negative_control_mask,
     examples_to_tensors,
     load_calibration_examples,
     split_examples_by_group,
@@ -111,6 +112,9 @@ def _loss(
     signed_weight: float,
     progress_weight: float,
     family_weight: float,
+    negative_control_mask: torch.Tensor | None = None,
+    negative_control_weight: float = 0.0,
+    negative_control_margin: float = -0.5,
 ) -> tuple[torch.Tensor, dict[str, float]]:
     signed_loss = F.mse_loss(outputs["signed_y"], signed_y)
     progress_loss = F.binary_cross_entropy_with_logits(
@@ -119,11 +123,22 @@ def _loss(
         pos_weight=pos_weight,
     )
     family_loss = F.mse_loss(outputs["family_vector"], families)
-    total = signed_weight * signed_loss + progress_weight * progress_loss + family_weight * family_loss
+    negative_control_loss = outputs["signed_y"].new_tensor(0.0)
+    if negative_control_mask is not None and negative_control_weight > 0.0:
+        selected = outputs["signed_y"][negative_control_mask > 0.5]
+        if selected.numel() > 0:
+            negative_control_loss = F.relu(selected - negative_control_margin).pow(2).mean()
+    total = (
+        signed_weight * signed_loss
+        + progress_weight * progress_loss
+        + family_weight * family_loss
+        + negative_control_weight * negative_control_loss
+    )
     return total, {
         "signed_mse": float(signed_loss.detach().cpu().item()),
         "progress_bce": float(progress_loss.detach().cpu().item()),
         "family_mse": float(family_loss.detach().cpu().item()),
+        "negative_control_hinge": float(negative_control_loss.detach().cpu().item()),
         "total": float(total.detach().cpu().item()),
     }
 
@@ -136,6 +151,7 @@ def _evaluate(
     families: torch.Tensor,
     pos_weight: torch.Tensor,
     args: argparse.Namespace,
+    negative_control_mask: torch.Tensor | None = None,
 ) -> dict[str, Any]:
     with torch.no_grad():
         outputs = model(x)
@@ -148,6 +164,9 @@ def _evaluate(
             signed_weight=args.signed_weight,
             progress_weight=args.progress_weight,
             family_weight=args.family_weight,
+            negative_control_mask=negative_control_mask,
+            negative_control_weight=args.negative_control_weight,
+            negative_control_margin=args.negative_control_margin,
         )
         progress_prob = torch.sigmoid(outputs["progress_logit"])
         progress_pred = (progress_prob >= 0.5).float()
@@ -181,9 +200,18 @@ def _baseline_metrics(
     families: torch.Tensor,
     pos_weight: torch.Tensor,
     args: argparse.Namespace,
+    negative_control_mask: torch.Tensor | None = None,
 ) -> dict[str, Any]:
     reference = _baseline_reference(signed_y, progress, families)
-    return _baseline_metrics_from_reference(reference, signed_y, progress, families, pos_weight, args)
+    return _baseline_metrics_from_reference(
+        reference,
+        signed_y,
+        progress,
+        families,
+        pos_weight,
+        args,
+        negative_control_mask=negative_control_mask,
+    )
 
 
 def _baseline_reference(
@@ -205,6 +233,7 @@ def _baseline_metrics_from_reference(
     families: torch.Tensor,
     pos_weight: torch.Tensor,
     args: argparse.Namespace,
+    negative_control_mask: torch.Tensor | None = None,
 ) -> dict[str, Any]:
     signed_mean = reference["signed_mean"].expand_as(signed_y)
     progress_logits = torch.logit(reference["progress_prior"]).expand_as(progress)
@@ -223,6 +252,9 @@ def _baseline_metrics_from_reference(
         signed_weight=args.signed_weight,
         progress_weight=args.progress_weight,
         family_weight=args.family_weight,
+        negative_control_mask=negative_control_mask,
+        negative_control_weight=args.negative_control_weight,
+        negative_control_margin=args.negative_control_margin,
     )
     signed_mae = (signed_mean - signed_y).abs().mean()
     progress_pred = (torch.sigmoid(progress_logits) >= 0.5).float()
@@ -256,13 +288,16 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         heldout_group_values=args.heldout_group_value,
     )
     train_x_raw, train_signed_y, train_progress, train_families = examples_to_tensors(split.train, device=device)
+    train_negative_control_mask = examples_to_negative_control_mask(split.train, device=device)
     train_x, feature_mean, feature_std = _standardize(train_x_raw)
     heldout_tensors = None
+    heldout_negative_control_mask = None
     if split.heldout:
         heldout_x_raw, heldout_signed_y, heldout_progress, heldout_families = examples_to_tensors(
             split.heldout,
             device=device,
         )
+        heldout_negative_control_mask = examples_to_negative_control_mask(split.heldout, device=device)
         heldout_tensors = (
             _standardize_with(heldout_x_raw, feature_mean, feature_std),
             heldout_signed_y,
@@ -287,8 +322,18 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         train_families,
         pos_weight,
         args,
+        negative_control_mask=train_negative_control_mask,
     )
-    initial = _evaluate(model, train_x, train_signed_y, train_progress, train_families, pos_weight, args)
+    initial = _evaluate(
+        model,
+        train_x,
+        train_signed_y,
+        train_progress,
+        train_families,
+        pos_weight,
+        args,
+        negative_control_mask=train_negative_control_mask,
+    )
     heldout_baseline = None
     heldout_initial = None
     if heldout_tensors is not None:
@@ -300,6 +345,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             heldout_families,
             pos_weight,
             args,
+            negative_control_mask=heldout_negative_control_mask,
         )
         heldout_initial = _evaluate(
             model,
@@ -309,6 +355,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             heldout_families,
             pos_weight,
             args,
+            negative_control_mask=heldout_negative_control_mask,
         )
     checkpoints: list[dict[str, float | int]] = []
     for step in range(1, args.steps + 1):
@@ -323,6 +370,9 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             signed_weight=args.signed_weight,
             progress_weight=args.progress_weight,
             family_weight=args.family_weight,
+            negative_control_mask=train_negative_control_mask,
+            negative_control_weight=args.negative_control_weight,
+            negative_control_margin=args.negative_control_margin,
         )
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
@@ -330,7 +380,16 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         if step in {1, args.steps} or step % args.log_every == 0:
             checkpoints.append({"step": step, **parts})
 
-    final = _evaluate(model, train_x, train_signed_y, train_progress, train_families, pos_weight, args)
+    final = _evaluate(
+        model,
+        train_x,
+        train_signed_y,
+        train_progress,
+        train_families,
+        pos_weight,
+        args,
+        negative_control_mask=train_negative_control_mask,
+    )
     heldout_final = None
     predictions = _predictions(model, train_x, split.train, split_name="train")
     if heldout_tensors is not None:
@@ -343,6 +402,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             heldout_families,
             pos_weight,
             args,
+            negative_control_mask=heldout_negative_control_mask,
         )
         predictions.extend(_predictions(model, heldout_x, split.heldout, split_name="heldout"))
     eval_scope = "train_fit_only_all_records"
@@ -392,6 +452,21 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             "signed": args.signed_weight,
             "progress": args.progress_weight,
             "family": args.family_weight,
+            "negative_control": args.negative_control_weight,
+        },
+        "auxiliary_objectives": {
+            "negative_control_labels": [
+                "stasis_no_change",
+                "dominant_group:stasis_loop",
+            ],
+            "negative_control_margin": args.negative_control_margin,
+            "negative_control_weight": args.negative_control_weight,
+            "train_negative_control_records": int(train_negative_control_mask.sum().detach().cpu().item()),
+            "heldout_negative_control_records": (
+                int(heldout_negative_control_mask.sum().detach().cpu().item())
+                if heldout_negative_control_mask is not None
+                else 0
+            ),
         },
         "feature_names": list(FEATURE_NAMES),
         "leakage_excluded_fields": list(LEAKAGE_EXCLUDED_FIELDS),
@@ -481,6 +556,7 @@ def _format_results(summary: dict[str, Any]) -> str:
     heldout_final = summary.get("heldout_final")
     heldout_baseline = summary.get("heldout_baseline")
     split_strategy = condition.get("split_strategy") or {}
+    auxiliary = condition.get("auxiliary_objectives") or {}
     status = "supervised fit smoke for a small chronometric calibration head."
     claim = (
         "This is not a held-out quality claim. It verifies that bridge rows can drive a learned "
@@ -513,6 +589,8 @@ def _format_results(summary: dict[str, Any]) -> str:
         f"- device: `{condition['device_resolved']}`",
         f"- seed: `{condition['seed']}`",
         f"- steps: `{condition['steps']}`",
+        f"- negative-control weight: `{auxiliary.get('negative_control_weight')}`",
+        f"- negative-control margin: `{auxiliary.get('negative_control_margin')}`",
         f"- training data promoted: `{condition['training_data_promoted']}`",
         "",
         "## Metrics",
@@ -591,6 +669,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--signed-weight", type=float, default=1.0)
     parser.add_argument("--progress-weight", type=float, default=1.0)
     parser.add_argument("--family-weight", type=float, default=0.25)
+    parser.add_argument(
+        "--negative-control-weight",
+        type=float,
+        default=0.0,
+        help="Auxiliary hinge weight for stasis/no-change and stasis-loop rows.",
+    )
+    parser.add_argument(
+        "--negative-control-margin",
+        type=float,
+        default=-0.5,
+        help="Signed-Y upper margin for the negative-control hinge objective.",
+    )
     parser.add_argument("--log-every", type=int, default=100)
     return parser.parse_args()
 

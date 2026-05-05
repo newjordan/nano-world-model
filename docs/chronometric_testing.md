@@ -333,6 +333,32 @@ python scripts/train_chronometric_calibrator.py \
   --heldout-group-value experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md
 ```
 
+## V008B Negative-Control Objective
+
+V008 fixed the heldout ACTION5/stasis-loop bucket but regressed ACTION6 and
+stasis/no-change. V008B keeps the temporal loop context and turns on an
+auxiliary hinge objective for negative control rows:
+
+```text
+control_label in {stasis_no_change, dominant_group:stasis_loop}
+signed_y <= negative_control_margin
+```
+
+The control label is used as supervision, not as an input feature.
+
+Runner:
+
+```bash
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v008b_negative_control_temporal_loop_context \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v008b_negative_control_temporal_loop_context \
+  --holdout-key source_condition_artifact \
+  --heldout-group-value experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md \
+  --negative-control-weight 1.0 \
+  --negative-control-margin -0.5
+```
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality
