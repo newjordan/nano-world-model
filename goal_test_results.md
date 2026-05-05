@@ -2,6 +2,44 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V008 Temporal Loop Context Line
+
+Artifacts:
+
+- `experiments/2026-05-05_chronometric_calibration_v008_temporal_loop_context_cross_family_holdout/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v008_temporal_loop_context_cross_family/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v008_temporal_loop_context/`
+- `experiments/2026-05-05_chronometric_calibration_v008b_negative_control_temporal_loop_context_cpu_comparable/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v008b_negative_control_temporal_loop_context_cpu/`
+- `experiments/2026-05-05_chronometric_calibration_v008c_gated_temporal_context_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v008c_gated_temporal_context_cpu/`
+
+Condition:
+
+- same V006/V007 cross-family manifest
+- train family: V031B post-progress avoidance replay
+- heldout family: V019B ten-task target-discriminated scout
+- split key: `source_condition_artifact`
+- seed: `20260505`
+- comparable CPU reads recorded for V008, V008B, and V008C
+- training data promoted: `False`
+
+Findings:
+
+- V008 temporal context fixed ACTION5 heldout signed-Y MAE:
+  V007 `0.972137` to V008 `0.0199724`.
+- V008 regressed ACTION6 heldout signed-Y MAE:
+  V007 `0.0343842` to V008 `1.96562`.
+- V008B negative-control objective did not restore ACTION6 under CPU:
+  ACTION6 MAE `1.81562`, heldout total `2.1029090881347656`.
+- V008C coordinate-action gating did not change the V008 aggregate:
+  heldout total `0.8733570575714111`, ACTION6 MAE `1.96562`.
+
+Decision:
+
+Do not promote V008/V008B/V008C. V007 remains current best. The next step is
+ACTION6 coordinate-action coverage, not stronger scalar weighting.
+
 ## V007B Feature Coverage Diagnostic
 
 Artifacts:

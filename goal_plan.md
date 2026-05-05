@@ -18,22 +18,21 @@ iteration.
   and hazard while continuing to exclude direct outcome/progress fields.
 - V007B: Added feature-coverage diagnostics over V007 predictions to separate
   train/heldout coverage gaps from objective failures.
-- V008: In progress. Add prior-only same-action streak features so loop/stasis
-  rows have a temporal branch signal that is not copied from signed outcomes.
-- V008B: In progress. Add a named negative-control auxiliary objective for
-  stasis/no-change and stasis-loop rows after V008 fixed ACTION5 but regressed
-  ACTION6.
-- V008C: In progress. Gate temporal loop context to non-coordinate actions so
-  targeted ACTION6 rows do not inherit false repeated-action loop features.
+- V008: Added prior-only same-action streak features. Result: fixed ACTION5 but
+  regressed unseen ACTION6 stasis/no-change rows, so not promoted.
+- V008B: Added a named negative-control auxiliary objective. Result: did not
+  restore ACTION6 polarity under comparable CPU conditions, so not promoted.
+- V008C: Gated temporal loop context to non-coordinate actions. Result: same
+  aggregate regression as V008, so not promoted.
 
 ## Active Queue
 
-1. V008C: run non-coordinate temporal loop-context calibration and bucket
-   diagnostics.
-   Goal: keep the ACTION5 improvement while removing the false ACTION6 loop
-   signal introduced by V008.
+1. V009: build an action-coverage diagnostic or bridge batch that includes
+   coordinate-bearing ACTION6 negative/stasis examples in train.
+   Goal: test whether the ACTION6 regression is a coverage gap before adding
+   more objective machinery.
 
-2. V009: expand cross-task coverage with a second heldout family.
+2. V010: expand cross-task coverage with a second heldout family.
    Goal: check whether safe potential inputs generalize beyond the current
    V031B to V019B family split.
 

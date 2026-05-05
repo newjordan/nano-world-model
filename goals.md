@@ -49,3 +49,7 @@ V007 safe potential inputs:
 V007 improves cross-family heldout signed-Y MAE from V006B `0.7257596` to
 `0.1836818` while keeping heldout progress accuracy `1.0` and heldout positive
 best rank `1`.
+
+V008/V008B/V008C are recorded as non-promoted follow-up diagnostics. They fixed
+the ACTION5 bucket but regressed unseen coordinate-bearing ACTION6 stasis rows,
+so V007 remains the current best checkpoint.
