@@ -1,0 +1,138 @@
+{
+  "condition": {
+    "arc_data_used": true,
+    "created_at_utc": "2026-05-05T23:36:46.898952+00:00",
+    "generator_commit": "a6b0763f8b1a224079ecdddc7305f527d6f64b30",
+    "generator_dirty": false,
+    "generator_repo": "/home/frosty40/nano-world-model",
+    "output_manifest": "experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/arc_bridge_manifest.jsonl",
+    "quarantine_status": "control_source: arc_scaffold_non_chronometric",
+    "run_kind": "bridge_manifest_merge",
+    "run_label": "arc_bridge_manifest_v010_coordinate_action_coverage",
+    "script": "scripts/merge_chronometric_bridge_manifests.py",
+    "source_manifests": [
+      {
+        "path": "experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl",
+        "records": 2744,
+        "sha256": "0bed73704f5ed373b2eec1119d86f5688ce035228d9e9b8e1fc709006eb8c7e1",
+        "source_condition_artifacts": [
+          "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md",
+          "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/CONDITION.md"
+        ]
+      },
+      {
+        "path": "experiments/2026-05-05_arc_bridge_manifest_v010_ft09_action6_affordance/arc_bridge_manifest.jsonl",
+        "records": 322,
+        "sha256": "96cb96ae3a1eb4fcacb1b28714878b9be6de54e08c5fc8e0b070346c627eaff8",
+        "source_condition_artifacts": [
+          "experiments/2026-05-04_v009_ft09_action6_affordance_sweep/CONDITION.md"
+        ]
+      },
+      {
+        "path": "experiments/2026-05-05_arc_bridge_manifest_v010_ft09_targeted_coordinate/arc_bridge_manifest.jsonl",
+        "records": 32,
+        "sha256": "344569a2b01c69fe836d583cc0ebcebc261453a912f37e8a22d829d6cec5f7be",
+        "source_condition_artifacts": [
+          "experiments/2026-05-04_v010_ft09_targeted_coordinate_scout/CONDITION.md"
+        ]
+      },
+      {
+        "path": "experiments/2026-05-05_arc_bridge_manifest_v010_tn36_action6_heatmap/arc_bridge_manifest.jsonl",
+        "records": 322,
+        "sha256": "90bb19dbcfc5034595c37d169f3de3c7f5723433f7704548c29fb4067b256224",
+        "source_condition_artifacts": [
+          "experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/CONDITION.md"
+        ]
+      },
+      {
+        "path": "experiments/2026-05-05_arc_bridge_manifest_v010_v023_mirror_hazard_holdout_family/arc_bridge_manifest.jsonl",
+        "records": 400,
+        "sha256": "f8178f930110b50f7d74c3f36c0992b50dece21eca2a41e015f4dd7243b5922e",
+        "source_condition_artifacts": [
+          "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/CONDITION.md"
+        ]
+      }
+    ],
+    "training_data_promoted": false
+  },
+  "control_labels": {
+    "dominant_group:goal_progress": 27,
+    "dominant_group:stasis_loop": 541,
+    "dominant_group:time_phase": 199,
+    "dominant_group:translation": 2419,
+    "stasis_no_change": 633,
+    "terminal_or_failure": 1
+  },
+  "negative_signed_outcome_records": 1175,
+  "positive_signed_outcome_records": 2645,
+  "progress_labels": {
+    "no_level_progress": 3793,
+    "progress_level_delta_positive": 27
+  },
+  "progress_records": 27,
+  "records": 3820,
+  "source_artifact_paths": {
+    "experiments/2026-05-04_v009_ft09_action6_affordance_sweep/grid/transition_events/v009_action6_affordance_ft09_stride4_seed0.transitions.jsonl": 322,
+    "experiments/2026-05-04_v010_ft09_targeted_coordinate_scout/grid/transition_events/v010_ft09_targeted_coordinate_v009prior_seed0.transitions.jsonl": 32,
+    "experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/grid/transition_events/v011_action6_heatmap_tn36_stride4_seed0.transitions.jsonl": 322,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_dc22_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_ft09_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_g50t_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_ka59_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_m0r0_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_sb26_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_sc25_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_tn36_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_tr87_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_tu93_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/v023_current_state_v023_mirror_hazard_dc22_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/v023_current_state_v023_mirror_hazard_ft09_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/v023_current_state_v023_mirror_hazard_g50t_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/v023_current_state_v023_mirror_hazard_ka59_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/v023_current_state_v023_mirror_hazard_m0r0_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/v023_current_state_v023_mirror_hazard_sb26_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/v023_current_state_v023_mirror_hazard_sc25_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/v023_current_state_v023_mirror_hazard_tn36_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/v023_current_state_v023_mirror_hazard_tr87_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/v023_current_state_v023_mirror_hazard_tu93_seed0.transitions.jsonl": 40,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_baseline_replay.transitions.jsonl": 40,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s030_action1_action5_escape.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s030_action1_probe_hold.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s030_action5_action1_return.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s030_action5_probe_hold.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s038_action1_action5_escape.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s038_action1_probe_hold.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s038_action5_action1_return.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s038_action5_probe_hold.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s046_action1_action5_escape.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s046_action5_action1_return.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s054_action1_action5_escape.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s054_action5_action1_return.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s058_action1_action5_escape.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s058_action5_action1_return.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s030_action1_action5_escape.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s030_action5_action1_return.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s038_action1_action5_escape.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s038_action5_action1_return.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s046_action1_action5_escape.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s046_action5_action1_return.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s054_action1_action5_escape.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s054_action5_action1_return.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s058_action1_action5_escape.transitions.jsonl": 96,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s058_action5_action1_return.transitions.jsonl": 96
+  },
+  "source_condition_artifacts": {
+    "experiments/2026-05-04_v009_ft09_action6_affordance_sweep/CONDITION.md": 322,
+    "experiments/2026-05-04_v010_ft09_targeted_coordinate_scout/CONDITION.md": 32,
+    "experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/CONDITION.md": 322,
+    "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md": 400,
+    "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/CONDITION.md": 400,
+    "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/CONDITION.md": 2344
+  },
+  "validation": {
+    "errors": [],
+    "path": "/home/frosty40/nano-world-model/experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/arc_bridge_manifest.jsonl",
+    "records": 3820,
+    "valid": true
+  }
+}
