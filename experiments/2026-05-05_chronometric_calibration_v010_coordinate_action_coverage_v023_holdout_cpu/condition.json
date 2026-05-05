@@ -1,0 +1,92 @@
+{
+  "auxiliary_objectives": {
+    "heldout_negative_control_records": 126,
+    "negative_control_labels": [
+      "stasis_no_change",
+      "dominant_group:stasis_loop"
+    ],
+    "negative_control_margin": -0.5,
+    "negative_control_weight": 0.0,
+    "train_negative_control_records": 1048
+  },
+  "bounded_outputs": true,
+  "created_at_utc": "2026-05-05T23:37:17.531479+00:00",
+  "device_fallback_reason": null,
+  "device_requested": "cpu",
+  "device_resolved": "cpu",
+  "eval_scope": "group_holdout_by_source_condition_artifact",
+  "feature_names": [
+    "t_norm",
+    "action_value_norm",
+    "has_action_data",
+    "action_data_x_norm",
+    "action_data_y_norm",
+    "changed_cells_norm",
+    "movement_dx_norm",
+    "movement_dy_norm",
+    "phase_sin",
+    "phase_cos",
+    "transition_changed_eta",
+    "time_phase_eta",
+    "stasis_no_change_eta",
+    "loop_repeated_action_eta",
+    "mirror_progress_path_eta",
+    "mirror_progress_blocker_eta",
+    "hazard_env_failure_eta",
+    "same_action_streak_norm",
+    "same_action_low_change_streak_norm"
+  ],
+  "git_commit": "00985f285eaaa894fe67efd358f6f6c24425e3cf",
+  "git_dirty": false,
+  "heldout_positive_records": 1,
+  "heldout_records": 400,
+  "hidden_size": 64,
+  "leakage_excluded_fields": [
+    "signed_outcome_y",
+    "progress_label",
+    "control_label",
+    "level_delta",
+    "levels_completed",
+    "next_levels_completed",
+    "event_mu[2]",
+    "branch_direction_n[2]",
+    "action_context[5]",
+    "action_context[6]",
+    "action_context[7]",
+    "goal_progress.level_delta"
+  ],
+  "loss_weights": {
+    "family": 0.25,
+    "negative_control": 0.0,
+    "progress": 1.0,
+    "signed": 1.0
+  },
+  "lr": 0.003,
+  "manifest": "experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/arc_bridge_manifest.jsonl",
+  "manifest_sha256": "b9ba791088d290287440308bda30231cb1a76f01bbe477ef62477217b44ea903",
+  "progress_positive_records": 27,
+  "quarantine_status_preserved": true,
+  "records": 3820,
+  "run_kind": "group_holdout_calibration_smoke",
+  "run_label": "chronometric_calibration_v010_coordinate_action_coverage_v023_holdout_cpu",
+  "script": "scripts/train_chronometric_calibrator.py",
+  "seed": 20260505,
+  "split_strategy": {
+    "explicit_heldout_group_values": [
+      "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/CONDITION.md"
+    ],
+    "heldout_group_values": [
+      "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/CONDITION.md"
+    ],
+    "heldout_groups": 1,
+    "holdout_fraction": 0.0,
+    "key": "source_condition_artifact",
+    "seed": 20260505,
+    "train_groups": 5
+  },
+  "steps": 800,
+  "train_positive_records": 26,
+  "train_records": 3420,
+  "training_data_promoted": false,
+  "weight_decay": 0.0001
+}
