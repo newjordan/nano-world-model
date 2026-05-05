@@ -1,0 +1,62 @@
+{
+  "action_counts": {
+    "ACTION6": 32
+  },
+  "condition": {
+    "arc_data_used": true,
+    "created_at_utc": "2026-05-05T23:35:43.408406+00:00",
+    "family_order": [
+      "transition.changed_cells",
+      "time_phase.repeated_effect_size",
+      "goal_progress.level_delta",
+      "stasis.no_change",
+      "loop.repeated_action",
+      "mirror.progress_path",
+      "mirror.progress_blocker",
+      "hazard.env_failure"
+    ],
+    "generator_commit": "8bcbcebdaa7ce3b23bb8758285401395bcb3fb1d",
+    "generator_dirty": false,
+    "generator_repo": "/home/frosty40/nano-world-model",
+    "max_records_per_source": 0,
+    "output_manifest": "experiments/2026-05-05_arc_bridge_manifest_v010_ft09_targeted_coordinate/arc_bridge_manifest.jsonl",
+    "quarantine_status": "control_source: arc_scaffold_non_chronometric",
+    "run_kind": "bridge_manifest_generation",
+    "run_label": "arc_bridge_manifest_v010_ft09_targeted_coordinate",
+    "script": "scripts/build_arc_bridge_manifest.py",
+    "source_artifacts": [
+      {
+        "input_rows": 32,
+        "path": "experiments/2026-05-04_v010_ft09_targeted_coordinate_scout/grid/transition_events/v010_ft09_targeted_coordinate_v009prior_seed0.transitions.jsonl",
+        "sha256": "42f93d7a011b525769f6bf38d13c3f0752b1d670c9b7e5bd37e816aca727f9f1"
+      }
+    ],
+    "source_commit": "9c850edf476bc5363a3c7de43b6d73f28a2eb5a8",
+    "source_condition_artifact": "experiments/2026-05-04_v010_ft09_targeted_coordinate_scout/CONDITION.md",
+    "source_condition_sha256": "714dc64b61ee196f458827c8f1ec50d8ac417a7302bdd8c36027b478dd1fb807",
+    "source_dirty": true,
+    "source_repo": "https://github.com/newjordan/arc-agi-3-worldmodel.git",
+    "source_repo_path": "/home/frosty40/world_model_1",
+    "split": "arc_sprint0_v010_ft09_targeted_coordinate_v010_train_coverage",
+    "training_data_promoted": false
+  },
+  "control_labels": {
+    "dominant_group:stasis_loop": 29,
+    "dominant_group:time_phase": 1,
+    "dominant_group:translation": 1,
+    "terminal_or_failure": 1
+  },
+  "negative_signed_outcome_records": 30,
+  "positive_signed_outcome_records": 2,
+  "progress_labels": {
+    "no_level_progress": 32
+  },
+  "progress_records": 0,
+  "records": 32,
+  "validation": {
+    "errors": [],
+    "path": "/home/frosty40/nano-world-model/experiments/2026-05-05_arc_bridge_manifest_v010_ft09_targeted_coordinate/arc_bridge_manifest.jsonl",
+    "records": 32,
+    "valid": true
+  }
+}
