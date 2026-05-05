@@ -1,0 +1,21 @@
+{
+  "calibration_metrics": "experiments/2026-05-05_chronometric_calibration_v010_coordinate_action_coverage_v023_holdout_cpu/metrics.json",
+  "calibration_metrics_sha256": "5acd1a837f6983a9f6cb649106ca54cd8b759ceaf80f22aaaea19aa53d30e67b",
+  "created_at_utc": "2026-05-05T23:37:48.808054+00:00",
+  "eval_scope": "posthoc_bucket_analysis",
+  "git_commit": "05cce0cf4c3d8a8f0e0e399ecb45c6522e504195",
+  "git_dirty": false,
+  "manifest": "experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/arc_bridge_manifest.jsonl",
+  "manifest_sha256": "b9ba791088d290287440308bda30231cb1a76f01bbe477ef62477217b44ea903",
+  "predictions": "experiments/2026-05-05_chronometric_calibration_v010_coordinate_action_coverage_v023_holdout_cpu/predictions.jsonl",
+  "predictions_sha256": "80bd18846661685ef1c596f5049d4ebddcce5eadd23853794420d3f712a2eb55",
+  "records": 3820,
+  "run_kind": "diagnostic_analysis_no_training",
+  "run_label": "chronometric_bucket_eval_v010_coordinate_action_coverage_v023_holdout_cpu",
+  "script": "scripts/analyze_chronometric_error_buckets.py",
+  "splits": {
+    "heldout": 400,
+    "train": 3420
+  },
+  "training_data_promoted": false
+}
