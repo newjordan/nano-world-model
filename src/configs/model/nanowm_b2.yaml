@@ -10,6 +10,7 @@ action_injection:
 causal: true  # temporal self-attn and cross-attn use causal mask (frame t attends only to <= t)
 chronometric:
   enabled: true
+  mode: audit  # audit | residual_once | residual_each | branch_rollout
   c: 1.0
   mass: 1.0
   dtau: 1.0
@@ -24,6 +25,7 @@ chronometric:
   loss_weights:
     invariant_norm: 1.0
     orthogonality: 1.0
+    raw_orthogonality: 0.0
 image_size: 256
 latent_size: 32
 extras: 1

@@ -17,10 +17,12 @@ import torch.nn as nn
 
 
 LOG_PHASE_LAMBDA = 3722.0 / 2705.0
+CHRONOMETRIC_MODES = {"audit", "residual_once", "residual_each", "branch_rollout"}
 
 
 @dataclass(frozen=True)
 class ChronometricConfig:
+    mode: str = "audit"
     c: float = 1.0
     mass: float = 1.0
     dtau: float = 1.0
@@ -32,6 +34,25 @@ class ChronometricConfig:
     residual_scale: float = 0.01
     potential_families: int = 16
     init_std: float = 0.02
+
+
+@dataclass(frozen=True)
+class ChronometricOutput:
+    update: torch.Tensor
+    event: torch.Tensor
+    velocity: torch.Tensor
+    external_force: torch.Tensor
+    contortion_force: torch.Tensor
+    total_force: torch.Tensor
+    next_event: torch.Tensor
+    outcome_y: torch.Tensor
+    family_probs: torch.Tensor
+    branch_direction: torch.Tensor
+    k_tensor: torch.Tensor
+    theta: torch.Tensor
+    invariant: torch.Tensor
+    orthogonality: torch.Tensor
+    raw_orthogonality: torch.Tensor
 
 
 def log_time_phase(
@@ -88,12 +109,15 @@ class ChronometricContortionLayer(nn.Module):
     def __init__(self, hidden_size: int, config: ChronometricConfig | None = None):
         super().__init__()
         self.config = config or ChronometricConfig()
+        if self.config.mode not in CHRONOMETRIC_MODES:
+            raise ValueError(f"chronometric mode must be one of {sorted(CHRONOMETRIC_MODES)}, got {self.config.mode}")
         if self.config.potential_families <= 0:
             raise ValueError("potential_families must be positive")
 
         self.event_head = nn.Linear(hidden_size, 4)
         self.velocity_head = nn.Linear(hidden_size, 3)
         self.external_force_head = nn.Linear(hidden_size, 4)
+        self.context_force_head = nn.Linear(hidden_size, 4)
         self.k_head = nn.Linear(hidden_size, 3 * 4 * 4)
         self.branch_head = nn.Linear(hidden_size, 4)
         self.family_head = nn.Linear(hidden_size, self.config.potential_families)
@@ -111,6 +135,7 @@ class ChronometricContortionLayer(nn.Module):
             self.event_head,
             self.velocity_head,
             self.external_force_head,
+            self.context_force_head,
             self.k_head,
             self.branch_head,
             self.family_head,
@@ -121,18 +146,43 @@ class ChronometricContortionLayer(nn.Module):
             nn.init.zeros_(module.bias)
         nn.init.normal_(self.family_basis, std=std)
 
-    def forward(self, tokens: torch.Tensor) -> torch.Tensor:
-        """Apply event-space contortion to temporal tokens.
+    def _check_context(self, tokens: torch.Tensor, context: torch.Tensor | None) -> torch.Tensor | None:
+        if context is None:
+            return None
+        if context.shape != tokens.shape:
+            raise ValueError(
+                f"action_context must match tokens shape {tuple(tokens.shape)}, got {tuple(context.shape)}"
+            )
+        return context.to(device=tokens.device, dtype=tokens.dtype)
 
-        Args:
-            tokens: [B, T, D] temporal hidden states. In NanoWM this is usually
-                [batch * spatial_patches, frames, hidden_size].
+    def _check_branch_direction(
+        self,
+        tokens: torch.Tensor,
+        branch_direction: torch.Tensor | None,
+    ) -> torch.Tensor | None:
+        if branch_direction is None:
+            return None
+        batch, frames, _ = tokens.shape
+        if branch_direction.ndim == 2:
+            branch_direction = branch_direction.unsqueeze(1).expand(batch, frames, 4)
+        if branch_direction.shape != (batch, frames, 4):
+            raise ValueError(
+                f"branch_direction must be [B,T,4] or [B,4], got {tuple(branch_direction.shape)}"
+            )
+        return branch_direction.to(device=tokens.device, dtype=tokens.dtype)
 
-        Returns:
-            Tokens with a small residual chronometric update applied.
-        """
+    def _compute_geometry(
+        self,
+        tokens: torch.Tensor,
+        *,
+        action_context: torch.Tensor | None = None,
+        branch_direction: torch.Tensor | None = None,
+    ) -> ChronometricOutput:
         if tokens.ndim != 3:
             raise ValueError(f"expected [B,T,D] tokens, got shape {tuple(tokens.shape)}")
+
+        action_context = self._check_context(tokens, action_context)
+        supplied_branch = self._check_branch_direction(tokens, branch_direction)
 
         cfg = self.config
         batch, frames, _ = tokens.shape
@@ -142,6 +192,8 @@ class ChronometricContortionLayer(nn.Module):
         event = self.event_head(tokens)
         velocity = normalize_timelike_velocity(self.velocity_head(tokens), c=cfg.c)
         external_force = self.external_force_head(tokens)
+        if action_context is not None:
+            external_force = external_force + self.context_force_head(action_context)
 
         k0, kc, ks = self.k_head(tokens).reshape(batch, frames, 3, 4, 4).unbind(dim=2)
         tau = torch.arange(frames, device=device, dtype=torch.float32).add_(1.0)
@@ -152,13 +204,18 @@ class ChronometricContortionLayer(nn.Module):
         family_logits = self.family_head(tokens)
         family_probs = torch.softmax(family_logits, dim=-1)
         family_direction = torch.matmul(family_probs, self.family_basis.to(dtype=dtype))
-        branch_direction = normalize_spatial_branch(self.branch_head(tokens) + family_direction)
+        if supplied_branch is None:
+            branch_direction = normalize_spatial_branch(self.branch_head(tokens) + family_direction)
+        else:
+            branch_direction = normalize_spatial_branch(supplied_branch)
 
         raw_response = torch.einsum("btij,btj->bti", k_tensor, branch_direction)
         speed_sq = (velocity[..., 1:] * velocity[..., 1:]).sum(dim=-1, keepdim=True)
+        raw_contortion = cfg.mass * speed_sq * raw_response
+        raw_orthogonality = minkowski_dot(velocity, raw_contortion)
         contortion_force = project_orthogonal_to_velocity(
             velocity,
-            cfg.mass * speed_sq * raw_response,
+            raw_contortion,
             c=cfg.c,
         )
         total_force = external_force + contortion_force
@@ -168,10 +225,6 @@ class ChronometricContortionLayer(nn.Module):
         outcome_y = self.outcome_head(next_event)
         invariant = minkowski_dot(velocity, velocity) + cfg.c * cfg.c
         orthogonality = minkowski_dot(velocity, contortion_force)
-        self.last_losses = {
-            "invariant_norm": invariant.square().mean(),
-            "orthogonality": orthogonality.square().mean(),
-        }
 
         update_features = torch.cat(
             [
@@ -186,14 +239,87 @@ class ChronometricContortionLayer(nn.Module):
         )
         update = self.update_proj(update_features)
 
+        return ChronometricOutput(
+            update=update,
+            event=event,
+            velocity=velocity,
+            external_force=external_force,
+            contortion_force=contortion_force,
+            total_force=total_force,
+            next_event=next_event,
+            outcome_y=outcome_y,
+            family_probs=family_probs,
+            branch_direction=branch_direction,
+            k_tensor=k_tensor,
+            theta=theta,
+            invariant=invariant,
+            orthogonality=orthogonality,
+            raw_orthogonality=raw_orthogonality,
+        )
+
+    def _store_diagnostics(self, output: ChronometricOutput) -> None:
+        self.last_losses = {
+            "invariant_norm": output.invariant.square().mean(),
+            "orthogonality": output.orthogonality.square().mean(),
+            "raw_orthogonality": output.raw_orthogonality.square().mean(),
+        }
+
         with torch.no_grad():
-            entropy = -(family_probs * family_probs.clamp_min(1e-8).log()).sum(dim=-1)
+            entropy = -(output.family_probs * output.family_probs.clamp_min(1e-8).log()).sum(dim=-1)
             self.last_metrics = {
-                "chronometric_invariant_abs_mean": invariant.abs().mean().detach(),
-                "chronometric_orthogonality_abs_mean": orthogonality.abs().mean().detach(),
-                "chronometric_force_rms": total_force.square().mean().sqrt().detach(),
-                "chronometric_outcome_y_mean": outcome_y.mean().detach(),
+                "chronometric_invariant_abs_mean": output.invariant.abs().mean().detach(),
+                "chronometric_orthogonality_abs_mean": output.orthogonality.abs().mean().detach(),
+                "chronometric_raw_orthogonality_abs_mean": output.raw_orthogonality.abs().mean().detach(),
+                "chronometric_external_force_rms": output.external_force.square().mean().sqrt().detach(),
+                "chronometric_contortion_force_rms": output.contortion_force.square().mean().sqrt().detach(),
+                "chronometric_force_rms": output.total_force.square().mean().sqrt().detach(),
+                "chronometric_outcome_y_mean": output.outcome_y.mean().detach(),
                 "chronometric_potential_entropy": entropy.mean().detach(),
+                "chronometric_theta_mean": output.theta.mean().detach(),
             }
 
-        return tokens + cfg.residual_scale * update
+    def score_branch(
+        self,
+        tokens: torch.Tensor,
+        branch_direction: torch.Tensor,
+        *,
+        action_context: torch.Tensor | None = None,
+    ) -> ChronometricOutput:
+        """Score a supplied branch direction without applying a token residual."""
+        output = self._compute_geometry(
+            tokens,
+            action_context=action_context,
+            branch_direction=branch_direction,
+        )
+        self._store_diagnostics(output)
+        return output
+
+    def forward(
+        self,
+        tokens: torch.Tensor,
+        *,
+        action_context: torch.Tensor | None = None,
+        branch_direction: torch.Tensor | None = None,
+        apply_residual: bool = True,
+    ) -> torch.Tensor:
+        """Apply event-space contortion to temporal tokens.
+
+        Args:
+            tokens: [B, T, D] temporal hidden states. In NanoWM this is usually
+                [batch * spatial_patches, frames, hidden_size].
+            action_context: optional shifted action/context embedding [B, T, D].
+            branch_direction: optional planner-supplied branch direction [B,T,4].
+            apply_residual: when false, only diagnostics are updated.
+
+        Returns:
+            Tokens with a small residual chronometric update applied.
+        """
+        output = self._compute_geometry(
+            tokens,
+            action_context=action_context,
+            branch_direction=branch_direction,
+        )
+        self._store_diagnostics(output)
+        if not apply_residual:
+            return tokens
+        return tokens + self.config.residual_scale * output.update

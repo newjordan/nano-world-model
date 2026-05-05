@@ -52,17 +52,43 @@ latent video tokens
 That is useful because it forces the model body to carry the chronometric
 primitive. It is not yet enough to claim the model is reasoning in event space.
 
+## Integration Status
+
+The first integration pass adds the missing control surface:
+
+- `model.chronometric.mode`
+  - `audit`: compute chronometric state/metrics, no residual update
+  - `residual_once`: apply one chronometric residual at the first temporal pass
+  - `residual_each`: apply a residual before every temporal block
+  - `branch_rollout`: compute branch geometry without changing tokens
+- shifted NanoWM action embeddings are passed into the chronometric layer as
+  `action_context`, so `F_ext` is no longer only a hidden-token projection
+- supplied `branch_direction` tensors can override the learned branch head
+- `score_branch(tokens, branch_direction, action_context=...)` exposes the
+  event-geometry scorer without mutating the token stream
+- audit mode returns identical NanoWM outputs to the same model with
+  chronometric disabled while still recording metrics
+
+The default model configs now use `mode: audit` so experiments must explicitly
+opt into residual behavior.
+
 ## Current Gaps
 
 ### External Force
 
-Current:
+Earlier:
 
 ```text
 F_ext = Linear(hidden_token)
 ```
 
-Needed:
+Current integration:
+
+```text
+F_ext = Linear(hidden_token) + Linear(shifted_action_embedding)
+```
+
+Still needed:
 
 ```text
 F_ext = f(observation_state, action, local_diff, history, optional branch context)
@@ -74,13 +100,19 @@ the shifted action embedding already used by the temporal blocks.
 
 ### Branch Direction
 
-Current:
+Earlier:
 
 ```text
 n = normalize(branch_head(hidden_token) + family_basis_mix)
 ```
 
-Needed:
+Current integration:
+
+```text
+n = supplied_branch_direction if provided else learned_branch_head(...)
+```
+
+Still needed:
 
 ```text
 n = branch candidate from planner / data source / sampled branch family
@@ -153,9 +185,11 @@ Gate:
 
 Goal: separate instrumentation from behavior change.
 
+Status: implemented.
+
 Work:
 
-- add `chronometric.mode: audit|residual_once|residual_each`
+- add `chronometric.mode: audit|residual_once|residual_each|branch_rollout`
 - log event norms, phase, force RMS, family entropy, signed Y
 - keep plain NanoWM output unchanged in audit mode
 
@@ -167,6 +201,9 @@ Gate:
 ### C2: External Force Split
 
 Goal: make `F_ext` actually mean observation/action force.
+
+Status: partial. Shifted NanoWM action embeddings now feed `F_ext`; dataset
+diff/local observation features are still absent.
 
 Work:
 
@@ -182,6 +219,9 @@ Gate:
 ### C3: Branch Interface
 
 Goal: make `n` a planner/search object.
+
+Status: partial. The layer and NanoWM forward path now accept supplied branch
+directions; no MCTS/grid caller is connected yet.
 
 Work:
 
@@ -256,10 +296,10 @@ Do not proceed to ARC ingestion as the next headline task.
 
 Next NanoWM work should be:
 
-1. Add `audit` vs `residual` modes.
-2. Pass action/context into the chronometric layer so `F_ext` has meaning.
-3. Add branch-direction input support before MCTS integration.
-4. Only then connect ARC/grid data and signed-potential labels.
+1. Add dataset-side context channels for local diffs and signed potential labels.
+2. Connect planner/MCTS candidates to `branch_direction`.
+3. Train or evaluate signed-Y/family supervision against held-out branches.
+4. Only then connect ARC/grid ingestion as a training surface.
 
 This keeps the chronology correct: foundation first, data ingestion second,
 planner/search third, ablations fourth.

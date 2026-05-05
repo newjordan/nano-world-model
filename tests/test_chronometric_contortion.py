@@ -58,10 +58,34 @@ class ChronometricContortionTests(unittest.TestCase):
         self.assertEqual(out.shape, tokens.shape)
         self.assertTrue(torch.isfinite(out).all())
         self.assertTrue(torch.isfinite(tokens.grad).all())
-        self.assertEqual(set(layer.last_losses), {"invariant_norm", "orthogonality"})
+        self.assertEqual(set(layer.last_losses), {"invariant_norm", "orthogonality", "raw_orthogonality"})
         self.assertIn("chronometric_outcome_y_mean", layer.last_metrics)
 
-    def test_nanowm_uses_chronometric_layer_when_runtime_deps_are_available(self):
+    def test_action_context_changes_external_force(self):
+        layer = chrono.ChronometricContortionLayer(hidden_size=16)
+        tokens = torch.randn(2, 4, 16)
+        branch = torch.tensor([[0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]])
+
+        without_action = layer.score_branch(tokens, branch)
+        with_action = layer.score_branch(tokens, branch, action_context=torch.ones_like(tokens))
+
+        self.assertFalse(torch.allclose(without_action.external_force, with_action.external_force))
+        self.assertIn("chronometric_external_force_rms", layer.last_metrics)
+
+    def test_supplied_branch_direction_controls_branch_path(self):
+        layer = chrono.ChronometricContortionLayer(hidden_size=16)
+        tokens = torch.randn(1, 4, 16)
+        branch_x = torch.tensor([[0.0, 1.0, 0.0, 0.0]])
+        branch_y = torch.tensor([[0.0, 0.0, 1.0, 0.0]])
+
+        out_x = layer.score_branch(tokens, branch_x)
+        out_y = layer.score_branch(tokens, branch_y)
+
+        self.assertFalse(torch.allclose(out_x.branch_direction, out_y.branch_direction))
+        self.assertTrue(torch.isfinite(out_x.outcome_y).all())
+        self.assertTrue(torch.isfinite(out_y.outcome_y).all())
+
+    def test_nanowm_audit_mode_tracks_metrics_without_changing_output_when_runtime_deps_are_available(self):
         try:
             from models.nanowm import NanoWM
         except ModuleNotFoundError as exc:
@@ -80,6 +104,49 @@ class ChronometricContortionTests(unittest.TestCase):
             causal=True,
             chronometric={
                 "enabled": True,
+                "mode": "audit",
+                "residual_scale": 0.01,
+                "potential_families": 8,
+            },
+        )
+        model.eval()
+        x = torch.randn(1, 4, 4, 8, 8)
+        t = torch.ones(1, 4)
+        action = torch.zeros(1, 4, 7)
+        branch_direction = torch.tensor([[[0.0, 1.0, 0.0, 0.0]]]).expand(1, 4, 4)
+
+        with torch.no_grad():
+            out_audit = model(x, t, action=action, branch_direction=branch_direction)
+            metrics = dict(model.get_chronometric_metrics())
+            losses = model.get_chronometric_losses()
+            model.use_chronometric = False
+            out_disabled = model(x, t, action=action)
+
+        self.assertEqual(out_audit.shape, x.shape)
+        self.assertTrue(torch.allclose(out_audit, out_disabled))
+        self.assertEqual(losses, {})
+        self.assertIn("chronometric_orthogonality_abs_mean", metrics)
+
+    def test_nanowm_residual_mode_exposes_chronometric_losses_when_runtime_deps_are_available(self):
+        try:
+            from models.nanowm import NanoWM
+        except ModuleNotFoundError as exc:
+            self.skipTest(f"NanoWM runtime dependency missing: {exc.name}")
+
+        model = NanoWM(
+            input_size=8,
+            patch_size=2,
+            in_channels=4,
+            hidden_size=64,
+            depth=2,
+            num_heads=4,
+            num_frames=4,
+            use_action=True,
+            action_dim=7,
+            causal=True,
+            chronometric={
+                "enabled": True,
+                "mode": "residual_once",
                 "residual_scale": 0.01,
                 "potential_families": 8,
             },
@@ -88,11 +155,10 @@ class ChronometricContortionTests(unittest.TestCase):
         t = torch.ones(1, 4)
         action = torch.zeros(1, 4, 7)
 
-        out = model(x, t, action=action)
+        _ = model(x, t, action=action)
 
-        self.assertEqual(out.shape, x.shape)
         self.assertTrue(model.use_chronometric)
-        self.assertIn("chronometric_orthogonality_abs_mean", model.get_chronometric_metrics())
+        self.assertIn("raw_orthogonality", model.get_chronometric_losses())
 
 
 if __name__ == "__main__":

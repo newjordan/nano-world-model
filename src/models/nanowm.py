@@ -526,13 +526,50 @@ class NanoWM(nn.Module):
 
     # @torch.cuda.amp.autocast()
     # @torch.compile
+    def _chronometric_should_apply_residual(self, block_index: int) -> bool:
+        if not self.use_chronometric:
+            return False
+        mode = self.chronometric.config.mode
+        if mode == "audit" or mode == "branch_rollout":
+            return False
+        if mode == "residual_once":
+            return block_index == 0
+        if mode == "residual_each":
+            return True
+        raise ValueError(f"Unsupported chronometric mode: {mode}")
+
+    def _chronometric_should_run(self, block_index: int) -> bool:
+        if not self.use_chronometric:
+            return False
+        mode = self.chronometric.config.mode
+        if mode in {"audit", "branch_rollout", "residual_each"}:
+            return True
+        if mode == "residual_once":
+            return block_index == 0
+        raise ValueError(f"Unsupported chronometric mode: {mode}")
+
+    def _prepare_chronometric_branch_direction(self, branch_direction, batches, frames, num_patches, device, dtype):
+        if branch_direction is None:
+            return None
+        if branch_direction.ndim == 2 and branch_direction.shape == (batches, 4):
+            branch_direction = branch_direction.unsqueeze(1).expand(batches, frames, 4)
+        if branch_direction.ndim == 3 and branch_direction.shape == (batches, frames, 4):
+            return repeat(branch_direction.to(device=device, dtype=dtype), 'b f d -> (b p) f d', p=num_patches)
+        if branch_direction.ndim == 3 and branch_direction.shape == (batches * num_patches, frames, 4):
+            return branch_direction.to(device=device, dtype=dtype)
+        raise ValueError(
+            "branch_direction must be [B,4], [B,F,4], or [B*num_patches,F,4]; "
+            f"got {tuple(branch_direction.shape)}"
+        )
+
     def forward(self, 
                 x, 
                 t, 
                 y=None, 
                 text_embedding=None, 
                 use_fp16=False,
-                action=None):
+                action=None,
+                branch_direction=None):
         """
         Forward pass of NanoWM.
         x: (N, F, C, H, W) tensor of video inputs
@@ -543,6 +580,7 @@ class NanoWM(nn.Module):
                 - Frame 1 gets zero embedding
                 - Frame 2 gets embedding of action 1
                 - Frame t gets embedding of action t-1
+        branch_direction: optional chronometric branch direction [N,4] or [N,F,4].
         """
         if use_fp16:
             x = x.to(dtype=torch.float16)
@@ -575,6 +613,17 @@ class NanoWM(nn.Module):
             action_emb_spatial_in = rearrange(action_emb, 'b f d -> (b f) 1 d')
             # For temporal blocks: x is [(B*P), F, D]. Action should be [(B*P), F, D]
             action_emb_temp_in = repeat(action_emb, 'b f d -> (b p) f d', p=num_patches)
+
+        branch_direction_temp_in = None
+        if branch_direction is not None and self.use_chronometric:
+            branch_direction_temp_in = self._prepare_chronometric_branch_direction(
+                branch_direction,
+                batches,
+                frames,
+                self.pos_embed.shape[1],
+                x.device,
+                x.dtype,
+            )
 
         # [B, F, C, H, W] -> [(B*F), C, H, W]
         x = rearrange(x, 'b f c h w -> (b f) c h w')
@@ -636,8 +685,13 @@ class NanoWM(nn.Module):
             if i == 0:
                 x = x + self.temp_embed
 
-            if self.use_chronometric:
-                x = self.chronometric(x)
+            if self._chronometric_should_run(i):
+                x = self.chronometric(
+                    x,
+                    action_context=action_emb_temp_in,
+                    branch_direction=branch_direction_temp_in,
+                    apply_residual=self._chronometric_should_apply_residual(i),
+                )
 
             if self.extras == 2:
                 raise ValueError("extras == 2 is not supported for Compression Forcing's purpose")
@@ -677,7 +731,7 @@ class NanoWM(nn.Module):
         x = rearrange(x, '(b f) c h w -> b f c h w', b=batches)
         return x
 
-    def forward_with_cfg(self, x, t, y=None, cfg_scale=7.0, use_fp16=False, text_embedding=None, action=None):
+    def forward_with_cfg(self, x, t, y=None, cfg_scale=7.0, use_fp16=False, text_embedding=None, action=None, branch_direction=None):
         """
         Forward pass of NanoWM, but also batches the unconditional forward pass for classifier-free guidance.
         """
@@ -692,8 +746,21 @@ class NanoWM(nn.Module):
         if action is not None:
             action_half = action[: len(action) // 2]
             action_combined = torch.cat([action_half, action_half], dim=0)
+
+        branch_direction_combined = None
+        if branch_direction is not None:
+            branch_half = branch_direction[: len(branch_direction) // 2]
+            branch_direction_combined = torch.cat([branch_half, branch_half], dim=0)
         
-        model_out = self.forward(combined, t, y=y, use_fp16=use_fp16, text_embedding=text_embedding, action=action_combined)
+        model_out = self.forward(
+            combined,
+            t,
+            y=y,
+            use_fp16=use_fp16,
+            text_embedding=text_embedding,
+            action=action_combined,
+            branch_direction=branch_direction_combined,
+        )
         # For exact reproducibility reasons, we apply classifier-free guidance on only
         # three channels by default. The standard approach to cfg applies it to all channels.
         # This can be done by uncommenting the following line and commenting-out the line following that.
@@ -713,7 +780,18 @@ class NanoWM(nn.Module):
     def get_chronometric_losses(self):
         if not self.use_chronometric:
             return {}
+        if self.chronometric.config.mode in {"audit", "branch_rollout"}:
+            return {}
         return self.chronometric.last_losses
+
+    def score_chronometric_branch(self, tokens, branch_direction, action_context=None):
+        if not self.use_chronometric:
+            raise RuntimeError("chronometric branch scoring requested while chronometric is disabled")
+        return self.chronometric.score_branch(
+            tokens,
+            branch_direction,
+            action_context=action_context,
+        )
 
 
 #################################################################################
