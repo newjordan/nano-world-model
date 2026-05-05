@@ -66,3 +66,19 @@ failure under the proxy condition:
 The remaining V009 tn36 errors are tiny missing-coverage coordinate ACTION6
 time/translation buckets, so the next target is broader coordinate-action
 coverage with a separate heldout family.
+
+V010 is the first broader coordinate-action coverage checkpoint with a separate
+heldout family:
+
+- merged manifest: `experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/`
+- calibration: `experiments/2026-05-05_chronometric_calibration_v010_coordinate_action_coverage_v023_holdout_cpu/`
+- heldout family: V023 mirror-hazard current-state scout
+- heldout signed-Y MAE: `0.0150969`
+- heldout ACTION6 signed-Y MAE: `0.0235673`
+- heldout progress accuracy: `1.0`
+- heldout positive best rank: `1`
+
+V010 validates that the ACTION6 coordinate-action coverage improves transfer
+to a separate heldout family. Its residual is a one-row ACTION6 time-phase edge,
+so the next target is second-family validation and/or a small time-phase support
+batch, not scalar loss weighting.

@@ -2,6 +2,65 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V010 Coordinate-Action Coverage With V023 Heldout
+
+Artifacts:
+
+- `experiments/2026-05-05_arc_bridge_manifest_v010_ft09_action6_affordance/`
+- `experiments/2026-05-05_arc_bridge_manifest_v010_ft09_targeted_coordinate/`
+- `experiments/2026-05-05_arc_bridge_manifest_v010_tn36_action6_heatmap/`
+- `experiments/2026-05-05_arc_bridge_manifest_v010_v023_mirror_hazard_holdout_family/`
+- `experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/`
+- `experiments/2026-05-05_chronometric_calibration_v010_coordinate_action_coverage_v023_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v010_coordinate_action_coverage_v023_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v010_coordinate_action_coverage_v023_holdout_cpu/`
+
+Condition:
+
+- manifest rows: `3820`
+- train rows: `3420`
+- heldout rows: `400`
+- heldout split key: `source_condition_artifact`
+- heldout family:
+  `experiments/2026-05-04_v023_mirror_hazard_current_state_scout/CONDITION.md`
+- added train coverage:
+  V009 ft09 ACTION6 affordance, V010 ft09 targeted coordinate, and V011 tn36
+  ACTION6 coordinate heatmap
+- requested device: `cpu`
+- seed: `20260505`
+- steps: `800`
+- training data promoted: `False`
+
+Metrics:
+
+- heldout total: `0.012320181354880333`
+- heldout loss reduction vs baseline: `1.839367488399148`
+- heldout signed-Y MAE: `0.015096906572580338`
+- heldout progress accuracy: `1.0`
+- heldout positive best rank: `1`
+- heldout top false-progress probability: `0.0012611246202141047`
+- heldout ACTION6 signed-Y MAE: `0.023567314073443413`
+- heldout stasis/no-change signed-Y MAE: `0.0007162117958068848`
+- heldout stasis-loop signed-Y MAE: `0.016637922901856273`
+- heldout time-phase signed-Y MAE: `0.08845959440805018`
+- heldout translation signed-Y MAE: `0.012906181446642611`
+
+Feature coverage findings:
+
+- ACTION6 stasis-loop is now supported by `419` same-label train rows and
+  transfers to V023 at bucket signed-Y MAE `0.02959994265907689`.
+- ACTION6 translation has same-label train support but still has one heldout
+  row at signed-Y MAE `0.15824070572853088`.
+- ACTION6 time-phase has `3` same-label train rows but one heldout edge remains
+  the top error at signed-Y MAE `0.5810495018959045`.
+
+Decision:
+
+V010 validates the V009 coverage-gap hypothesis under a cleaner separate-family
+heldout. It is a strong coordinate-action transfer checkpoint, not ARC solve
+evidence. Next step is second-family validation; if the same residual repeats,
+add a tiny time-phase support batch or feature check before changing losses.
+
 ## V009 ACTION6 Coverage Proxy
 
 Artifacts:

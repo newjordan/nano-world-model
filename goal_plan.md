@@ -29,16 +29,21 @@ iteration.
   repaired main ACTION6 polarity under proxy coverage, but exposed tiny
   missing-coverage coordinate ACTION6 time/translation buckets, so not promoted
   as a clean cross-family checkpoint.
+- V010: Built a broader coordinate-action bridge batch from V006 plus ft09 and
+  tn36 ACTION6 coordinate surfaces, then held out the separate V023
+  mirror-hazard family. Result: strong transfer with heldout signed-Y MAE
+  `0.0150969`, ACTION6 MAE `0.0235673`, progress accuracy `1.0`, and positive
+  best rank `1`; residual is a one-row ACTION6 time-phase edge.
 
 ## Active Queue
 
-1. V010: build a broader coordinate-action bridge batch with more ACTION6
-   coordinate/stasis/time examples while reserving a separate heldout family.
-   Goal: turn the V009 coverage-proxy finding into a cleaner transfer test.
-
-2. V011: expand cross-task coverage with a second heldout family.
+1. V011: expand cross-task coverage with a second heldout family.
    Goal: check whether safe potential inputs generalize beyond the current
-   V031B to V019B family split.
+   V010 V023 heldout success.
+
+2. V012: add a small time-phase support batch or feature check if the second
+   heldout repeats the V010 one-row ACTION6 time-phase residual.
+   Goal: handle rare signed-Y polarity edges without weakening stasis transfer.
 
 3. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.

@@ -430,6 +430,86 @@ Promotion rule: V009 can support the coverage-gap hypothesis, but V007 remains
 the clean cross-family checkpoint until a broader coordinate-action batch uses a
 separate heldout family.
 
+## V010 Coordinate-Action Coverage With V023 Heldout
+
+V010 turns the V009 coverage-proxy finding into a cleaner transfer test. It
+adds recorded ACTION6 coordinate surfaces to train and holds out the separate
+V023 mirror-hazard current-state family by `source_condition_artifact`.
+
+Bridge sources:
+
+```bash
+python scripts/build_arc_bridge_manifest.py \
+  --run-label arc_bridge_manifest_v010_ft09_action6_affordance \
+  --source-condition-artifact experiments/2026-05-04_v009_ft09_action6_affordance_sweep/CONDITION.md \
+  --source-transition-glob 'experiments/2026-05-04_v009_ft09_action6_affordance_sweep/grid/transition_events/*.jsonl' \
+  --split arc_sprint0_v009_ft09_action6_affordance_v010_train_coverage \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v010_ft09_action6_affordance
+
+python scripts/build_arc_bridge_manifest.py \
+  --run-label arc_bridge_manifest_v010_ft09_targeted_coordinate \
+  --source-condition-artifact experiments/2026-05-04_v010_ft09_targeted_coordinate_scout/CONDITION.md \
+  --source-transition-glob 'experiments/2026-05-04_v010_ft09_targeted_coordinate_scout/grid/transition_events/*.jsonl' \
+  --split arc_sprint0_v010_ft09_targeted_coordinate_v010_train_coverage \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v010_ft09_targeted_coordinate
+
+python scripts/build_arc_bridge_manifest.py \
+  --run-label arc_bridge_manifest_v010_tn36_action6_heatmap \
+  --source-condition-artifact experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/CONDITION.md \
+  --source-transition-glob 'experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/grid/transition_events/*.jsonl' \
+  --split arc_sprint0_v011_tn36_action6_heatmap_v010_train_coverage \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v010_tn36_action6_heatmap
+
+python scripts/build_arc_bridge_manifest.py \
+  --run-label arc_bridge_manifest_v010_v023_mirror_hazard_holdout_family \
+  --source-condition-artifact experiments/2026-05-04_v023_mirror_hazard_current_state_scout/CONDITION.md \
+  --source-transition-glob 'experiments/2026-05-04_v023_mirror_hazard_current_state_scout/grid/transition_events/*.jsonl' \
+  --split arc_sprint0_v023_mirror_hazard_family_v010_heldout \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v010_v023_mirror_hazard_holdout_family
+```
+
+Merged manifest:
+
+```bash
+python scripts/merge_chronometric_bridge_manifests.py \
+  --run-label arc_bridge_manifest_v010_coordinate_action_coverage \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v010_ft09_action6_affordance/arc_bridge_manifest.jsonl \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v010_ft09_targeted_coordinate/arc_bridge_manifest.jsonl \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v010_tn36_action6_heatmap/arc_bridge_manifest.jsonl \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v010_v023_mirror_hazard_holdout_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage
+```
+
+Calibration and diagnostics:
+
+```bash
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v010_coordinate_action_coverage_v023_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v010_coordinate_action_coverage_v023_holdout_cpu \
+  --holdout-key source_condition_artifact \
+  --heldout-group-value experiments/2026-05-04_v023_mirror_hazard_current_state_scout/CONDITION.md \
+  --device cpu
+
+python scripts/analyze_chronometric_error_buckets.py \
+  --run-label chronometric_bucket_eval_v010_coordinate_action_coverage_v023_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/arc_bridge_manifest.jsonl \
+  --predictions experiments/2026-05-05_chronometric_calibration_v010_coordinate_action_coverage_v023_holdout_cpu/predictions.jsonl \
+  --calibration-metrics experiments/2026-05-05_chronometric_calibration_v010_coordinate_action_coverage_v023_holdout_cpu/metrics.json \
+  --out-dir experiments/2026-05-05_chronometric_bucket_eval_v010_coordinate_action_coverage_v023_holdout_cpu
+
+python scripts/analyze_chronometric_feature_coverage.py \
+  --run-label chronometric_feature_coverage_v010_coordinate_action_coverage_v023_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/arc_bridge_manifest.jsonl \
+  --predictions experiments/2026-05-05_chronometric_calibration_v010_coordinate_action_coverage_v023_holdout_cpu/predictions.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_feature_coverage_v010_coordinate_action_coverage_v023_holdout_cpu
+```
+
+Promotion rule: V010 is a coordinate-action transfer checkpoint with
+`training_data_promoted: False`. It does not prove ARC solve competence. Its
+residual is a rare ACTION6 time-phase signed-Y edge, not progress ranking.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality
