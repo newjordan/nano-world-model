@@ -308,6 +308,31 @@ Use this diagnostic when a bucket remains wrong after a model/input change. A
 small nearest-train distance with poor signed-Y means an objective/model issue;
 sparse same-label rows or a high same-label distance means a coverage issue.
 
+## V008 Temporal Loop Context
+
+V008 adds prior-only temporal context features to the calibration input surface:
+
+```text
+same_action_streak_norm
+same_action_low_change_streak_norm
+```
+
+These features are computed inside each `source_artifact_path` branch from rows
+with lower or equal `t` only. They use action identity and low changed-cell
+ratios, not signed outcomes, progress labels, future rows, or post-outcome
+fields.
+
+The V008 cross-family condition reuses the V006/V007 manifest and heldout split:
+
+```bash
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v008_temporal_loop_context_cross_family_holdout \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v008_temporal_loop_context_cross_family_holdout \
+  --holdout-key source_condition_artifact \
+  --heldout-group-value experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md
+```
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality

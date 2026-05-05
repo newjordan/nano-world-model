@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
+from dataclasses import dataclass
 import hashlib
 import math
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +33,8 @@ FEATURE_NAMES = (
     "mirror_progress_path_eta",
     "mirror_progress_blocker_eta",
     "hazard_env_failure_eta",
+    "same_action_streak_norm",
+    "same_action_low_change_streak_norm",
 )
 
 LEAKAGE_EXCLUDED_FIELDS = (
@@ -118,6 +121,8 @@ def calibration_features(record: dict[str, Any], *, max_steps: float = 100.0) ->
         family.get("mirror.progress_path", 0.0),
         family.get("mirror.progress_blocker", 0.0),
         family.get("hazard.env_failure", 0.0),
+        _number(record.get("same_action_streak_norm")),
+        _number(record.get("same_action_low_change_streak_norm")),
     ]
 
 
@@ -135,7 +140,43 @@ def calibration_example(record: dict[str, Any]) -> CalibrationExample:
 
 
 def load_calibration_examples(path: Path) -> list[CalibrationExample]:
-    return [calibration_example(record) for record in read_jsonl(path)]
+    return [calibration_example(record) for record in records_with_temporal_context(read_jsonl(path))]
+
+
+def records_with_temporal_context(
+    records: list[dict[str, Any]],
+    *,
+    max_streak: float = 40.0,
+    low_change_threshold: float = 0.001,
+) -> list[dict[str, Any]]:
+    """Add prior-only action streak features within each source branch."""
+    annotated = [dict(record) for record in records]
+    groups: dict[str, list[int]] = defaultdict(list)
+    for index, record in enumerate(annotated):
+        source = record.get("source_artifact_path")
+        groups[str(source) if source else f"row:{index}"].append(index)
+
+    for indices in groups.values():
+        last_action: str | None = None
+        action_streak = 0
+        low_change_streak = 0
+        for index in sorted(indices, key=lambda row_index: int(annotated[row_index].get("t", 0) or 0)):
+            record = annotated[index]
+            action = str(record.get("action_id", ""))
+            changed_eta = _get_sequence_number(record.get("action_context"), 4)
+            if action and action == last_action:
+                action_streak += 1
+                if abs(changed_eta) <= low_change_threshold:
+                    low_change_streak += 1
+                else:
+                    low_change_streak = 0
+            else:
+                action_streak = 0
+                low_change_streak = 0
+            record["same_action_streak_norm"] = min(action_streak / max_streak, 1.0)
+            record["same_action_low_change_streak_norm"] = min(low_change_streak / max_streak, 1.0)
+            last_action = action
+    return annotated
 
 
 def _stable_group_order(groups: list[str], *, seed: int) -> list[str]:

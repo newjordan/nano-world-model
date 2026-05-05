@@ -14,6 +14,7 @@ from chronometric_calibration import (  # noqa: E402
     ChronometricCalibrationMLP,
     calibration_example,
     calibration_features,
+    records_with_temporal_context,
     split_examples_by_group,
 )
 from chronometric_bridge import synthetic_bridge_records  # noqa: E402
@@ -76,6 +77,34 @@ def test_calibration_features_include_safe_potential_family_inputs():
     assert features["mirror_progress_blocker_eta"] == 0.0625
     assert features["hazard_env_failure_eta"] == 0.25
     assert "goal_progress_level_delta" not in features
+
+
+def test_records_with_temporal_context_adds_prior_only_loop_features():
+    records = []
+    for index, action in enumerate(["ACTION1", "ACTION5", "ACTION5", "ACTION5", "ACTION2"]):
+        record = copy.deepcopy(synthetic_bridge_records()[0])
+        record["source_artifact_path"] = "branch.jsonl"
+        record["t"] = index
+        record["action_id"] = action
+        record["action_context"] = [0.5, 0.0, 0.0, 0.0, 0.000244140625, 0.0, 0.0, 0.0]
+        record["signed_outcome_y"] = 1.0 if index == 2 else -1.0
+        records.append(record)
+
+    annotated = records_with_temporal_context(records, max_streak=4.0)
+
+    assert annotated[0]["same_action_streak_norm"] == 0.0
+    assert annotated[1]["same_action_streak_norm"] == 0.0
+    assert annotated[2]["same_action_streak_norm"] == 0.25
+    assert annotated[3]["same_action_streak_norm"] == 0.5
+    assert annotated[3]["same_action_low_change_streak_norm"] == 0.5
+    assert annotated[4]["same_action_streak_norm"] == 0.0
+
+    original_features = calibration_features(annotated[2])
+    mutated = copy.deepcopy(annotated[2])
+    mutated["signed_outcome_y"] = -1.0
+    mutated["progress_label"] = "no_level_progress"
+
+    assert calibration_features(mutated) == original_features
 
 
 def test_calibration_example_keeps_targets_separate_from_features():

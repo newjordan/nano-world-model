@@ -18,15 +18,15 @@ iteration.
   and hazard while continuing to exclude direct outcome/progress fields.
 - V007B: Added feature-coverage diagnostics over V007 predictions to separate
   train/heldout coverage gaps from objective failures.
+- V008: In progress. Add prior-only same-action streak features so loop/stasis
+  rows have a temporal branch signal that is not copied from signed outcomes.
 
 ## Active Queue
 
-1. V008: add a loop/stasis branch-consistency objective or paired contrastive
-   diagnostic.
-   Goal: distinguish repeated-action loops from single-step stasis without
-   leaking direct signed outcomes.
-   Evidence: V007B found only 3 same-label train rows for heldout
-   ACTION5/stasis-loop, under different time-phase and movement conditions.
+1. V008: run temporal loop-context cross-family calibration and bucket
+   diagnostics.
+   Goal: verify whether prior-only action streak features reduce the
+   ACTION5/stasis-loop signed-Y failure without damaging progress rank.
 
 2. V009: expand cross-task coverage with a second heldout family.
    Goal: check whether safe potential inputs generalize beyond the current

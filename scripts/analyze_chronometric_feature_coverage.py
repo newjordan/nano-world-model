@@ -19,7 +19,7 @@ sys.path.insert(0, str(SRC))
 
 from chronometric_bridge import read_jsonl  # noqa: E402
 from chronometric_bucket_eval import join_predictions_to_manifest  # noqa: E402
-from chronometric_calibration import FEATURE_NAMES  # noqa: E402
+from chronometric_calibration import FEATURE_NAMES, records_with_temporal_context  # noqa: E402
 from chronometric_feature_coverage import (  # noqa: E402
     nearest_train_groups,
     summarize_feature_groups,
@@ -80,7 +80,7 @@ def analyze(args: argparse.Namespace) -> dict[str, Any]:
     manifest_path = args.manifest.resolve()
     predictions_path = args.predictions.resolve()
 
-    manifest_records = read_jsonl(manifest_path)
+    manifest_records = records_with_temporal_context(read_jsonl(manifest_path))
     prediction_records = read_jsonl(predictions_path)
     joined = join_predictions_to_manifest(manifest_records, prediction_records)
     groups = summarize_feature_groups(joined)
