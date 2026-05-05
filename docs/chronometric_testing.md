@@ -145,6 +145,35 @@ Inputs intentionally exclude direct outcome labels and post-outcome fields:
 The default condition is train-fit only on the 40-row V019B bridge smoke. It is
 a learning-path verification, not a held-out model-quality claim.
 
+## V004 Controlled Batch Holdout
+
+Bridge runner:
+
+```bash
+python scripts/build_arc_bridge_manifest.py \
+  --run-label arc_bridge_manifest_v004_controlled_batch \
+  --source-condition-artifact experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/CONDITION.md \
+  --source-transition-glob 'experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/*.jsonl' \
+  --split arc_sprint0_v031b_m0r0_post_progress_group_holdout_v004 \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v004_controlled_batch
+```
+
+Calibration runner:
+
+```bash
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v004_group_holdout \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v004_controlled_batch/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v004_group_holdout \
+  --holdout-key source_artifact_path \
+  --holdout-fraction 0.24
+```
+
+This is the first medium controlled batch. The split is by whole
+`source_artifact_path` groups, not random rows, so a replay branch file cannot
+appear in both train and heldout. The source condition remains a quarantined
+ARC scaffold/control replay, and `training_data_promoted` remains false.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality

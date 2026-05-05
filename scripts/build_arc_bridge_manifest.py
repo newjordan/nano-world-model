@@ -8,6 +8,7 @@ schema. It does not train a model and it does not remove quarantine status.
 from __future__ import annotations
 
 import argparse
+import glob
 import hashlib
 import json
 import subprocess
@@ -68,9 +69,24 @@ def _rel(repo: Path, path: Path) -> str:
         return str(path)
 
 
+def _source_transition_event_args(arc_repo: Path, args: argparse.Namespace) -> list[str]:
+    values = list(args.source_transition_events or [])
+    for pattern in args.source_transition_globs or []:
+        if Path(pattern).is_absolute():
+            matches = [Path(item) for item in sorted(glob.glob(pattern))]
+        else:
+            matches = sorted(arc_repo.glob(pattern))
+        if not matches:
+            raise FileNotFoundError(f"no transition-event files matched {pattern!r}")
+        values.extend(_rel(arc_repo, path) for path in matches)
+    if not values:
+        values = [DEFAULT_SOURCE_TRANSITIONS]
+    return values
+
+
 def build_bridge(args: argparse.Namespace) -> dict[str, Any]:
     arc_repo = args.arc_repo.resolve()
-    source_paths = [_resolve_in_repo(arc_repo, item) for item in args.source_transition_events]
+    source_paths = [_resolve_in_repo(arc_repo, item) for item in _source_transition_event_args(arc_repo, args)]
     condition_path = _resolve_in_repo(arc_repo, args.source_condition_artifact)
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -121,7 +137,7 @@ def build_bridge(args: argparse.Namespace) -> dict[str, Any]:
     positive_records = sum(1 for record in records if record["signed_outcome_y"] > 0)
 
     condition = {
-        "run_label": "arc_bridge_manifest_smoke",
+        "run_label": args.run_label,
         "run_kind": "bridge_manifest_generation",
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "script": "scripts/build_arc_bridge_manifest.py",
@@ -228,14 +244,20 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Transition-events JSONL path relative to --arc-repo. Can be repeated.",
     )
+    parser.add_argument(
+        "--source-transition-glob",
+        action="append",
+        dest="source_transition_globs",
+        default=None,
+        help="Glob for transition-events JSONL paths relative to --arc-repo. Can be repeated.",
+    )
     parser.add_argument("--source-condition-artifact", default=DEFAULT_SOURCE_CONDITION)
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
+    parser.add_argument("--run-label", default="arc_bridge_manifest_smoke")
     parser.add_argument("--split", default="arc_sprint0_v019b_m0r0_progress_bridge_v001")
     parser.add_argument("--max-records", type=int, default=0, help="0 means all rows from each source.")
     parser.add_argument("--family-order", nargs="+", default=list(DEFAULT_POTENTIAL_FAMILY_ORDER))
     args = parser.parse_args()
-    if args.source_transition_events is None:
-        args.source_transition_events = [DEFAULT_SOURCE_TRANSITIONS]
     return args
 
 

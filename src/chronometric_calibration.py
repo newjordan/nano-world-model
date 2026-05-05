@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import math
 from dataclasses import dataclass
 from pathlib import Path
@@ -51,6 +52,17 @@ class CalibrationExample:
     signed_y: float
     progress: float
     family_vector: list[float]
+
+
+@dataclass(frozen=True)
+class CalibrationExampleSplit:
+    train: list[CalibrationExample]
+    heldout: list[CalibrationExample]
+    key: str
+    holdout_fraction: float
+    seed: int
+    train_groups: list[str]
+    heldout_groups: list[str]
 
 
 def _number(value: Any, default: float = 0.0) -> float:
@@ -114,6 +126,78 @@ def calibration_example(record: dict[str, Any]) -> CalibrationExample:
 
 def load_calibration_examples(path: Path) -> list[CalibrationExample]:
     return [calibration_example(record) for record in read_jsonl(path)]
+
+
+def _stable_group_order(groups: list[str], *, seed: int) -> list[str]:
+    return sorted(groups, key=lambda key: hashlib.sha256(f"{seed}:{key}".encode("utf-8")).hexdigest())
+
+
+def _select_heldout_groups(groups: list[str], *, holdout_fraction: float, seed: int) -> list[str]:
+    if len(groups) <= 1:
+        return []
+    count = max(1, round(len(groups) * holdout_fraction))
+    count = min(count, len(groups) - 1)
+    return _stable_group_order(groups, seed=seed)[:count]
+
+
+def split_examples_by_group(
+    examples: list[CalibrationExample],
+    *,
+    key: str = "source_artifact_path",
+    holdout_fraction: float = 0.0,
+    seed: int = 20260505,
+) -> CalibrationExampleSplit:
+    """Deterministically split examples by group, preserving positive-bearing groups when possible."""
+    if not examples:
+        raise ValueError("calibration examples must not be empty")
+    if holdout_fraction < 0.0 or holdout_fraction >= 1.0:
+        raise ValueError("holdout_fraction must be in [0.0, 1.0)")
+    groups: dict[str, list[CalibrationExample]] = {}
+    example_groups: dict[int, str] = {}
+    for index, example in enumerate(examples):
+        group = example.record.get(key)
+        if not isinstance(group, str) or not group:
+            group = example.record.get("attempt_id")
+        if not isinstance(group, str) or not group:
+            group = f"row:{index}"
+        example_groups[id(example)] = group
+        groups.setdefault(group, []).append(example)
+
+    if holdout_fraction <= 0.0:
+        return CalibrationExampleSplit(
+            train=list(examples),
+            heldout=[],
+            key=key,
+            holdout_fraction=holdout_fraction,
+            seed=seed,
+            train_groups=sorted(groups),
+            heldout_groups=[],
+        )
+    if len(groups) <= 1:
+        raise ValueError("group holdout requires at least two groups")
+
+    positive_groups = [group for group, rows in groups.items() if any(row.progress > 0.5 for row in rows)]
+    nonpositive_groups = [group for group in groups if group not in positive_groups]
+    heldout_groups = set(_select_heldout_groups(positive_groups, holdout_fraction=holdout_fraction, seed=seed))
+    heldout_groups.update(
+        _select_heldout_groups(nonpositive_groups, holdout_fraction=holdout_fraction, seed=seed + 1)
+    )
+    if not heldout_groups:
+        heldout_groups.add(_stable_group_order(sorted(groups), seed=seed)[0])
+
+    train = [example for example in examples if example_groups[id(example)] not in heldout_groups]
+    heldout = [example for example in examples if example_groups[id(example)] in heldout_groups]
+    if not train or not heldout:
+        raise ValueError("group holdout produced an empty train or heldout split")
+    return CalibrationExampleSplit(
+        train=train,
+        heldout=heldout,
+        key=key,
+        holdout_fraction=holdout_fraction,
+        seed=seed,
+        train_groups=sorted(set(groups) - heldout_groups),
+        heldout_groups=sorted(heldout_groups),
+    )
 
 
 def examples_to_tensors(

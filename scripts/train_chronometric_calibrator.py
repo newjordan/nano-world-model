@@ -26,6 +26,7 @@ from chronometric_calibration import (  # noqa: E402
     ChronometricCalibrationMLP,
     examples_to_tensors,
     load_calibration_examples,
+    split_examples_by_group,
 )
 
 
@@ -66,6 +67,10 @@ def _standardize(x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Ten
     mean = x.mean(dim=0, keepdim=True)
     std = x.std(dim=0, keepdim=True, unbiased=False).clamp_min(1e-6)
     return (x - mean) / std, mean.squeeze(0), std.squeeze(0)
+
+
+def _standardize_with(x: torch.Tensor, mean: torch.Tensor, std: torch.Tensor) -> torch.Tensor:
+    return (x - mean.view(1, -1)) / std.view(1, -1)
 
 
 def _pos_weight(progress: torch.Tensor) -> torch.Tensor:
@@ -128,14 +133,23 @@ def _evaluate(
         progress_acc = (progress_pred == progress).float().mean()
         positive_indices = torch.nonzero(progress.squeeze(-1) > 0.5, as_tuple=False).flatten()
         positive_rank = None
+        positive_ranks: list[int] = []
         if positive_indices.numel() > 0:
             sorted_indices = torch.argsort(progress_prob.squeeze(-1), descending=True)
-            positive_rank = int((sorted_indices == positive_indices[0]).nonzero(as_tuple=False)[0].item()) + 1
+            for positive_index in positive_indices:
+                rank = int((sorted_indices == positive_index).nonzero(as_tuple=False)[0].item()) + 1
+                positive_ranks.append(rank)
+            positive_rank = positive_ranks[0]
         return {
             **losses,
             "signed_mae": float(signed_mae.detach().cpu().item()),
             "progress_accuracy": float(progress_acc.detach().cpu().item()),
             "positive_progress_rank": positive_rank,
+            "positive_progress_count": int(positive_indices.numel()),
+            "positive_progress_best_rank": min(positive_ranks) if positive_ranks else None,
+            "positive_progress_mean_rank": (
+                float(sum(positive_ranks) / len(positive_ranks)) if positive_ranks else None
+            ),
         }
 
 
@@ -146,10 +160,33 @@ def _baseline_metrics(
     pos_weight: torch.Tensor,
     args: argparse.Namespace,
 ) -> dict[str, Any]:
-    signed_mean = signed_y.mean().expand_as(signed_y)
-    progress_prior = progress.mean().clamp(1e-6, 1.0 - 1e-6)
-    progress_logits = torch.logit(progress_prior).expand_as(progress)
-    family_mean = families.mean(dim=0, keepdim=True).expand_as(families)
+    reference = _baseline_reference(signed_y, progress, families)
+    return _baseline_metrics_from_reference(reference, signed_y, progress, families, pos_weight, args)
+
+
+def _baseline_reference(
+    signed_y: torch.Tensor,
+    progress: torch.Tensor,
+    families: torch.Tensor,
+) -> dict[str, torch.Tensor]:
+    return {
+        "signed_mean": signed_y.mean(),
+        "progress_prior": progress.mean().clamp(1e-6, 1.0 - 1e-6),
+        "family_mean": families.mean(dim=0, keepdim=True),
+    }
+
+
+def _baseline_metrics_from_reference(
+    reference: dict[str, torch.Tensor],
+    signed_y: torch.Tensor,
+    progress: torch.Tensor,
+    families: torch.Tensor,
+    pos_weight: torch.Tensor,
+    args: argparse.Namespace,
+) -> dict[str, Any]:
+    signed_mean = reference["signed_mean"].expand_as(signed_y)
+    progress_logits = torch.logit(reference["progress_prior"]).expand_as(progress)
+    family_mean = reference["family_mean"].expand_as(families)
     outputs = {
         "signed_y": signed_mean,
         "progress_logit": progress_logits,
@@ -167,11 +204,15 @@ def _baseline_metrics(
     )
     signed_mae = (signed_mean - signed_y).abs().mean()
     progress_pred = (torch.sigmoid(progress_logits) >= 0.5).float()
+    positive_count = int(torch.nonzero(progress.squeeze(-1) > 0.5, as_tuple=False).numel())
     return {
         **losses,
         "signed_mae": float(signed_mae.detach().cpu().item()),
         "progress_accuracy": float((progress_pred == progress).float().mean().detach().cpu().item()),
         "positive_progress_rank": None,
+        "positive_progress_count": positive_count,
+        "positive_progress_best_rank": None,
+        "positive_progress_mean_rank": None,
     }
 
 
@@ -185,28 +226,75 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         torch.cuda.manual_seed_all(args.seed)
 
     examples = load_calibration_examples(manifest)
-    x, signed_y, progress, families = examples_to_tensors(examples, device=device)
-    x, feature_mean, feature_std = _standardize(x)
-    pos_weight = _pos_weight(progress)
+    split = split_examples_by_group(
+        examples,
+        key=args.holdout_key,
+        holdout_fraction=args.holdout_fraction,
+        seed=args.holdout_seed,
+    )
+    train_x_raw, train_signed_y, train_progress, train_families = examples_to_tensors(split.train, device=device)
+    train_x, feature_mean, feature_std = _standardize(train_x_raw)
+    heldout_tensors = None
+    if split.heldout:
+        heldout_x_raw, heldout_signed_y, heldout_progress, heldout_families = examples_to_tensors(
+            split.heldout,
+            device=device,
+        )
+        heldout_tensors = (
+            _standardize_with(heldout_x_raw, feature_mean, feature_std),
+            heldout_signed_y,
+            heldout_progress,
+            heldout_families,
+        )
+    pos_weight = _pos_weight(train_progress)
 
     model = ChronometricCalibrationMLP(
-        input_dim=x.shape[1],
-        family_dim=families.shape[1],
+        input_dim=train_x.shape[1],
+        family_dim=train_families.shape[1],
         hidden_size=args.hidden_size,
     ).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
-    baseline = _baseline_metrics(signed_y, progress, families, pos_weight, args)
-    initial = _evaluate(model, x, signed_y, progress, families, pos_weight, args)
+    baseline_reference = _baseline_reference(train_signed_y, train_progress, train_families)
+    baseline = _baseline_metrics_from_reference(
+        baseline_reference,
+        train_signed_y,
+        train_progress,
+        train_families,
+        pos_weight,
+        args,
+    )
+    initial = _evaluate(model, train_x, train_signed_y, train_progress, train_families, pos_weight, args)
+    heldout_baseline = None
+    heldout_initial = None
+    if heldout_tensors is not None:
+        heldout_x, heldout_signed_y, heldout_progress, heldout_families = heldout_tensors
+        heldout_baseline = _baseline_metrics_from_reference(
+            baseline_reference,
+            heldout_signed_y,
+            heldout_progress,
+            heldout_families,
+            pos_weight,
+            args,
+        )
+        heldout_initial = _evaluate(
+            model,
+            heldout_x,
+            heldout_signed_y,
+            heldout_progress,
+            heldout_families,
+            pos_weight,
+            args,
+        )
     checkpoints: list[dict[str, float | int]] = []
     for step in range(1, args.steps + 1):
         optimizer.zero_grad(set_to_none=True)
-        outputs = model(x)
+        outputs = model(train_x)
         loss, parts = _loss(
             outputs,
-            signed_y,
-            progress,
-            families,
+            train_signed_y,
+            train_progress,
+            train_families,
             pos_weight,
             signed_weight=args.signed_weight,
             progress_weight=args.progress_weight,
@@ -218,11 +306,29 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         if step in {1, args.steps} or step % args.log_every == 0:
             checkpoints.append({"step": step, **parts})
 
-    final = _evaluate(model, x, signed_y, progress, families, pos_weight, args)
-    predictions = _predictions(model, x, examples)
+    final = _evaluate(model, train_x, train_signed_y, train_progress, train_families, pos_weight, args)
+    heldout_final = None
+    predictions = _predictions(model, train_x, split.train, split_name="train")
+    if heldout_tensors is not None:
+        heldout_x, heldout_signed_y, heldout_progress, heldout_families = heldout_tensors
+        heldout_final = _evaluate(
+            model,
+            heldout_x,
+            heldout_signed_y,
+            heldout_progress,
+            heldout_families,
+            pos_weight,
+            args,
+        )
+        predictions.extend(_predictions(model, heldout_x, split.heldout, split_name="heldout"))
+    eval_scope = "train_fit_only_all_records"
+    run_kind = "fit_smoke_no_generalization_claim"
+    if split.heldout:
+        eval_scope = f"group_holdout_by_{args.holdout_key}"
+        run_kind = "group_holdout_calibration_smoke"
     condition = {
-        "run_label": "chronometric_calibration_smoke",
-        "run_kind": "fit_smoke_no_generalization_claim",
+        "run_label": args.run_label,
+        "run_kind": run_kind,
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "script": "scripts/train_chronometric_calibrator.py",
         "git_commit": _git(["rev-parse", "HEAD"]),
@@ -230,7 +336,24 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         "manifest": str(manifest.relative_to(ROOT)),
         "manifest_sha256": _sha256(manifest),
         "records": len(examples),
-        "progress_positive_records": int(progress.sum().detach().cpu().item()),
+        "progress_positive_records": int(
+            train_progress.sum().detach().cpu().item()
+            + (heldout_tensors[2].sum().detach().cpu().item() if heldout_tensors is not None else 0)
+        ),
+        "train_records": len(split.train),
+        "heldout_records": len(split.heldout),
+        "train_positive_records": int(train_progress.sum().detach().cpu().item()),
+        "heldout_positive_records": (
+            int(heldout_tensors[2].sum().detach().cpu().item()) if heldout_tensors is not None else 0
+        ),
+        "split_strategy": {
+            "key": split.key,
+            "holdout_fraction": split.holdout_fraction,
+            "seed": split.seed,
+            "train_groups": len(split.train_groups),
+            "heldout_groups": len(split.heldout_groups),
+            "heldout_group_values": split.heldout_groups,
+        },
         "device_requested": getattr(args, "requested_device", args.device),
         "device_resolved": str(device),
         "device_fallback_reason": fallback_reason,
@@ -248,7 +371,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         "leakage_excluded_fields": list(LEAKAGE_EXCLUDED_FIELDS),
         "quarantine_status_preserved": True,
         "training_data_promoted": False,
-        "eval_scope": "train_fit_only_all_records",
+        "eval_scope": eval_scope,
     }
     summary = {
         "condition": condition,
@@ -257,6 +380,19 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         "final": final,
         "loss_reduction_vs_initial": initial["total"] - final["total"],
         "loss_reduction_vs_baseline": baseline["total"] - final["total"],
+        "heldout_baseline": heldout_baseline,
+        "heldout_initial": heldout_initial,
+        "heldout_final": heldout_final,
+        "heldout_loss_reduction_vs_baseline": (
+            heldout_baseline["total"] - heldout_final["total"]
+            if heldout_baseline is not None and heldout_final is not None
+            else None
+        ),
+        "heldout_loss_reduction_vs_initial": (
+            heldout_initial["total"] - heldout_final["total"]
+            if heldout_initial is not None and heldout_final is not None
+            else None
+        ),
         "checkpoints": checkpoints,
         "feature_mean": [float(v) for v in feature_mean.detach().cpu().tolist()],
         "feature_std": [float(v) for v in feature_std.detach().cpu().tolist()],
@@ -273,6 +409,8 @@ def _predictions(
     model: ChronometricCalibrationMLP,
     x: torch.Tensor,
     examples: list[Any],
+    *,
+    split_name: str,
 ) -> list[dict[str, Any]]:
     with torch.no_grad():
         outputs = model(x)
@@ -284,8 +422,10 @@ def _predictions(
         rows.append(
             {
                 "index": index,
+                "split": split_name,
                 "task_id": record.get("task_id"),
                 "attempt_id": record.get("attempt_id"),
+                "source_artifact_path": record.get("source_artifact_path"),
                 "t": record.get("t"),
                 "action_id": record.get("action_id"),
                 "target_signed_y": example.signed_y,
@@ -312,12 +452,23 @@ def _format_results(summary: dict[str, Any]) -> str:
     condition = summary["condition"]
     final = summary["final"]
     baseline = summary["baseline"]
+    heldout_final = summary.get("heldout_final")
+    heldout_baseline = summary.get("heldout_baseline")
+    split_strategy = condition.get("split_strategy") or {}
+    status = "supervised fit smoke for a small chronometric calibration head."
+    claim = (
+        "This is not a held-out quality claim. It verifies that bridge rows can drive a learned "
+        "calibration objective without manual scorer knob changes."
+    )
+    if heldout_final is not None:
+        status = "grouped held-out smoke for a small chronometric calibration head."
+        claim = "This is a branch-group held-out signal check, not an ARC solve claim or training-data promotion."
     lines = [
         "# Chronometric Calibration Smoke Results",
         "",
-        "Status: supervised fit smoke for a small chronometric calibration head.",
+        f"Status: {status}",
         "",
-        "This is not a held-out quality claim. It verifies that bridge rows can drive a learned calibration objective without manual scorer knob changes.",
+        claim,
         "",
         "## Condition",
         "",
@@ -328,6 +479,11 @@ def _format_results(summary: dict[str, Any]) -> str:
         f"- manifest: `{condition['manifest']}`",
         f"- records: `{condition['records']}`",
         f"- progress-positive records: `{condition['progress_positive_records']}`",
+        f"- train records: `{condition['train_records']}`",
+        f"- heldout records: `{condition['heldout_records']}`",
+        f"- train progress-positive records: `{condition['train_positive_records']}`",
+        f"- heldout progress-positive records: `{condition['heldout_positive_records']}`",
+        f"- eval scope: `{condition['eval_scope']}`",
         f"- device: `{condition['device_resolved']}`",
         f"- seed: `{condition['seed']}`",
         f"- steps: `{condition['steps']}`",
@@ -335,21 +491,48 @@ def _format_results(summary: dict[str, Any]) -> str:
         "",
         "## Metrics",
         "",
-        f"- baseline total loss: `{baseline['total']}`",
-        f"- final total loss: `{final['total']}`",
-        f"- loss reduction vs baseline: `{summary['loss_reduction_vs_baseline']}`",
-        f"- signed-Y MAE final: `{final['signed_mae']}`",
-        f"- progress accuracy final: `{final['progress_accuracy']}`",
-        f"- positive progress rank final: `{final['positive_progress_rank']}`",
-        f"- family MSE final: `{final['family_mse']}`",
+        f"- train baseline total loss: `{baseline['total']}`",
+        f"- train final total loss: `{final['total']}`",
+        f"- train loss reduction vs baseline: `{summary['loss_reduction_vs_baseline']}`",
+        f"- train signed-Y MAE final: `{final['signed_mae']}`",
+        f"- train progress accuracy final: `{final['progress_accuracy']}`",
+        f"- train positive best rank final: `{final['positive_progress_best_rank']}`",
+        f"- train family MSE final: `{final['family_mse']}`",
         "",
+    ]
+    if heldout_final is not None and heldout_baseline is not None:
+        lines.extend(
+            [
+                "## Heldout Metrics",
+                "",
+                f"- heldout baseline total loss: `{heldout_baseline['total']}`",
+                f"- heldout final total loss: `{heldout_final['total']}`",
+                f"- heldout loss reduction vs baseline: `{summary['heldout_loss_reduction_vs_baseline']}`",
+                f"- heldout signed-Y MAE final: `{heldout_final['signed_mae']}`",
+                f"- heldout progress accuracy final: `{heldout_final['progress_accuracy']}`",
+                f"- heldout positive best rank final: `{heldout_final['positive_progress_best_rank']}`",
+                f"- heldout positive mean rank final: `{heldout_final['positive_progress_mean_rank']}`",
+                f"- heldout family MSE final: `{heldout_final['family_mse']}`",
+                "",
+                "## Split",
+                "",
+                f"- key: `{split_strategy.get('key')}`",
+                f"- holdout fraction: `{split_strategy.get('holdout_fraction')}`",
+                f"- train groups: `{split_strategy.get('train_groups')}`",
+                f"- heldout groups: `{split_strategy.get('heldout_groups')}`",
+                "",
+            ]
+        )
+    lines.extend(
+        [
         "## Integrity",
         "",
         "- inputs exclude direct outcome labels and post-outcome fields",
         "- all records preserve quarantine/control provenance",
-        "- eval scope is train-fit only; more bridge rows are required before held-out claims",
+        "- heldout split is by group, not by random row, when heldout records are present",
         "",
-    ]
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -357,8 +540,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
+    parser.add_argument("--run-label", default="chronometric_calibration_smoke")
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--seed", type=int, default=20260505)
+    parser.add_argument("--holdout-key", default="source_artifact_path")
+    parser.add_argument("--holdout-fraction", type=float, default=0.0)
+    parser.add_argument("--holdout-seed", type=int, default=20260505)
     parser.add_argument("--steps", type=int, default=800)
     parser.add_argument("--hidden-size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=3e-3)
@@ -394,8 +581,17 @@ def main() -> int:
         json.dumps(
             {
                 "final_total": summary["final"]["total"],
+                "heldout_final_total": (
+                    summary["heldout_final"]["total"] if summary.get("heldout_final") is not None else None
+                ),
                 "loss_reduction_vs_baseline": summary["loss_reduction_vs_baseline"],
-                "positive_progress_rank": summary["final"]["positive_progress_rank"],
+                "heldout_loss_reduction_vs_baseline": summary.get("heldout_loss_reduction_vs_baseline"),
+                "positive_progress_best_rank": summary["final"]["positive_progress_best_rank"],
+                "heldout_positive_progress_best_rank": (
+                    summary["heldout_final"]["positive_progress_best_rank"]
+                    if summary.get("heldout_final") is not None
+                    else None
+                ),
             },
             indent=2,
         )

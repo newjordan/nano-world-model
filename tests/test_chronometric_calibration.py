@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from chronometric_calibration import calibration_example, calibration_features  # noqa: E402
+from chronometric_calibration import calibration_example, calibration_features, split_examples_by_group  # noqa: E402
 from chronometric_bridge import synthetic_bridge_records  # noqa: E402
 
 
@@ -47,3 +47,27 @@ def test_calibration_example_keeps_targets_separate_from_features():
     assert example.progress == 1.0
     assert example.signed_y == record["signed_outcome_y"]
     assert len(example.features) == 12
+
+
+def test_split_examples_by_group_holds_out_whole_groups():
+    records = []
+    for index in range(4):
+        record = copy.deepcopy(synthetic_bridge_records()[index % 2])
+        record["source_artifact_path"] = f"group_{index}.jsonl"
+        record["progress_label"] = "progress_level_delta_positive" if index < 2 else "no_level_progress"
+        records.append(record)
+
+    split = split_examples_by_group(
+        [calibration_example(record) for record in records],
+        key="source_artifact_path",
+        holdout_fraction=0.5,
+        seed=7,
+    )
+    train_groups = {example.record["source_artifact_path"] for example in split.train}
+    heldout_groups = {example.record["source_artifact_path"] for example in split.heldout}
+
+    assert train_groups.isdisjoint(heldout_groups)
+    assert train_groups
+    assert heldout_groups
+    assert any(example.progress == 1.0 for example in split.train)
+    assert any(example.progress == 1.0 for example in split.heldout)
