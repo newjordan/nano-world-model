@@ -1,0 +1,31 @@
+{
+  "arc_data_used": true,
+  "created_at_utc": "2026-05-05T19:38:44.774403+00:00",
+  "generator_commit": "c3c5257d7fdeadf24848de306cec42ef1f2ca175",
+  "generator_dirty": false,
+  "generator_repo": "/home/frosty40/nano-world-model",
+  "output_manifest": "experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl",
+  "quarantine_status": "control_source: arc_scaffold_non_chronometric",
+  "run_kind": "bridge_manifest_merge",
+  "run_label": "arc_bridge_manifest_v006_cross_family",
+  "script": "scripts/merge_chronometric_bridge_manifests.py",
+  "source_manifests": [
+    {
+      "path": "experiments/2026-05-05_arc_bridge_manifest_v004_controlled_batch/arc_bridge_manifest.jsonl",
+      "records": 2344,
+      "sha256": "505d08056252c8e1aa63fbd35fe3cd8e51038bf6bd8446c01dbf5893b6b78edd",
+      "source_condition_artifacts": [
+        "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/CONDITION.md"
+      ]
+    },
+    {
+      "path": "experiments/2026-05-05_arc_bridge_manifest_v006_v019b_ten_task_family/arc_bridge_manifest.jsonl",
+      "records": 400,
+      "sha256": "44e256d87e0734094f47431d01a3e95dc4c21cf3f85ae3d3d3da52e6f9b862e5",
+      "source_condition_artifacts": [
+        "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md"
+      ]
+    }
+  ],
+  "training_data_promoted": false
+}
