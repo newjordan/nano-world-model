@@ -1,0 +1,36 @@
+{
+  "arc_data_used": true,
+  "created_at_utc": "2026-05-05T23:52:00.637018+00:00",
+  "generator_commit": "d8b7f74431cf3aaafbcc1d4e4d58e981856f4af2",
+  "generator_dirty": false,
+  "generator_repo": "/home/frosty40/nano-world-model",
+  "output_manifest": "experiments/2026-05-05_arc_bridge_manifest_v011_nonlocal_second_family/arc_bridge_manifest.jsonl",
+  "quarantine_status": "control_source: arc_scaffold_non_chronometric",
+  "run_kind": "bridge_manifest_merge",
+  "run_label": "arc_bridge_manifest_v011_nonlocal_second_family",
+  "script": "scripts/merge_chronometric_bridge_manifests.py",
+  "source_manifests": [
+    {
+      "path": "experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/arc_bridge_manifest.jsonl",
+      "records": 3820,
+      "sha256": "b9ba791088d290287440308bda30231cb1a76f01bbe477ef62477217b44ea903",
+      "source_condition_artifacts": [
+        "experiments/2026-05-04_v009_ft09_action6_affordance_sweep/CONDITION.md",
+        "experiments/2026-05-04_v010_ft09_targeted_coordinate_scout/CONDITION.md",
+        "experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/CONDITION.md",
+        "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md",
+        "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/CONDITION.md",
+        "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/CONDITION.md"
+      ]
+    },
+    {
+      "path": "experiments/2026-05-05_arc_bridge_manifest_v011_v033_nonlocal_holdout_family/arc_bridge_manifest.jsonl",
+      "records": 3112,
+      "sha256": "da9e10177000766a876472d86aaecfa3f564b1cc2ac908e6f29233fb1228e404",
+      "source_condition_artifacts": [
+        "experiments/2026-05-05_v033_post_progress_nonlocal_replay/CONDITION.md"
+      ]
+    }
+  ],
+  "training_data_promoted": false
+}
