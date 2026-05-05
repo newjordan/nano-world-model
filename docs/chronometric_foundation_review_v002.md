@@ -216,6 +216,8 @@ Gate:
 - synthetic action-conditioned transition test shows `F_ext` changes with
   action while `F_cont` remains projector-constrained
 
+First mechanics runner: `scripts/chronometric_mechanics_smoke.py`.
+
 ### C3: Branch Interface
 
 Goal: make `n` a planner/search object.
@@ -234,6 +236,8 @@ Gate:
 
 - same state can evaluate at least two distinct branch directions with
   distinct signed outcomes and shared constraints
+
+First mechanics runner: `scripts/chronometric_mechanics_smoke.py`.
 
 ### C4: Signed Y And Family Supervision
 
