@@ -238,8 +238,9 @@ def examples_to_tensors(
 class ChronometricCalibrationMLP(nn.Module):
     """Small supervised calibration head over bridge-manifest features."""
 
-    def __init__(self, input_dim: int, family_dim: int, hidden_size: int = 64):
+    def __init__(self, input_dim: int, family_dim: int, hidden_size: int = 64, *, bounded_outputs: bool = True):
         super().__init__()
+        self.bounded_outputs = bounded_outputs
         self.net = nn.Sequential(
             nn.Linear(input_dim, hidden_size),
             nn.SiLU(),
@@ -252,8 +253,13 @@ class ChronometricCalibrationMLP(nn.Module):
 
     def forward(self, x: torch.Tensor) -> dict[str, torch.Tensor]:
         hidden = self.net(x)
+        signed_y = self.signed_y_head(hidden)
+        family_vector = self.family_head(hidden)
+        if self.bounded_outputs:
+            signed_y = torch.tanh(signed_y)
+            family_vector = torch.tanh(family_vector)
         return {
-            "signed_y": self.signed_y_head(hidden),
+            "signed_y": signed_y,
             "progress_logit": self.progress_head(hidden),
-            "family_vector": self.family_head(hidden),
+            "family_vector": family_vector,
         }

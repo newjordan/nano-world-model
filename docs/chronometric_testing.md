@@ -245,6 +245,26 @@ This is a family-transfer diagnostic. A good result means the progress head
 stays calibrated outside the V031B replay family; it still does not establish
 general ARC competence.
 
+## V006B Bounded Cross-Family Holdout
+
+V006 showed that the progress logit transferred, but the unbounded signed-Y and
+family heads exploded on heldout ACTION6 rows. V006B reruns the same
+cross-family condition with bounded signed-Y and potential-family outputs.
+
+Runner:
+
+```bash
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v006b_bounded_cross_family_holdout \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v006_cross_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v006b_bounded_cross_family_holdout \
+  --holdout-key source_condition_artifact \
+  --heldout-group-value experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md
+```
+
+The progress head remains a logit. The signed-Y and family heads are passed
+through `tanh` because their targets are bounded potential/outcome quantities.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality

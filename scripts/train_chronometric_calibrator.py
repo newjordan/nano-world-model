@@ -275,6 +275,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         input_dim=train_x.shape[1],
         family_dim=train_families.shape[1],
         hidden_size=args.hidden_size,
+        bounded_outputs=not args.unbounded_outputs,
     ).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
@@ -386,6 +387,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         "lr": args.lr,
         "weight_decay": args.weight_decay,
         "hidden_size": args.hidden_size,
+        "bounded_outputs": not args.unbounded_outputs,
         "loss_weights": {
             "signed": args.signed_weight,
             "progress": args.progress_weight,
@@ -578,6 +580,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--steps", type=int, default=800)
     parser.add_argument("--hidden-size", type=int, default=64)
+    parser.add_argument(
+        "--unbounded-outputs",
+        action="store_true",
+        help="Disable tanh bounds on signed-Y and family heads. Kept only for reproducing older failure modes.",
+    )
     parser.add_argument("--lr", type=float, default=3e-3)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--grad-clip", type=float, default=1.0)

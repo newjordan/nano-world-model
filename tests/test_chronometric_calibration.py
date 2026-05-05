@@ -7,7 +7,14 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from chronometric_calibration import calibration_example, calibration_features, split_examples_by_group  # noqa: E402
+import torch
+
+from chronometric_calibration import (  # noqa: E402
+    ChronometricCalibrationMLP,
+    calibration_example,
+    calibration_features,
+    split_examples_by_group,
+)
 from chronometric_bridge import synthetic_bridge_records  # noqa: E402
 
 
@@ -105,3 +112,13 @@ def test_split_examples_by_group_rejects_missing_explicit_heldout_group():
         assert "missing_family" in str(exc)
     else:
         raise AssertionError("missing explicit heldout group should fail")
+
+
+def test_calibration_mlp_bounds_signed_and_family_outputs():
+    model = ChronometricCalibrationMLP(input_dim=3, family_dim=2, hidden_size=4, bounded_outputs=True)
+    outputs = model(torch.full((2, 3), 1000.0))
+
+    assert torch.all(outputs["signed_y"] <= 1.0)
+    assert torch.all(outputs["signed_y"] >= -1.0)
+    assert torch.all(outputs["family_vector"] <= 1.0)
+    assert torch.all(outputs["family_vector"] >= -1.0)
