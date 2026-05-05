@@ -1,0 +1,38 @@
+{
+  "arc_data_used": false,
+  "bridge_manifest": "experiments/2026-05-05_chronometric_mechanics_smoke/synthetic_bridge_manifest.jsonl",
+  "chronometric_config": {
+    "init_std": 0.03,
+    "mode": "branch_rollout",
+    "potential_families": 8,
+    "residual_scale": 0.05
+  },
+  "created_at_utc": "2026-05-05T18:17:16.093583+00:00",
+  "cuda_available": true,
+  "cuda_device_count": 1,
+  "cuda_device_name": "NVIDIA GB10",
+  "device_fallback_reason": null,
+  "device_requested": "auto",
+  "device_resolved": "cuda",
+  "git_commit": "7c3691f843faccc576418e9cdfd2cdfaac1c92fc",
+  "git_dirty": true,
+  "git_dirty_excluding_output_dir": false,
+  "nvidia_smi": "NVIDIA GB10, [N/A], [N/A], 0 %, 11.92 W",
+  "run_kind": "new_experiment",
+  "run_label": "mechanics_smoke",
+  "script": "scripts/chronometric_mechanics_smoke.py",
+  "seed": 20260505,
+  "synthetic_tokens": {
+    "batch": 3,
+    "frames": 6,
+    "hidden_size": 32
+  },
+  "thresholds": {
+    "action_force_delta_gt": 1e-08,
+    "branch_force_pairwise_gt": 1e-08,
+    "constraint_max_abs_lt": 1e-05,
+    "phase_delta_error_lt": 1e-05,
+    "residual_delta_gt": 1e-08
+  },
+  "torch_version": "2.11.0+cu130"
+}

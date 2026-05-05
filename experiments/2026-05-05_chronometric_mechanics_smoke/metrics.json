@@ -1,0 +1,108 @@
+{
+  "all_gates_pass": true,
+  "condition": {
+    "arc_data_used": false,
+    "bridge_manifest": "experiments/2026-05-05_chronometric_mechanics_smoke/synthetic_bridge_manifest.jsonl",
+    "chronometric_config": {
+      "init_std": 0.03,
+      "mode": "branch_rollout",
+      "potential_families": 8,
+      "residual_scale": 0.05
+    },
+    "created_at_utc": "2026-05-05T18:17:16.093583+00:00",
+    "cuda_available": true,
+    "cuda_device_count": 1,
+    "cuda_device_name": "NVIDIA GB10",
+    "device_fallback_reason": null,
+    "device_requested": "auto",
+    "device_resolved": "cuda",
+    "git_commit": "7c3691f843faccc576418e9cdfd2cdfaac1c92fc",
+    "git_dirty": true,
+    "git_dirty_excluding_output_dir": false,
+    "nvidia_smi": "NVIDIA GB10, [N/A], [N/A], 0 %, 11.92 W",
+    "run_kind": "new_experiment",
+    "run_label": "mechanics_smoke",
+    "script": "scripts/chronometric_mechanics_smoke.py",
+    "seed": 20260505,
+    "synthetic_tokens": {
+      "batch": 3,
+      "frames": 6,
+      "hidden_size": 32
+    },
+    "thresholds": {
+      "action_force_delta_gt": 1e-08,
+      "branch_force_pairwise_gt": 1e-08,
+      "constraint_max_abs_lt": 1e-05,
+      "phase_delta_error_lt": 1e-05,
+      "residual_delta_gt": 1e-08
+    },
+    "torch_version": "2.11.0+cu130"
+  },
+  "gates": {
+    "action_context_changes_external_force": {
+      "external_force_abs_mean_delta": 0.1436905562877655,
+      "pass": true
+    },
+    "branch_direction_distinction": {
+      "branch_force_pairwise_max": 0.026731830090284348,
+      "branch_outcome_means": [
+        -0.04858763888478279,
+        -0.049177076667547226,
+        -0.05079903081059456
+      ],
+      "branch_outcome_std": 0.0009350238251499832,
+      "pass": true
+    },
+    "bridge_manifest_schema": {
+      "errors": [],
+      "manifest_path": "experiments/2026-05-05_chronometric_mechanics_smoke/synthetic_bridge_manifest.jsonl",
+      "pass": true,
+      "records": 2
+    },
+    "layer_constraints": {
+      "invariant": {
+        "abs_mean": 5.62932740422184e-08,
+        "max_abs": 1.7881393432617188e-07,
+        "mean": 3.311369178859991e-09,
+        "std": 8.063710765782162e-08
+      },
+      "orthogonality": {
+        "abs_mean": 9.526114341795733e-10,
+        "max_abs": 7.450580596923828e-09,
+        "mean": -2.574543633837578e-10,
+        "std": 1.5828017785324278e-09
+      },
+      "pass": true
+    },
+    "nanowm_audit_forward": {
+      "losses": {},
+      "metric_keys": [
+        "chronometric_contortion_force_rms",
+        "chronometric_external_force_rms",
+        "chronometric_force_rms",
+        "chronometric_invariant_abs_mean",
+        "chronometric_orthogonality_abs_mean",
+        "chronometric_outcome_y_mean",
+        "chronometric_potential_entropy",
+        "chronometric_raw_orthogonality_abs_mean",
+        "chronometric_theta_mean"
+      ],
+      "output_delta_max_abs": 0.0,
+      "pass": true
+    },
+    "phase_log_cycle": {
+      "lambda_value": 1.3759704251386322,
+      "pass": true,
+      "phase_delta_error": 1.430511474609375e-06
+    },
+    "projector_constraint": {
+      "invariant_max_abs": 2.384185791015625e-07,
+      "orthogonality_max_abs": 4.76837158203125e-07,
+      "pass": true
+    },
+    "residual_update_nonzero": {
+      "pass": true,
+      "residual_abs_mean_delta": 0.0017147973412647843
+    }
+  }
+}
