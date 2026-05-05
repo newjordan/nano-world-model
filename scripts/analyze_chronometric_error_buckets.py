@@ -100,7 +100,7 @@ def analyze(args: argparse.Namespace) -> dict[str, Any]:
         "records": len(joined),
         "splits": {split: len(rows) for split, rows in sorted(split_rows.items())},
         "training_data_promoted": False,
-        "eval_scope": "posthoc_bucket_analysis_of_v004_group_holdout",
+        "eval_scope": "posthoc_bucket_analysis",
     }
     summary = {
         "condition": condition,
@@ -148,9 +148,9 @@ def _format_results(summary: dict[str, Any]) -> str:
     movement_rows = _table_rows(heldout_buckets.get("movement_axis", {}))
     time_rows = _table_rows(heldout_buckets.get("time_window", {}))
     lines = [
-        "# Chronometric Bucket Eval V005 Results",
+        "# Chronometric Bucket Eval Results",
         "",
-        "Status: posthoc bucket diagnostic over the recorded V004 group-holdout predictions.",
+        f"Status: posthoc bucket diagnostic for `{condition['run_label']}`.",
         "",
         "This is not a new training run and not ARC solve evidence. It checks which transition families carry the learned signal.",
         "",
@@ -165,6 +165,7 @@ def _format_results(summary: dict[str, Any]) -> str:
         f"- calibration metrics: `{condition['calibration_metrics']}`",
         f"- records: `{condition['records']}`",
         f"- splits: `{condition['splits']}`",
+        f"- eval scope: `{condition['eval_scope']}`",
         f"- training data promoted: `{condition['training_data_promoted']}`",
         "",
         "## Split Summary",
@@ -203,7 +204,7 @@ def _format_results(summary: dict[str, Any]) -> str:
         "- progress rows remain cleanly separated in heldout branch files",
         "- highest heldout non-progress probability stays far below the 0.5 progress threshold",
         "- signed-Y error is concentrated in non-progress movement/stasis rows, not in progress classification",
-        "- this remains one m0r0 replay family; V006 should add cross-task or cross-family holdout",
+        "- use the run label, manifest, and calibration metrics paths above as the exact scope boundary",
         "",
     ]
     return "\n".join(lines)
