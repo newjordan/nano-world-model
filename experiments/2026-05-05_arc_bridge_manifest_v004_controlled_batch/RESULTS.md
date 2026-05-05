@@ -1,0 +1,59 @@
+# ARC Bridge Manifest Smoke Results
+
+Status: quarantined ARC transition rows converted into the NanoWM chronometric bridge schema.
+
+This is not training data promotion. The output keeps `control_source: arc_scaffold_non_chronometric` in every record.
+
+## Condition
+
+- run label: `arc_bridge_manifest_v004_controlled_batch`
+- run kind: `bridge_manifest_generation`
+- generator commit: `ae7dee8fd866c0a48c32dd1799a38a77cfd82dac`
+- generator dirty at run: `False`
+- source repo: `https://github.com/newjordan/arc-agi-3-worldmodel.git`
+- source commit: `9c850edf476bc5363a3c7de43b6d73f28a2eb5a8`
+- source dirty at run: `True`
+- source condition: `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/CONDITION.md`
+- output manifest: `experiments/2026-05-05_arc_bridge_manifest_v004_controlled_batch/arc_bridge_manifest.jsonl`
+
+## Source Artifacts
+
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_baseline_replay.transitions.jsonl` rows=`40` sha256=`82512954272e3ce9db0430c7895a79c4c236d6c35e47a541da7f0a99e1f5da48`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s030_action1_action5_escape.transitions.jsonl` rows=`96` sha256=`0cece134415d5f367bb646e1bcb7f6ece29a14e785aa278de605dd2c8ee35358`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s030_action1_probe_hold.transitions.jsonl` rows=`96` sha256=`82e1930bf9f0f01159b4c7f340b91ff30627f4b9155985fdebe1b0a7b6952fec`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s030_action5_action1_return.transitions.jsonl` rows=`96` sha256=`ce3f021843e04198751e8353a33bff5df90e42ae7b1e32d38d443f5df4947ab7`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s030_action5_probe_hold.transitions.jsonl` rows=`96` sha256=`24705b8dcdd964fc83462ea5ec4d78327de2caa73e99c59ecb0ad8b88a4fd21b`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s038_action1_action5_escape.transitions.jsonl` rows=`96` sha256=`ab7b736e72f6d510733d09b4e0d04f278dba0e2fc396a5939f4813632029b985`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s038_action1_probe_hold.transitions.jsonl` rows=`96` sha256=`51152eb3547bff2acec9e523806879220f36c95a403b46d51bbe5905dfe1888e`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s038_action5_action1_return.transitions.jsonl` rows=`96` sha256=`99150f43baf8a60ebf796a75932c6aa01630cc0e619f3acd43d3fd1c280e5dbf`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s038_action5_probe_hold.transitions.jsonl` rows=`96` sha256=`b5fade701236b570ae399e9e38f76adca5c7c7a58e84c843441d1e3fd6571d57`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s046_action1_action5_escape.transitions.jsonl` rows=`96` sha256=`1446feaa4da972827f5d31c3771d6d61911b4b52a0bd4e76c3920a8399ebb6fb`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s046_action5_action1_return.transitions.jsonl` rows=`96` sha256=`a8de25cca7da29bcfc65209b1dfce8201f7d3ef75214c716b5439c01ec6b6d7c`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s054_action1_action5_escape.transitions.jsonl` rows=`96` sha256=`7b0b8856f9a2da145df2a41b83ac6aa44ffa17e62dc2f42373b79dcedf8e16eb`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s054_action5_action1_return.transitions.jsonl` rows=`96` sha256=`884517069da9787f5addd9534c234cb5ad72ee66473a5212dfbca6aa09acb81a`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s058_action1_action5_escape.transitions.jsonl` rows=`96` sha256=`9887381495e7037a40c76112a1445634977d4d46b95187d42d0ffbedaf8f4bf4`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s058_action5_action1_return.transitions.jsonl` rows=`96` sha256=`a6cca7ac5060761b99191b9a74082c6420268062d8a00d239e0a139c28cc9582`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s030_action1_action5_escape.transitions.jsonl` rows=`96` sha256=`f934b72d1e84cfc116226975841b5a4a28c80699677bd95cf1351dbdd27efeaf`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s030_action5_action1_return.transitions.jsonl` rows=`96` sha256=`e331f36e2784e5df122ad12caf424d0ea7e9d022a59318e7e829d3b5b8573887`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s038_action1_action5_escape.transitions.jsonl` rows=`96` sha256=`478be6d03d3224929addf1c8aad0ed94b6a2d52f671837d5048ef1db3fef243a`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s038_action5_action1_return.transitions.jsonl` rows=`96` sha256=`50efb32aaf971751faddeaf1888c5da125c79c57cc373cf09d2710cbdd187430`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s046_action1_action5_escape.transitions.jsonl` rows=`96` sha256=`523dc1abd8900efe497651cd96bad61b25bf4fcd965534203cf0f077d18fe96a`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s046_action5_action1_return.transitions.jsonl` rows=`96` sha256=`00ea86aa42cbb253e4c69a6bd361d6b6ae8e3293113292e763b6d7cfe1742038`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s054_action1_action5_escape.transitions.jsonl` rows=`96` sha256=`3c9cd816b1959221328c2efc47374e1c9e549ca09e01006a331b303e363d95d3`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s054_action5_action1_return.transitions.jsonl` rows=`96` sha256=`7045ed4c34db1c3825c8135c8b8e2697a9bdf312fbd4312cf3ce69aed047b0e1`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s058_action1_action5_escape.transitions.jsonl` rows=`96` sha256=`e6db7edc274f5d4a3a1ec9915aba84ac8c5fc955f545330fbedf305d4720ba52`
+- `experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s058_action5_action1_return.transitions.jsonl` rows=`96` sha256=`41db8cfcb18bbe95fde3f11705e15f8e5af320fa44072398f63fd406a52a8c99`
+
+## Validation
+
+- valid: `True`
+- records: `2344`
+- errors: `0`
+- progress records: `25`
+- positive signed-outcome records: `2093`
+- negative signed-outcome records: `251`
+
+## Labels
+
+- progress labels: `{'no_level_progress': 2319, 'progress_level_delta_positive': 25}`
+- control labels: `{'dominant_group:goal_progress': 25, 'dominant_group:stasis_loop': 8, 'dominant_group:time_phase': 165, 'dominant_group:translation': 1903, 'stasis_no_change': 243}`
