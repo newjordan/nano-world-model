@@ -174,6 +174,36 @@ This is the first medium controlled batch. The split is by whole
 appear in both train and heldout. The source condition remains a quarantined
 ARC scaffold/control replay, and `training_data_promoted` remains false.
 
+## V005 Bucket Diagnostics
+
+Runner:
+
+```bash
+python scripts/analyze_chronometric_error_buckets.py
+```
+
+Default source:
+
+```text
+experiments/2026-05-05_arc_bridge_manifest_v004_controlled_batch/arc_bridge_manifest.jsonl
+experiments/2026-05-05_chronometric_calibration_v004_group_holdout/predictions.jsonl
+experiments/2026-05-05_chronometric_calibration_v004_group_holdout/metrics.json
+```
+
+Default output:
+
+```text
+experiments/2026-05-05_chronometric_bucket_eval_v005/
+  condition.json
+  bucket_metrics.json
+  bucket_rows.jsonl
+  RESULTS.md
+```
+
+This is a no-training diagnostic. It joins V004 predictions back to bridge rows
+and reports errors by split, control label, action, dominant group, signed-Y
+band, movement axis, time window, and changed-cell bucket.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality
