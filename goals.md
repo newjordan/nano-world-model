@@ -82,3 +82,17 @@ V010 validates that the ACTION6 coordinate-action coverage improves transfer
 to a separate heldout family. Its residual is a one-row ACTION6 time-phase edge,
 so the next target is second-family validation and/or a small time-phase support
 batch, not scalar loss weighting.
+
+V011 validates progress/nonlocal transfer on a second heldout family:
+
+- merged manifest: `experiments/2026-05-05_arc_bridge_manifest_v011_nonlocal_second_family/`
+- calibration: `experiments/2026-05-05_chronometric_calibration_v011_nonlocal_second_family_v033_holdout_cpu/`
+- heldout family: V033 post-progress nonlocal replay
+- heldout rows: `3112`
+- heldout progress-positive rows: `25`
+- heldout signed-Y MAE: `0.0105739`
+- heldout progress accuracy: `1.0`
+- heldout positive best rank: `1`
+
+V011 did not contain ACTION6, so it does not close the V010 ACTION6 time-phase
+residual. The next target is an ACTION6-bearing ten-task heldout family.

@@ -34,15 +34,19 @@ iteration.
   mirror-hazard family. Result: strong transfer with heldout signed-Y MAE
   `0.0150969`, ACTION6 MAE `0.0235673`, progress accuracy `1.0`, and positive
   best rank `1`; residual is a one-row ACTION6 time-phase edge.
+- V011: Added V033 post-progress nonlocal replay as a second heldout family.
+  Result: heldout signed-Y MAE `0.0105739`, progress accuracy `1.0`, positive
+  best rank `1`, and top false-progress probability `0.000195519`; this gates
+  progress/nonlocal transfer but does not test ACTION6.
 
 ## Active Queue
 
-1. V011: expand cross-task coverage with a second heldout family.
-   Goal: check whether safe potential inputs generalize beyond the current
-   V010 V023 heldout success.
+1. V012: hold out an ACTION6-bearing ten-task family.
+   Goal: test whether the V010 ACTION6 time-phase residual repeats outside
+   V019B/V023 while keeping progress and stasis transfer intact.
 
-2. V012: add a small time-phase support batch or feature check if the second
-   heldout repeats the V010 one-row ACTION6 time-phase residual.
+2. V013: add a small time-phase support batch or feature check if V012 repeats
+   the V010 one-row ACTION6 time-phase residual.
    Goal: handle rare signed-Y polarity edges without weakening stasis transfer.
 
 3. C-model integration: route the calibration head output back into NanoWM

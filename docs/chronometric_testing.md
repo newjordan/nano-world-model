@@ -510,6 +510,58 @@ Promotion rule: V010 is a coordinate-action transfer checkpoint with
 `training_data_promoted: False`. It does not prove ARC solve competence. Its
 residual is a rare ACTION6 time-phase signed-Y edge, not progress ranking.
 
+## V011 Nonlocal Second-Family Holdout
+
+V011 adds V033 post-progress nonlocal replay as a second heldout family. This
+tests progress/nonlocal transfer after V010, but it does not test ACTION6
+because V033 contains no ACTION6 rows.
+
+Bridge and merge:
+
+```bash
+python scripts/build_arc_bridge_manifest.py \
+  --run-label arc_bridge_manifest_v011_v033_nonlocal_holdout_family \
+  --source-condition-artifact experiments/2026-05-05_v033_post_progress_nonlocal_replay/CONDITION.md \
+  --source-transition-glob 'experiments/2026-05-05_v033_post_progress_nonlocal_replay/grid/transition_events/*.jsonl' \
+  --split arc_sprint0_v033_nonlocal_family_v011_heldout \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v011_v033_nonlocal_holdout_family
+
+python scripts/merge_chronometric_bridge_manifests.py \
+  --run-label arc_bridge_manifest_v011_nonlocal_second_family \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v010_coordinate_action_coverage/arc_bridge_manifest.jsonl \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v011_v033_nonlocal_holdout_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v011_nonlocal_second_family
+```
+
+Calibration and diagnostics:
+
+```bash
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v011_nonlocal_second_family_v033_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v011_nonlocal_second_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v011_nonlocal_second_family_v033_holdout_cpu \
+  --holdout-key source_condition_artifact \
+  --heldout-group-value experiments/2026-05-05_v033_post_progress_nonlocal_replay/CONDITION.md \
+  --device cpu
+
+python scripts/analyze_chronometric_error_buckets.py \
+  --run-label chronometric_bucket_eval_v011_nonlocal_second_family_v033_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v011_nonlocal_second_family/arc_bridge_manifest.jsonl \
+  --predictions experiments/2026-05-05_chronometric_calibration_v011_nonlocal_second_family_v033_holdout_cpu/predictions.jsonl \
+  --calibration-metrics experiments/2026-05-05_chronometric_calibration_v011_nonlocal_second_family_v033_holdout_cpu/metrics.json \
+  --out-dir experiments/2026-05-05_chronometric_bucket_eval_v011_nonlocal_second_family_v033_holdout_cpu
+
+python scripts/analyze_chronometric_feature_coverage.py \
+  --run-label chronometric_feature_coverage_v011_nonlocal_second_family_v033_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v011_nonlocal_second_family/arc_bridge_manifest.jsonl \
+  --predictions experiments/2026-05-05_chronometric_calibration_v011_nonlocal_second_family_v033_holdout_cpu/predictions.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_feature_coverage_v011_nonlocal_second_family_v033_holdout_cpu
+```
+
+Promotion rule: V011 supports second-family progress/nonlocal transfer. It does
+not close the ACTION6 residual; use an ACTION6-bearing ten-task heldout for the
+next gate.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality

@@ -2,6 +2,59 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V011 Nonlocal Second-Family Holdout
+
+Artifacts:
+
+- `experiments/2026-05-05_arc_bridge_manifest_v011_v033_nonlocal_holdout_family/`
+- `experiments/2026-05-05_arc_bridge_manifest_v011_nonlocal_second_family/`
+- `experiments/2026-05-05_chronometric_calibration_v011_nonlocal_second_family_v033_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v011_nonlocal_second_family_v033_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v011_nonlocal_second_family_v033_holdout_cpu/`
+
+Condition:
+
+- base manifest: V010 coordinate-action coverage
+- added heldout family:
+  `experiments/2026-05-05_v033_post_progress_nonlocal_replay/CONDITION.md`
+- merged manifest rows: `6932`
+- train rows: `3820`
+- heldout rows: `3112`
+- heldout progress-positive rows: `25`
+- heldout split key: `source_condition_artifact`
+- requested device: `cpu`
+- seed: `20260505`
+- steps: `800`
+- training data promoted: `False`
+
+Metrics:
+
+- heldout total: `0.02222723700106144`
+- heldout loss reduction vs baseline: `5.747143318876624`
+- heldout signed-Y MAE: `0.01057388260960579`
+- heldout progress accuracy: `1.0`
+- heldout positive best rank: `1`
+- heldout positive mean rank: `13.0`
+- heldout top false-progress probability: `0.00019551934383343905`
+- heldout stasis/no-change signed-Y MAE: `0.0007385778427124024`
+- heldout time-phase signed-Y MAE: `0.03205674101940143`
+- heldout translation signed-Y MAE: `0.008579632027232642`
+- heldout goal-progress signed-Y MAE: `0.004302263259887695`
+
+Feature coverage findings:
+
+- top heldout bucket: `action:ACTION4|control_label:dominant_group:time_phase`
+- rows: `154`
+- signed-Y MAE: `0.04311674078563591`
+- same-label train rows: `62`
+- same-label distance: `0.06919068110400774`
+
+Decision:
+
+V011 validates progress/nonlocal transfer on a second heldout family. It is not
+an ACTION6 residual gate because V033 has no ACTION6 rows. Next step is an
+ACTION6-bearing ten-task heldout family.
+
 ## V010 Coordinate-Action Coverage With V023 Heldout
 
 Artifacts:
