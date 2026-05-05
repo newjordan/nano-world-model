@@ -1,0 +1,246 @@
+{
+  "baseline": {
+    "family_mse": 0.1844356805086136,
+    "positive_progress_best_rank": null,
+    "positive_progress_count": 19,
+    "positive_progress_mean_rank": null,
+    "positive_progress_rank": null,
+    "progress_accuracy": 0.9892534613609314,
+    "progress_bce": 4.495137691497803,
+    "signed_mae": 0.2172175645828247,
+    "signed_mse": 0.12697739899158478,
+    "total": 4.668223857879639
+  },
+  "checkpoints": [
+    {
+      "family_mse": 0.20640452206134796,
+      "progress_bce": 1.1964540481567383,
+      "signed_mse": 0.14032642543315887,
+      "step": 1,
+      "total": 1.3883816003799438
+    },
+    {
+      "family_mse": 0.03034033253788948,
+      "progress_bce": 0.0008074712241068482,
+      "signed_mse": 0.054346077144145966,
+      "step": 100,
+      "total": 0.06273863464593887
+    },
+    {
+      "family_mse": 0.024748940020799637,
+      "progress_bce": 0.00033957965206354856,
+      "signed_mse": 0.04925723001360893,
+      "step": 200,
+      "total": 0.05578404292464256
+    },
+    {
+      "family_mse": 0.02240719087421894,
+      "progress_bce": 0.00015115737915039062,
+      "signed_mse": 0.043807726353406906,
+      "step": 300,
+      "total": 0.049560680985450745
+    },
+    {
+      "family_mse": 0.01908867619931698,
+      "progress_bce": 6.512258551083505e-05,
+      "signed_mse": 0.03695530444383621,
+      "step": 400,
+      "total": 0.04179259389638901
+    },
+    {
+      "family_mse": 0.016689935699105263,
+      "progress_bce": 3.5303983167978004e-05,
+      "signed_mse": 0.032198820263147354,
+      "step": 500,
+      "total": 0.036406610161066055
+    },
+    {
+      "family_mse": 0.014667298644781113,
+      "progress_bce": 2.266557748953346e-05,
+      "signed_mse": 0.02808189019560814,
+      "step": 600,
+      "total": 0.031771380454301834
+    },
+    {
+      "family_mse": 0.012968604452908039,
+      "progress_bce": 1.824939317884855e-05,
+      "signed_mse": 0.02478961832821369,
+      "step": 700,
+      "total": 0.028050020337104797
+    },
+    {
+      "family_mse": 0.011787030845880508,
+      "progress_bce": 1.4999804079707246e-05,
+      "signed_mse": 0.023085828870534897,
+      "step": 800,
+      "total": 0.026047587394714355
+    }
+  ],
+  "condition": {
+    "created_at_utc": "2026-05-05T19:17:05.412851+00:00",
+    "device_fallback_reason": null,
+    "device_requested": "auto",
+    "device_resolved": "cuda",
+    "eval_scope": "group_holdout_by_source_artifact_path",
+    "feature_names": [
+      "t_norm",
+      "action_value_norm",
+      "has_action_data",
+      "action_data_x_norm",
+      "action_data_y_norm",
+      "changed_cells_norm",
+      "movement_dx_norm",
+      "movement_dy_norm",
+      "phase_sin",
+      "phase_cos",
+      "transition_changed_eta",
+      "time_phase_eta"
+    ],
+    "git_commit": "30eff83e755521b3d5cf0142853c66ed65248d9b",
+    "git_dirty": false,
+    "heldout_positive_records": 6,
+    "heldout_records": 576,
+    "hidden_size": 64,
+    "leakage_excluded_fields": [
+      "signed_outcome_y",
+      "progress_label",
+      "control_label",
+      "level_delta",
+      "levels_completed",
+      "next_levels_completed",
+      "event_mu[2]",
+      "branch_direction_n[2]",
+      "action_context[5]",
+      "action_context[6]",
+      "action_context[7]",
+      "goal_progress.level_delta"
+    ],
+    "loss_weights": {
+      "family": 0.25,
+      "progress": 1.0,
+      "signed": 1.0
+    },
+    "lr": 0.003,
+    "manifest": "experiments/2026-05-05_arc_bridge_manifest_v004_controlled_batch/arc_bridge_manifest.jsonl",
+    "manifest_sha256": "505d08056252c8e1aa63fbd35fe3cd8e51038bf6bd8446c01dbf5893b6b78edd",
+    "progress_positive_records": 25,
+    "quarantine_status_preserved": true,
+    "records": 2344,
+    "run_kind": "group_holdout_calibration_smoke",
+    "run_label": "chronometric_calibration_v004_group_holdout",
+    "script": "scripts/train_chronometric_calibrator.py",
+    "seed": 20260505,
+    "split_strategy": {
+      "heldout_group_values": [
+        "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s030_action5_action1_return.transitions.jsonl",
+        "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_ranked_action3_action2_s046_action5_action1_return.transitions.jsonl",
+        "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s038_action5_action1_return.transitions.jsonl",
+        "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s046_action1_action5_escape.transitions.jsonl",
+        "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s046_action5_action1_return.transitions.jsonl",
+        "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/grid/transition_events/v031b_m0r0_post_progress_avoidance_v030_source_progress_action4_action3_s054_action1_action5_escape.transitions.jsonl"
+      ],
+      "heldout_groups": 6,
+      "holdout_fraction": 0.24,
+      "key": "source_artifact_path",
+      "seed": 20260505,
+      "train_groups": 19
+    },
+    "steps": 800,
+    "train_positive_records": 19,
+    "train_records": 1768,
+    "training_data_promoted": false,
+    "weight_decay": 0.0001
+  },
+  "feature_mean": [
+    0.46866515278816223,
+    0.27516970038414,
+    0.0,
+    0.0,
+    0.0,
+    0.021048568189144135,
+    2.0792071154573932e-05,
+    -0.005916780326515436,
+    0.053903982043266296,
+    0.033346135169267654,
+    0.021048568189144135,
+    0.01640271581709385
+  ],
+  "feature_std": [
+    0.27764979004859924,
+    0.10333782434463501,
+    9.999999974752427e-07,
+    9.999999974752427e-07,
+    9.999999974752427e-07,
+    0.07409759610891342,
+    0.008101516403257847,
+    0.06357739120721817,
+    0.7063738107681274,
+    0.7049952745437622,
+    0.07409759610891342,
+    0.06190016120672226
+  ],
+  "final": {
+    "family_mse": 0.0119260149076581,
+    "positive_progress_best_rank": 1,
+    "positive_progress_count": 19,
+    "positive_progress_mean_rank": 10.0,
+    "positive_progress_rank": 1,
+    "progress_accuracy": 1.0,
+    "progress_bce": 1.5089884072949644e-05,
+    "signed_mae": 0.0928897112607956,
+    "signed_mse": 0.023550650104880333,
+    "total": 0.02654724381864071
+  },
+  "heldout_baseline": {
+    "family_mse": 0.16476957499980927,
+    "positive_progress_best_rank": null,
+    "positive_progress_count": 6,
+    "positive_progress_mean_rank": null,
+    "positive_progress_rank": null,
+    "progress_accuracy": 0.9895833134651184,
+    "progress_bce": 4.3574604988098145,
+    "signed_mae": 0.1855175495147705,
+    "signed_mse": 0.09156598150730133,
+    "total": 4.4902191162109375
+  },
+  "heldout_final": {
+    "family_mse": 0.0146353580057621,
+    "positive_progress_best_rank": 1,
+    "positive_progress_count": 6,
+    "positive_progress_mean_rank": 3.5,
+    "positive_progress_rank": 1,
+    "progress_accuracy": 1.0,
+    "progress_bce": 1.404867634846596e-05,
+    "signed_mae": 0.09581122547388077,
+    "signed_mse": 0.030978921800851822,
+    "total": 0.03465180844068527
+  },
+  "heldout_initial": {
+    "family_mse": 0.18170714378356934,
+    "positive_progress_best_rank": 1,
+    "positive_progress_count": 6,
+    "positive_progress_mean_rank": 3.5,
+    "positive_progress_rank": 1,
+    "progress_accuracy": 0.7395833134651184,
+    "progress_bce": 1.1821643114089966,
+    "signed_mae": 0.2050487995147705,
+    "signed_mse": 0.10702580958604813,
+    "total": 1.3346168994903564
+  },
+  "heldout_loss_reduction_vs_baseline": 4.455567307770252,
+  "heldout_loss_reduction_vs_initial": 1.2999650910496712,
+  "initial": {
+    "family_mse": 0.20640452206134796,
+    "positive_progress_best_rank": 1,
+    "positive_progress_count": 19,
+    "positive_progress_mean_rank": 10.0,
+    "positive_progress_rank": 1,
+    "progress_accuracy": 0.7873303294181824,
+    "progress_bce": 1.1964540481567383,
+    "signed_mae": 0.2349323034286499,
+    "signed_mse": 0.14032642543315887,
+    "total": 1.3883816003799438
+  },
+  "loss_reduction_vs_baseline": 4.641676614060998,
+  "loss_reduction_vs_initial": 1.3618343565613031
+}
