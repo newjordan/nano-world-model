@@ -1,0 +1,83 @@
+{
+  "arc_data_used": true,
+  "created_at_utc": "2026-05-05T23:57:27.561332+00:00",
+  "family_order": [
+    "transition.changed_cells",
+    "time_phase.repeated_effect_size",
+    "goal_progress.level_delta",
+    "stasis.no_change",
+    "loop.repeated_action",
+    "mirror.progress_path",
+    "mirror.progress_blocker",
+    "hazard.env_failure"
+  ],
+  "generator_commit": "772b17ca60c47f9590adfb488816b20f779e1b48",
+  "generator_dirty": false,
+  "generator_repo": "/home/frosty40/nano-world-model",
+  "max_records_per_source": 0,
+  "output_manifest": "experiments/2026-05-05_arc_bridge_manifest_v013_v015_action6_holdout_family/arc_bridge_manifest.jsonl",
+  "quarantine_status": "control_source: arc_scaffold_non_chronometric",
+  "run_kind": "bridge_manifest_generation",
+  "run_label": "arc_bridge_manifest_v013_v015_action6_holdout_family",
+  "script": "scripts/build_arc_bridge_manifest.py",
+  "source_artifacts": [
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/v015_current_state_v015_object_relative_dc22_seed0.transitions.jsonl",
+      "sha256": "e701c67a752e29e557436eeceea0108b464b0d5ff58422301d9ef14dbbd8b6a7"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/v015_current_state_v015_object_relative_ft09_seed0.transitions.jsonl",
+      "sha256": "41d2c27e25e1030334068c43efccf09d5ea9cfa67d53b906f2bcd1a509f8e69c"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/v015_current_state_v015_object_relative_g50t_seed0.transitions.jsonl",
+      "sha256": "355cfe3294c248a93df39861083b89ed8fcc2fbf36e035ebef2f8a81a14dadb8"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/v015_current_state_v015_object_relative_ka59_seed0.transitions.jsonl",
+      "sha256": "4bf19757db30f3fefe1241c49c81b826ff9de41d7443bb36e474d96267fd7abf"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/v015_current_state_v015_object_relative_m0r0_seed0.transitions.jsonl",
+      "sha256": "4184c51d59dbfae7e679dfedcf451a6788c939c745e9c4971982b7538812f1ca"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/v015_current_state_v015_object_relative_sb26_seed0.transitions.jsonl",
+      "sha256": "08a1c4562decdd2a63dd33cb37d98d35f4ada355006b4be8ebe905d89a96246f"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/v015_current_state_v015_object_relative_sc25_seed0.transitions.jsonl",
+      "sha256": "a0ce1c6bcd28af2eeec4d610b464a7bef018f6e42c0d0213ee36ddf4ba920bdf"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/v015_current_state_v015_object_relative_tn36_seed0.transitions.jsonl",
+      "sha256": "33f8e6e6124fc78c0238715dcb18e34a543652d3579cee8b6d8fb4ddb1115e20"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/v015_current_state_v015_object_relative_tr87_seed0.transitions.jsonl",
+      "sha256": "ef0ad298f19d6898aca1173f82b135b07cc4007d8cffccda31fcee787a01a01c"
+    },
+    {
+      "input_rows": 40,
+      "path": "experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/v015_current_state_v015_object_relative_tu93_seed0.transitions.jsonl",
+      "sha256": "ad4a285857ddad0843229fc714f047eecd0d49ce802f6005bb77871d2cc0f97d"
+    }
+  ],
+  "source_commit": "9c850edf476bc5363a3c7de43b6d73f28a2eb5a8",
+  "source_condition_artifact": "experiments/2026-05-04_v015_object_relative_movement_scout/CONDITION.md",
+  "source_condition_sha256": "404e5b81590770a8e3090d0207c071304a9b9ccf1a159eec736fc551a71bf487",
+  "source_dirty": true,
+  "source_repo": "https://github.com/newjordan/arc-agi-3-worldmodel.git",
+  "source_repo_path": "/home/frosty40/world_model_1",
+  "split": "arc_sprint0_v015_object_relative_family_v013_heldout",
+  "training_data_promoted": false
+}
