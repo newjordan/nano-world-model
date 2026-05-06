@@ -10,6 +10,9 @@ sys.path.insert(0, str(SRC))
 from chronometric_branch_library import (  # noqa: E402
     blend_branch_library_signed_y,
     build_action6_time_phase_branch_library,
+    build_chronometric_branch_library,
+    dominant_time_phase_grid_key,
+    dominant_translation_grid_key,
 )
 from chronometric_bridge import synthetic_bridge_records  # noqa: E402
 
@@ -51,3 +54,48 @@ def test_branch_library_builds_from_train_targets_and_blends_predictions():
     assert partial == -0.3125
     assert unmatched == -0.5
     assert missing_entry is None
+
+
+def test_dominant_time_phase_scope_builds_non_coordinate_grid_prototypes():
+    train = _row("train", 0.0, 0.0, 0.25, -0.9)
+    train.update(
+        {
+            "action_id": "ACTION5",
+            "action_context": [0.5, 0.0, 0.0, 0.0, 0.000244140625, 0.0, 0.25, 1.0],
+            "changed_cells": 1,
+        }
+    )
+    heldout = copy.deepcopy(train)
+    heldout.update({"split": "heldout", "target_signed_y": 0.0, "pred_signed_y": -0.25})
+
+    library = build_chronometric_branch_library([train, heldout], scope="dominant_time_phase")
+    adjusted, entry = blend_branch_library_signed_y(heldout, library, blend=1.0)
+
+    assert dominant_time_phase_grid_key(train) == "ACTION5|dominant_group:time_phase|no_coord|changed:1"
+    assert library["ACTION5|dominant_group:time_phase|no_coord|changed:1"].records == 1
+    assert adjusted == 0.25
+    assert entry is not None
+
+
+def test_time_phase_translation_scope_builds_translation_grid_prototypes():
+    train = _row("train", 0.0, 0.0, 0.01171875, -0.9)
+    train.update(
+        {
+            "action_id": "ACTION5",
+            "control_label": "dominant_group:translation",
+            "action_context": [0.5, 0.0, 0.0, 0.0, 0.01171875, 0.0, 0.0, 1.0],
+            "changed_cells": 48,
+            "potential_family_names": ["transition.changed_cells"],
+            "potential_family_vector": [0.01171875],
+        }
+    )
+    heldout = copy.deepcopy(train)
+    heldout.update({"split": "heldout", "target_signed_y": 0.0, "pred_signed_y": -0.25})
+
+    library = build_chronometric_branch_library([train, heldout], scope="time_phase_translation")
+    adjusted, entry = blend_branch_library_signed_y(heldout, library, blend=1.0)
+
+    assert dominant_translation_grid_key(train) == "ACTION5|dominant_group:translation|no_coord|changed:48"
+    assert library["ACTION5|dominant_group:translation|no_coord|changed:48"].records == 1
+    assert adjusted == 0.01171875
+    assert entry is not None

@@ -18,8 +18,9 @@ SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
 from chronometric_branch_library import (  # noqa: E402
+    BRANCH_LIBRARY_SCOPES,
     blend_branch_library_signed_y,
-    build_action6_time_phase_branch_library,
+    build_chronometric_branch_library,
 )
 from chronometric_bridge import read_jsonl  # noqa: E402
 from chronometric_bucket_eval import join_predictions_to_manifest, summarize_rows  # noqa: E402
@@ -86,7 +87,11 @@ def apply_library(args: argparse.Namespace) -> dict[str, Any]:
     metrics_path = args.calibration_metrics.resolve()
 
     joined = join_predictions_to_manifest(read_jsonl(manifest_path), read_jsonl(predictions_path))
-    library = build_action6_time_phase_branch_library(joined, min_records=args.min_records)
+    library = build_chronometric_branch_library(
+        joined,
+        min_records=args.min_records,
+        scope=args.library_scope,
+    )
     adjusted = [_adjust_prediction(row, library, blend=args.blend) for row in joined]
     split_rows: dict[str, list[dict[str, Any]]] = {}
     for row in adjusted:
@@ -107,6 +112,8 @@ def apply_library(args: argparse.Namespace) -> dict[str, Any]:
         "calibration_metrics_sha256": _sha256(metrics_path),
         "blend": args.blend,
         "min_records": args.min_records,
+        "library_scope": args.library_scope,
+        "library_key_strategy": "action_control_grid_coordinate_or_changed_cells",
         "library_source_split": "train",
         "library_source_field": "target_signed_y",
         "heldout_labels_used": False,
@@ -182,6 +189,8 @@ def _format_results(summary: dict[str, Any]) -> str:
             f"- input predictions: `{condition['input_predictions']}`",
             f"- blend: `{condition['blend']}`",
             f"- min records: `{condition['min_records']}`",
+            f"- library scope: `{condition['library_scope']}`",
+            f"- library key strategy: `{condition['library_key_strategy']}`",
             f"- library entries: `{summary['library_entries']}`",
             f"- adjusted records: `{summary['adjusted_records']}`",
             f"- heldout labels used: `{condition['heldout_labels_used']}`",
@@ -207,6 +216,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--run-label", default="chronometric_branch_library_v020")
     parser.add_argument("--blend", type=float, default=1.0)
     parser.add_argument("--min-records", type=int, default=1)
+    parser.add_argument("--library-scope", choices=BRANCH_LIBRARY_SCOPES, default="action6_time_phase")
     return parser.parse_args()
 
 
