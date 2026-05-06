@@ -2,6 +2,49 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V031 Labeled Map Perception And Ray Accuracy Gate
+
+Artifacts:
+
+- `docs/chronometric_map_perception_v031.md`
+- `scripts/evaluate_chronometric_map_perception.py`
+- `src/chronometric_map_perception.py`
+- `tests/test_chronometric_map_perception.py`
+
+Condition:
+
+- no training run
+- no ARC solve claim
+- no Nemo call yet
+- run label: `new_experiment`
+- input contract: clean palette-labeled image or screenshot-derived label image
+- raw screenshot segmentation implemented: `False`
+- label image to integer grid implemented: `True`
+- simple 3D height geometry implemented: `True`
+- non-wall object ray anchors implemented: `True`
+- internal accuracy gate implemented: `True`
+- condition/metrics artifact harness implemented: `True`
+- strict default trust thresholds: cell accuracy `1.0`, height accuracy `1.0`,
+  ray exact accuracy `1.0`
+- training data promoted: `False`
+
+Verification:
+
+- `python -m py_compile src/chronometric_ab_overlay.py src/chronometric_grid_imagination.py src/chronometric_map_perception.py scripts/evaluate_chronometric_map_perception.py`
+- `python -m pytest tests/test_chronometric_map_perception.py tests/test_chronometric_ab_overlay.py tests/test_chronometric_grid_imagination.py`
+- result: `15 passed`
+- `python -m pytest tests/test_chronometric_map_perception.py tests/test_chronometric_ab_overlay.py tests/test_chronometric_grid_imagination.py tests/test_chronometric_branch_selection.py tests/test_chronometric_planner_scoring.py tests/test_chronometric_branch_library.py tests/test_chronometric_contortion.py`
+- result: `35 passed`
+
+Decision:
+
+V031 fills the missing layer under the raycaster. A clean labeled map image can
+now be converted into an integer grid, transformed into simple 3D cell
+geometry, raycast from every non-wall object anchor, and checked against a truth
+grid before ray evidence is trusted. This is still not learned visual
+perception; the next perception task is the raw screenshot adapter or detector
+that produces the labeled image consumed by this gate.
+
 ## V030 A/B Q/A Overlay With Imagination Frame
 
 Artifacts:

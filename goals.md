@@ -14,11 +14,12 @@ signals, phase/time features, and bounded branch calibration heads.
 
 ## Current Research Target
 
-Build the ray accuracy gate before full planner wiring. V027 proves branch
-scores flow through the NanoWM-compatible chronometric scoring API, V028 proves
-deterministic selection works when multi-action state groups exist, V029
-validates heldout branch choice on the V033 nonlocal candidate surface, and
-V030 defines the A/B Q/A packet plus gridspace imagination raymap.
+Wire perception-trusted imagination into planner-facing branch choice. V027
+proves branch scores flow through the NanoWM-compatible chronometric scoring
+API, V028 proves deterministic selection works when multi-action state groups
+exist, V029 validates heldout branch choice on the V033 nonlocal candidate
+surface, V030 defines the A/B Q/A packet plus gridspace imagination raymap, and
+V031 adds the labeled-image to grid, 3D geometry, and strict ray accuracy gate.
 
 ## Hard Boundaries
 
@@ -36,6 +37,8 @@ V030 defines the A/B Q/A packet plus gridspace imagination raymap.
   mirrors, traps, fuel, locks, or hazards may emerge as hypotheses, but the
   root interface is A/B state, open questions, dimensional gridspace, modifier
   confidence, and candidate branches.
+- Do not let raycasts influence action selection unless the map perception gate
+  reports trusted labels, geometry, and ray contacts.
 
 ## Active Metrics
 

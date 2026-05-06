@@ -210,3 +210,11 @@ V030 should add a small local packet builder and tests:
 The implementation should not call Nemo yet. The first step is to define the
 interface so Nemo can become the thinking brain without contaminating the
 chronometric scorer with hardcoded game concepts.
+
+## V031 Follow-Up
+
+The concrete perception gate is tracked in
+[Chronometric Map Perception Gate V031](chronometric_map_perception_v031.md).
+V030 defined the symbolic imagination packet and grid raymap. V031 adds the
+clean labeled-image input contract, grid labeling, simple 3D geometry, and
+cell/height/ray accuracy gate that decides whether rays are trusted.

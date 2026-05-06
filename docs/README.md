@@ -14,6 +14,8 @@ docs/
 │                         (chronometric fork boundary + ARC quarantine rules)
 ├── chronometric_ab_qa_overlay_v030.md
 │                         (A/B-centered open Q/A overlay for Nemo + NanoWM)
+├── chronometric_map_perception_v031.md
+│                         (labeled image/grid/3D geometry accuracy gate)
 ├── chronometric_testing.md
 │                         (first mechanics smoke and bridge-manifest gate)
 ├── datasets/
@@ -32,6 +34,7 @@ docs/
 - **[Chronometric Contortion Foundation](chronometric_contortion_foundation.md)** — installed 4D event-state, learned 4x4 K tensor, log-time phase, projector constraint, and potential-family hook.
 - **[Chronometric Foundation Review V002](chronometric_foundation_review_v002.md)** — stricter audit of what is installed, what is still placeholder, and the staged path before ARC/data integration.
 - **[Chronometric A/B Q/A Overlay V030](chronometric_ab_qa_overlay_v030.md)** — A/B-centered open question loop for Nemo-style semantic reasoning feeding NanoWM branch scoring.
+- **[Chronometric Map Perception Gate V031](chronometric_map_perception_v031.md)** — palette-labeled image to grid, simple 3D geometry, object ray anchors, and strict accuracy gating before ray evidence is trusted.
 - **[Chronometric Testing](chronometric_testing.md)** — dated mechanics smoke condition, gates, and the bridge-manifest schema used before ARC data can enter NanoWM tests.
 - **[Evaluation](evaluation.md)** — `experiment=evaluate_only`, scheduling modes, metric definitions, headline numbers on each domain.
 - **[Datasets](datasets/README.md)** — DINO-WM (5 envs), RT-1 fractal, CSGO. Download / split / format / config.
