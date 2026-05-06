@@ -2,6 +2,61 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V024 Time-Phase And Translation Potential Fallback
+
+Artifacts:
+
+- `src/chronometric_branch_library.py`
+- `scripts/apply_chronometric_branch_library.py`
+- `tests/test_chronometric_branch_library.py`
+- `experiments/2026-05-05_chronometric_branch_library_v024_time_phase_translation_fallback_v018_geometry_predictions/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v024_time_phase_translation_fallback/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v024_time_phase_translation_fallback/`
+
+Condition:
+
+- source predictions:
+  `experiments/2026-05-05_chronometric_calibration_v018_geometry_v015_support_v016_holdout_balance_cpu/predictions.jsonl`
+- manifest:
+  `experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl`
+- branch library source split: `train`
+- library scope: `time_phase_translation`
+- fallback scope: `time_phase_translation_potential`
+- fallback source fields:
+  `potential_family_vector.time_phase.repeated_effect_size` and
+  `potential_family_vector.transition.changed_cells`
+- heldout labels used: `False`
+- training data promoted: `False`
+- clean diagnostic condition: `git_dirty=False`
+
+Verification:
+
+- `python -m pytest tests/test_chronometric_branch_library.py tests/test_chronometric_contortion.py tests/test_chronometric_calibration.py`
+- result: `27 passed`
+- `python -m py_compile src/chronometric_branch_library.py scripts/apply_chronometric_branch_library.py src/models/chronometric_contortion.py src/models/nanowm.py`
+
+Metrics:
+
+- library entries: `120`
+- adjusted records: `6077`
+- fallback records: `20`
+- heldout fallback records: `20`
+- heldout signed-Y MAE: `0.0018488270044326781`
+- heldout progress accuracy: `1.0`
+- heldout translation signed-Y MAE: `0.0`
+- heldout time-phase signed-Y MAE: `0.0`
+- top heldout action-control bucket:
+  `ACTION6|dominant_group:stasis_loop` at signed-Y MAE
+  `0.01084810103240766`
+
+Decision:
+
+V024 closes the missing-prototype residuals for time-phase and translation
+using safe observed potential-family context. The next blocker is not another
+movement prototype; it is stasis-loop behavior. The next clean test should
+broaden train-built library coverage to stasis-loop rows before adding a new
+fallback rule.
+
 ## V023 Translation Potential Fallback
 
 Artifacts:

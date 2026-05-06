@@ -91,13 +91,16 @@ iteration.
   branch-library prototypes. Result: heldout signed-Y MAE improved to
   `0.00214512`, translation MAE reached `0.0`, and progress accuracy stayed
   `1.0`.
+- V024: Added an opt-in observation-derived time-phase fallback and combined it
+  with the translation fallback. Result: heldout signed-Y MAE improved to
+  `0.00184883`, translation/time-phase MAE reached `0.0`, and progress
+  accuracy stayed `1.0`.
 
 ## Active Queue
 
-1. V024: add a safe fallback for missing time-phase prototypes.
-   Goal: handle heldout time-phase rows whose changed-cell counts are absent
-   from the train-built library, using observed potential-family context rather
-   than direct heldout labels.
+1. V025: broaden train-built library coverage to stasis-loop behavior.
+   Goal: test whether stasis-loop residuals can be reduced by train-derived
+   branch prototypes before inventing any new fallback rule.
 
 2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.

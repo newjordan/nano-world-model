@@ -238,3 +238,17 @@ V023 added an observation-derived fallback for missing translation prototypes:
 The remaining top residual is small and now sits in missing time-phase
 prototype rows, led by `ACTION1|dominant_group:time_phase` at signed-Y MAE
 `0.023844`.
+
+V024 added the matching observation-derived fallback for time-phase rows:
+
+- fallback scope `time_phase_translation_potential` handles missing
+  time-phase and translation prototypes from observed potential-family values.
+- V024 adjusted `6077` records, including `20` heldout fallback rows, with no
+  heldout labels.
+- heldout signed-Y MAE improved from V023 `0.00214512` to `0.00184883`.
+- heldout translation and time-phase MAE both reached `0.0`; progress accuracy
+  stayed `1.0`.
+
+The remaining residual has moved to stasis-loop behavior. The top bucket is
+`ACTION6|dominant_group:stasis_loop` at signed-Y MAE `0.0108481`, followed by
+`ACTION5|dominant_group:stasis_loop` at `0.00760109`.
