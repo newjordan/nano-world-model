@@ -1,0 +1,63 @@
+{
+  "applied_records": 6770,
+  "by_split": {
+    "heldout": {
+      "applied_records": 339,
+      "applied_reference_mae": 3.4879953504312003e-09,
+      "applied_reference_max_abs_diff": 1.1920928955078125e-07,
+      "applied_target_signed_mae": 3.4879953504312003e-09,
+      "fallback_records": 23,
+      "records": 400,
+      "unapplied_records": 61
+    },
+    "train": {
+      "applied_records": 6431,
+      "applied_reference_mae": 2.8539946570105027e-09,
+      "applied_reference_max_abs_diff": 1.1920928955078125e-07,
+      "applied_target_signed_mae": 2.8539946570105027e-09,
+      "fallback_records": 0,
+      "records": 7332,
+      "unapplied_records": 901
+    }
+  },
+  "condition": {
+    "batch_size": 512,
+    "blend": 1.0,
+    "created_at_utc": "2026-05-06T02:58:05.012764+00:00",
+    "device": "cpu",
+    "fallback_scope": "time_phase_translation_potential",
+    "frames": 4,
+    "git_commit": "0bfb08d22716846057e8a76e9a9948576fd7f750",
+    "git_dirty": false,
+    "heldout_labels_used": false,
+    "hidden_size": 32,
+    "input_predictions": "experiments/2026-05-05_chronometric_calibration_v016_action6_dominant_time_phase_balance_v015_holdout_cpu/predictions.jsonl",
+    "input_predictions_sha256": "9b5838658720c1a2bc22a8ae5eed1880768d34a72739f5f5ac086497e458fa94",
+    "library_scope": "time_phase_translation_stasis_loop",
+    "library_source_field": "target_signed_y",
+    "library_source_split": "train",
+    "manifest": "experiments/2026-05-05_arc_bridge_manifest_v013_action6_support_v015_holdout/arc_bridge_manifest.jsonl",
+    "manifest_sha256": "c9db243d749dd37cacc1ceb1896f59477ef8bcd014a46f9c1560dd8ebcd2045b",
+    "min_records": 1,
+    "potential_families": 16,
+    "run_kind": "planner_branch_scoring_smoke",
+    "run_label": "chronometric_planner_branch_score_v027_v015_holdout_cross_family",
+    "scorer_impl": "ChronometricContortionLayer.score_branch",
+    "scorer_surface": "score_chronometric_branch_or_score_branch",
+    "script": "scripts/score_chronometric_planner_branches.py",
+    "seed": 20260505,
+    "training_data_promoted": false
+  },
+  "fallback_records": 23,
+  "library_entries": 550,
+  "overall": {
+    "applied_records": 6770,
+    "applied_reference_mae": 2.8857415159572703e-09,
+    "applied_reference_max_abs_diff": 1.1920928955078125e-07,
+    "applied_target_signed_mae": 2.8857415159572703e-09,
+    "fallback_records": 23,
+    "records": 7732,
+    "unapplied_records": 962
+  },
+  "records": 7732
+}
