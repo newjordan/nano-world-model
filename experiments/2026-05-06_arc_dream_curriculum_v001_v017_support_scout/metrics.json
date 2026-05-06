@@ -1,0 +1,79 @@
+{
+  "condition": {
+    "arc_data_used": true,
+    "challenge_schema": "dream_kernel.arc_dream_challenge.v001",
+    "compile_kernel_policy": "none",
+    "created_at_utc": "2026-05-06T17:58:54.644877+00:00",
+    "curriculum_schema": "dream_kernel.arc_dream_curriculum.v001",
+    "dataset_path": "experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl",
+    "git_commit": "f7c19b0041516fccdf54234b4e58fa3298c9aef9",
+    "git_dirty": true,
+    "gpu_count": 0,
+    "historical_comparator": "none_first_arc_dream_curriculum",
+    "historical_comparator_artifact": null,
+    "loader_mode": "jsonl_bridge_manifest_direct",
+    "max_per_tier": 24,
+    "max_total": 160,
+    "metric_to_compare": "curriculum_tier_coverage_and_quarantine_integrity",
+    "projection_version": "arc_bridge_vector_to_dream_kernel_proxy_v001",
+    "quantization_policy": "none",
+    "quarantine_status_required": "control_source: arc_scaffold_non_chronometric",
+    "run_kind": "quarantined_arc_to_dream_curriculum_build",
+    "run_label": "arc_dream_curriculum_v001_v017_support_scout",
+    "run_label_semantics": "scout_curriculum_adapter",
+    "script": "scripts/build_arc_dream_curriculum.py",
+    "script_sha256": "33e6644574e76a0dddd3eeb6638f20f378df1a7b5c5a5eb514026da375c239de",
+    "seed": "not_applicable_deterministic_sort_select",
+    "selected_challenges": 96,
+    "source_manifest": "experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl",
+    "source_manifest_records": 7732,
+    "source_manifest_sha256": "c9db243d749dd37cacc1ceb1896f59477ef8bcd014a46f9c1560dd8ebcd2045b",
+    "source_manifest_valid": true,
+    "tokenizer_path": "not_applicable",
+    "training_data_promoted": false,
+    "vocab_size": "not_applicable",
+    "wallclock_budget": "not_applicable_posthoc_local_build",
+    "world_size": 1
+  },
+  "control_counts": {
+    "dominant_group:goal_progress": 23,
+    "dominant_group:stasis_loop": 13,
+    "dominant_group:translation": 48,
+    "stasis_no_change": 11,
+    "terminal_or_failure": 1
+  },
+  "curriculum_ready_for_dream_kernel_proxy_eval": true,
+  "quarantine_integrity": {
+    "projection_version": "arc_bridge_vector_to_dream_kernel_proxy_v001",
+    "quarantine_preserved": true,
+    "training_data_promoted": false
+  },
+  "selected_challenges": 96,
+  "source_rows": 7732,
+  "source_validation": {
+    "errors": [],
+    "path": "/home/frosty40/nano-world-model/experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl",
+    "records": 7732,
+    "valid": true
+  },
+  "split_counts": {
+    "arc_sprint0_v009_ft09_action6_affordance_v010_train_coverage": 13,
+    "arc_sprint0_v010_ft09_targeted_coordinate_v010_train_coverage": 1,
+    "arc_sprint0_v015_object_relative_family_v013_heldout": 29,
+    "arc_sprint0_v016_controllability_family_v012_heldout": 6,
+    "arc_sprint0_v019b_ten_task_family_v006": 25,
+    "arc_sprint0_v023_mirror_hazard_family_v010_heldout": 1,
+    "arc_sprint0_v031b_m0r0_post_progress_group_holdout_v004": 21
+  },
+  "task_counts": {
+    "dc22-fdcac232": 59,
+    "ft09-0d8bbf25": 14,
+    "m0r0-492f87ba": 23
+  },
+  "tier_counts": {
+    "t1_local_translation": 24,
+    "t2_action_coordinate": 24,
+    "t3_object_relative_branching": 24,
+    "t4_nonlocal_goal_hazard": 24
+  }
+}
