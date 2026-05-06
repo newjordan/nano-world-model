@@ -137,33 +137,40 @@ iteration.
   pre-action simulation channel with confidence, observed signed-Y outcome is
   post-action calibration truth, and the record compares the two without
   leaking observed outcome into visual/temporal perception.
+- V034: Added a deterministic sensory smattering harness. Result: five
+  human-review cases cover direct positive movement, wall-blocked movement,
+  temporal miss, visual map misread, and outcome-sign miss; the harness writes
+  condition, metrics, records, results, and a `HUMAN_EVAL.md` review sheet.
 
 ## Active Queue
 
-1. Outcome-imagined branch selection: feed V033 trusted visual+temporal+
+1. Run and review V034 human-eval batch. Goal: compare the system's trust
+   signals and imagined outcomes against human labels before scaling.
+
+2. Outcome-imagined branch selection: feed V033 trusted visual+temporal+
    imagined-outcome records into V029-style candidate selection as auxiliary
    evidence.
    Goal: prove the internal map can constrain action choice without bypassing
    NanoWM scoring.
 
-2. Batch sensory-record builder: convert recorded state/action traces into
+3. Batch sensory-record builder: convert recorded state/action traces into
    confirmation-record JSONL for correlation sweeps.
    Goal: turn each datapoint into comparable visual and temporal evidence.
 
-3. Raw screenshot perception adapter: add a renderer/screenshot fixture or
+4. Raw screenshot perception adapter: add a renderer/screenshot fixture or
    detector stub that produces the palette-labeled image required by V031.
    Goal: separate image parsing accuracy from geometry/raycast correctness.
 
-4. Full NanoWM/CEM integration: wire chronometric scoring into the real
+5. Full NanoWM/CEM integration: wire chronometric scoring into the real
    planner path once heldout branch choice has a small deterministic smoke.
    Goal: avoid hiding scorer bugs inside diffusion rollout complexity.
 
-5. Fresh heldout family: build or select the next heldout family beyond
+6. Fresh heldout family: build or select the next heldout family beyond
    V015/V016 after the action-candidate manifest is available.
    Goal: test whether the mechanism survives a new family with real branch
    alternatives instead of polishing a nearly saturated split.
 
-6. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
+7. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
    but do not tune directly against it unless it grows on a new heldout family.
    Goal: prevent research drift into cosmetic residual chasing.
 

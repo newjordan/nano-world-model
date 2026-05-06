@@ -20,6 +20,8 @@ docs/
 │                         (visual + temporal confirmation records)
 ├── chronometric_outcome_imagination_v033.md
 │                         (pre-action imagined outcome vs observed outcome)
+├── chronometric_sensory_smattering_v034.md
+│                         (small human-eval probe batch)
 ├── chronometric_testing.md
 │                         (first mechanics smoke and bridge-manifest gate)
 ├── datasets/
@@ -41,6 +43,7 @@ docs/
 - **[Chronometric Map Perception Gate V031](chronometric_map_perception_v031.md)** — palette-labeled image to grid, simple 3D geometry, object ray anchors, and strict accuracy gating before ray evidence is trusted.
 - **[Chronometric Sensory Alignment V032](chronometric_sensory_alignment_v032.md)** — visual and temporal confirmation records linking 2D maps, 3D geometry, predicted transitions, observed transitions, and outcome imagination.
 - **[Chronometric Outcome Imagination V033](chronometric_outcome_imagination_v033.md)** — corrected outcome channel: pre-action imagined signed-Y is available for planning, observed signed-Y is post-action calibration truth.
+- **[Chronometric Sensory Smattering V034](chronometric_sensory_smattering_v034.md)** — deterministic human-eval probe batch over visual, temporal, and outcome-imagination cases.
 - **[Chronometric Testing](chronometric_testing.md)** — dated mechanics smoke condition, gates, and the bridge-manifest schema used before ARC data can enter NanoWM tests.
 - **[Evaluation](evaluation.md)** — `experiment=evaluate_only`, scheduling modes, metric definitions, headline numbers on each domain.
 - **[Datasets](datasets/README.md)** — DINO-WM (5 envs), RT-1 fractal, CSGO. Download / split / format / config.
