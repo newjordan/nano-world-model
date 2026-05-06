@@ -56,6 +56,8 @@ def test_calibration_features_exclude_direct_outcome_labels():
 
 def test_calibration_features_include_safe_potential_family_inputs():
     record = synthetic_bridge_records()[0]
+    record["action_id"] = "ACTION4"
+    record["action_context"] = [0.4, 1.0, 0.2, 0.3, 0.125, 1.0, 1.0, 1.0]
     record["potential_family_names"] = [
         "transition.changed_cells",
         "time_phase.repeated_effect_size",
@@ -77,6 +79,31 @@ def test_calibration_features_include_safe_potential_family_inputs():
     assert features["mirror_progress_path_eta"] == 0.125
     assert features["mirror_progress_blocker_eta"] == 0.0625
     assert features["hazard_env_failure_eta"] == 0.25
+    assert features["coordinate_time_phase_eta"] == 0.5
+    assert features["action6_time_phase_eta"] == 0.0
+    assert features["action6_coordinate_time_phase_eta"] == 0.0
+    assert features["action6_coordinate_transition_eta"] == 0.0
+    assert "goal_progress_level_delta" not in features
+
+
+def test_calibration_features_include_safe_action6_time_phase_interactions():
+    record = synthetic_bridge_records()[0]
+    record["action_id"] = "ACTION6"
+    record["action_context"] = [0.6, 1.0, 0.2, 0.3, 0.125, 1.0, 1.0, 1.0]
+    record["potential_family_names"] = [
+        "transition.changed_cells",
+        "time_phase.repeated_effect_size",
+        "goal_progress.level_delta",
+        "stasis.no_change",
+    ]
+    record["potential_family_vector"] = [0.000244140625, 0.25, 10.0, 0.0]
+
+    features = dict(zip(FEATURE_NAMES, calibration_features(record), strict=True))
+
+    assert features["coordinate_time_phase_eta"] == 0.25
+    assert features["action6_time_phase_eta"] == 0.25
+    assert features["action6_coordinate_time_phase_eta"] == 0.25
+    assert features["action6_coordinate_transition_eta"] == 0.000244140625
     assert "goal_progress_level_delta" not in features
 
 

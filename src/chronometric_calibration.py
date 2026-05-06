@@ -35,6 +35,10 @@ FEATURE_NAMES = (
     "hazard_env_failure_eta",
     "same_action_streak_norm",
     "same_action_low_change_streak_norm",
+    "coordinate_time_phase_eta",
+    "action6_time_phase_eta",
+    "action6_coordinate_time_phase_eta",
+    "action6_coordinate_transition_eta",
 )
 
 LEAKAGE_EXCLUDED_FIELDS = (
@@ -107,11 +111,18 @@ def calibration_features(record: dict[str, Any], *, max_steps: float = 100.0) ->
     width = max(_get_sequence_number(shape, 1, 64.0), 1.0)
     phase_theta = _number(record.get("phase_theta"), 0.0)
     family = _family_lookup(record)
+    action_value_norm = _get_sequence_number(action_context, 0)
+    has_action_data = _get_sequence_number(action_context, 1)
+    transition_changed_eta = family.get("transition.changed_cells", 0.0)
+    time_phase_eta = family.get("time_phase.repeated_effect_size", 0.0)
+    action_id = str(record.get("action_id", "")).upper()
+    is_action6 = 1.0 if action_id == "ACTION6" or math.isclose(action_value_norm, 0.6) else 0.0
+    coordinate_gate = 1.0 if has_action_data > 0.5 else 0.0
 
     return [
         min(max(_number(record.get("t")) / max_steps, 0.0), 1.0),
-        _get_sequence_number(action_context, 0),
-        _get_sequence_number(action_context, 1),
+        action_value_norm,
+        has_action_data,
         _get_sequence_number(action_context, 2),
         _get_sequence_number(action_context, 3),
         _get_sequence_number(action_context, 4),
@@ -119,8 +130,8 @@ def calibration_features(record: dict[str, Any], *, max_steps: float = 100.0) ->
         _get_sequence_number(movement, 1) / height,
         math.sin(phase_theta),
         math.cos(phase_theta),
-        family.get("transition.changed_cells", 0.0),
-        family.get("time_phase.repeated_effect_size", 0.0),
+        transition_changed_eta,
+        time_phase_eta,
         family.get("stasis.no_change", 0.0),
         family.get("loop.repeated_action", 0.0),
         family.get("mirror.progress_path", 0.0),
@@ -128,6 +139,10 @@ def calibration_features(record: dict[str, Any], *, max_steps: float = 100.0) ->
         family.get("hazard.env_failure", 0.0),
         _number(record.get("same_action_streak_norm")),
         _number(record.get("same_action_low_change_streak_norm")),
+        coordinate_gate * time_phase_eta,
+        is_action6 * time_phase_eta,
+        is_action6 * coordinate_gate * time_phase_eta,
+        is_action6 * coordinate_gate * transition_changed_eta,
     ]
 
 
