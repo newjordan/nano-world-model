@@ -1,0 +1,34 @@
+{
+  "actuator_steps_executed": 0,
+  "ambiguity_detected": true,
+  "arc_solve_claim": false,
+  "branch_simulation_artifact": "experiments/2026-05-06_arc_agi3_model_decision_v052_ls20_live_nemo3_mlp_alias_reset/branch_simulation.json",
+  "branch_simulation_sha256": "e88d746a1e61e0471d6bd07c4eb65139dcc60586df030a318ac24f277d0835a6",
+  "created_at_utc": "2026-05-06T22:08:18.716000+00:00",
+  "created_before_actuator_step": true,
+  "drives_selected_action": true,
+  "lock_reason": "internal chronometric branch simulation selected the action before actuator use",
+  "locked": true,
+  "nemo3_interim_confirmations": [
+    {
+      "artifact": "experiments/2026-05-06_arc_agi3_model_decision_v052_ls20_live_nemo3_mlp_alias_reset/nemo3_interim_branch_selection_gap.json",
+      "confirmation_mode": "live-relay",
+      "created_during_internal_thinking": true,
+      "external_nemo3_model_invoked": true,
+      "question_id": "branch_selection_gap",
+      "role": "ambiguity_or_question_confirmation",
+      "schema": "arc_agi3.nemo3_interim_confirmation.v001",
+      "sha256": "af00a5bec8ce6444437a22ed069450b43c00fef04524a84258989d874c49134f"
+    }
+  ],
+  "open_question_ids": [
+    "branch_selection_gap"
+  ],
+  "schema": "arc_agi3.internal_thinking_lock.v001",
+  "selected_action_name": "ACTION3",
+  "selected_action_source": "world_model_internal_thinking",
+  "selected_action_value": 3,
+  "selected_branch_id": "ls20:reset:dc151fd9-d537-4b08-a7d6-e0fa2b408450:action:3",
+  "state_id": "ls20:reset:dc151fd9-d537-4b08-a7d6-e0fa2b408450",
+  "training_data_promoted": false
+}
