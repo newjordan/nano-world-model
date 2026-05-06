@@ -1,0 +1,162 @@
+{
+  "adjusted_records": 8,
+  "adjusted_records_by_split": {
+    "heldout": 2,
+    "train": 6
+  },
+  "by_split": {
+    "heldout": {
+      "max_progress_prob": 0.0014542012941092253,
+      "mean_progress_prob": 3.567228773108079e-05,
+      "positive_best_rank": null,
+      "positive_mean_rank": null,
+      "positive_records": 0,
+      "progress_accuracy": 1.0,
+      "progress_bce": 3.5678917657129544e-05,
+      "records": 400,
+      "signed_bias": -0.0063762724115076705,
+      "signed_mae": 0.018027649731448037,
+      "top_false_positive": {
+        "action_id": "ACTION6",
+        "control_label": "dominant_group:stasis_loop",
+        "pred_progress_prob": 0.0014542012941092253,
+        "pred_progress_rank": 1,
+        "pred_signed_y": -0.9168888926506042,
+        "progress_label": "no_level_progress",
+        "source_artifact_path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_tn36_seed0.transitions.jsonl",
+        "split": "heldout",
+        "t": 5,
+        "target_progress": 0.0,
+        "target_signed_y": -1.0
+      },
+      "worst_signed_error": {
+        "action_id": "ACTION5",
+        "control_label": "dominant_group:translation",
+        "pred_progress_prob": 3.688807578194737e-27,
+        "pred_progress_rank": 400,
+        "pred_signed_y": -0.9591033458709717,
+        "progress_label": "no_level_progress",
+        "source_artifact_path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_g50t_seed0.transitions.jsonl",
+        "split": "heldout",
+        "t": 9,
+        "target_progress": 0.0,
+        "target_signed_y": 0.0234375
+      }
+    },
+    "train": {
+      "max_progress_prob": 1.0,
+      "mean_progress_prob": 0.00712118558723407,
+      "positive_best_rank": 1,
+      "positive_mean_rank": 26.5,
+      "positive_records": 52,
+      "progress_accuracy": 1.0,
+      "progress_bce": 2.8990063030453234e-05,
+      "records": 7332,
+      "signed_bias": -0.003630020019456168,
+      "signed_mae": 0.006895978301113819,
+      "top_false_positive": {
+        "action_id": "ACTION6",
+        "control_label": "dominant_group:stasis_loop",
+        "pred_progress_prob": 0.0017402744852006435,
+        "pred_progress_rank": 53,
+        "pred_signed_y": -0.9944205284118652,
+        "progress_label": "no_level_progress",
+        "source_artifact_path": "experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/grid/transition_events/v011_action6_heatmap_tn36_stride4_seed0.transitions.jsonl",
+        "split": "train",
+        "t": 24,
+        "target_progress": 0.0,
+        "target_signed_y": -1.0
+      },
+      "worst_signed_error": {
+        "action_id": "ACTION6",
+        "control_label": "dominant_group:stasis_loop",
+        "pred_progress_prob": 1.2752229849866126e-05,
+        "pred_progress_rank": 4923,
+        "pred_signed_y": -0.4505140781402588,
+        "progress_label": "no_level_progress",
+        "source_artifact_path": "experiments/2026-05-04_v010_ft09_targeted_coordinate_scout/grid/transition_events/v010_ft09_targeted_coordinate_v009prior_seed0.transitions.jsonl",
+        "split": "train",
+        "t": 9,
+        "target_progress": 0.0,
+        "target_signed_y": -1.0
+      }
+    }
+  },
+  "condition": {
+    "blend": 1.0,
+    "calibration_metrics": "experiments/2026-05-05_chronometric_calibration_v018_geometry_v015_support_v016_holdout_balance_cpu/metrics.json",
+    "calibration_metrics_sha256": "b326fe8d1645f2d9366e09c514971f00f2bd2e9671caa77e148f23d801a318e3",
+    "created_at_utc": "2026-05-06T02:03:46.181322+00:00",
+    "git_commit": "bfe50dccc333773011159f99f84f4ba64f467238",
+    "git_dirty": false,
+    "heldout_labels_used": false,
+    "input_predictions": "experiments/2026-05-05_chronometric_calibration_v018_geometry_v015_support_v016_holdout_balance_cpu/predictions.jsonl",
+    "input_predictions_sha256": "27446bb6015bdf110a6d4d277fb3af25d49f310ba1af9ab9ec168742a53f1ca7",
+    "library_source_field": "target_signed_y",
+    "library_source_split": "train",
+    "manifest": "experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl",
+    "manifest_sha256": "c9db243d749dd37cacc1ceb1896f59477ef8bcd014a46f9c1560dd8ebcd2045b",
+    "min_records": 1,
+    "run_kind": "branch_library_posthoc_inference",
+    "run_label": "chronometric_branch_library_v020_v018_geometry_predictions",
+    "script": "scripts/apply_chronometric_branch_library.py",
+    "training_data_promoted": false
+  },
+  "library": {
+    "ACTION6|dominant_group:time_phase|x:28|y:30": {
+      "records": 1,
+      "signed_y_mean": 0.250244140625
+    },
+    "ACTION6|dominant_group:time_phase|x:44|y:36": {
+      "records": 1,
+      "signed_y_mean": 0.25927734375
+    },
+    "ACTION6|dominant_group:time_phase|x:4|y:0": {
+      "records": 1,
+      "signed_y_mean": 0.250244140625
+    },
+    "ACTION6|dominant_group:time_phase|x:61|y:1": {
+      "records": 3,
+      "signed_y_mean": 0.250244140625
+    }
+  },
+  "library_entries": 4,
+  "overall": {
+    "max_progress_prob": 1.0,
+    "mean_progress_prob": 0.006754630320834535,
+    "positive_best_rank": 1,
+    "positive_mean_rank": 26.5,
+    "positive_records": 52,
+    "progress_accuracy": 1.0,
+    "progress_bce": 2.933609793095382e-05,
+    "records": 7732,
+    "signed_bias": -0.0037720920521541247,
+    "signed_mae": 0.0074718536984409905,
+    "top_false_positive": {
+      "action_id": "ACTION6",
+      "control_label": "dominant_group:stasis_loop",
+      "pred_progress_prob": 0.0017402744852006435,
+      "pred_progress_rank": 53,
+      "pred_signed_y": -0.9944205284118652,
+      "progress_label": "no_level_progress",
+      "source_artifact_path": "experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/grid/transition_events/v011_action6_heatmap_tn36_stride4_seed0.transitions.jsonl",
+      "split": "train",
+      "t": 24,
+      "target_progress": 0.0,
+      "target_signed_y": -1.0
+    },
+    "worst_signed_error": {
+      "action_id": "ACTION5",
+      "control_label": "dominant_group:translation",
+      "pred_progress_prob": 3.688807578194737e-27,
+      "pred_progress_rank": 400,
+      "pred_signed_y": -0.9591033458709717,
+      "progress_label": "no_level_progress",
+      "source_artifact_path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_g50t_seed0.transitions.jsonl",
+      "split": "heldout",
+      "t": 9,
+      "target_progress": 0.0,
+      "target_signed_y": 0.0234375
+    }
+  }
+}
