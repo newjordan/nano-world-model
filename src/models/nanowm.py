@@ -784,13 +784,24 @@ class NanoWM(nn.Module):
             return {}
         return self.chronometric.last_losses
 
-    def score_chronometric_branch(self, tokens, branch_direction, action_context=None):
+    def score_chronometric_branch(
+        self,
+        tokens,
+        branch_direction,
+        action_context=None,
+        branch_library=None,
+        branch_library_contexts=None,
+        branch_library_blend=1.0,
+    ):
         if not self.use_chronometric:
             raise RuntimeError("chronometric branch scoring requested while chronometric is disabled")
         return self.chronometric.score_branch(
             tokens,
             branch_direction,
             action_context=action_context,
+            branch_library=branch_library,
+            branch_library_contexts=branch_library_contexts,
+            branch_library_blend=branch_library_blend,
         )
 
 

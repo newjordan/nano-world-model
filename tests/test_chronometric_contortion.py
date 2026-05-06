@@ -85,6 +85,47 @@ class ChronometricContortionTests(unittest.TestCase):
         self.assertTrue(torch.isfinite(out_x.outcome_y).all())
         self.assertTrue(torch.isfinite(out_y.outcome_y).all())
 
+    def test_branch_library_hotload_adjusts_score_branch_outcome(self):
+        layer = chrono.ChronometricContortionLayer(hidden_size=16)
+        tokens = torch.randn(2, 4, 16)
+        branch = torch.tensor([[0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]])
+        contexts = [
+            {
+                "action_id": "ACTION6",
+                "control_label": "dominant_group:time_phase",
+                "action_context": [0.6, 1.0, 0.4375, 0.46875, 0.0, 0.0, 0.0, 0.0],
+                "potential_family_names": ["time_phase.repeated_effect_size"],
+                "potential_family_vector": [0.25],
+            },
+            {
+                "action_id": "ACTION5",
+                "control_label": "dominant_group:translation",
+                "action_context": [0.5, 1.0, 0.4375, 0.46875, 0.0, 0.0, 0.0, 0.0],
+                "potential_family_names": ["time_phase.repeated_effect_size"],
+                "potential_family_vector": [0.25],
+            },
+        ]
+        library = {
+            "ACTION6|dominant_group:time_phase|x:28|y:30": chrono.BranchLibraryEntry(
+                key="ACTION6|dominant_group:time_phase|x:28|y:30",
+                records=1,
+                signed_y_mean=0.25,
+            )
+        }
+
+        raw = layer.score_branch(tokens, branch)
+        adjusted = layer.score_branch(
+            tokens,
+            branch,
+            branch_library=library,
+            branch_library_contexts=contexts,
+            branch_library_blend=1.0,
+        )
+
+        self.assertTrue(torch.allclose(adjusted.outcome_y[0].mean(), torch.tensor(0.25), atol=1e-6))
+        self.assertTrue(torch.allclose(adjusted.outcome_y[1], raw.outcome_y[1], atol=1e-6))
+        self.assertEqual(float(layer.last_metrics["chronometric_branch_library_applied"].item()), 1.0)
+
     def test_nanowm_audit_mode_tracks_metrics_without_changing_output_when_runtime_deps_are_available(self):
         try:
             from models.nanowm import NanoWM

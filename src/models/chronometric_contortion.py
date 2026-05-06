@@ -9,11 +9,13 @@ velocity, and maps the integrated event update back into model hidden space.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
-from typing import Dict
+from dataclasses import dataclass, replace
+from typing import Any, Dict
 
 import torch
 import torch.nn as nn
+
+from chronometric_branch_library import BranchLibraryEntry, blend_branch_library_signed_y
 
 
 LOG_PHASE_LAMBDA = 3722.0 / 2705.0
@@ -284,6 +286,9 @@ class ChronometricContortionLayer(nn.Module):
         branch_direction: torch.Tensor,
         *,
         action_context: torch.Tensor | None = None,
+        branch_library: dict[str, BranchLibraryEntry] | None = None,
+        branch_library_contexts: list[dict[str, Any]] | None = None,
+        branch_library_blend: float = 1.0,
     ) -> ChronometricOutput:
         """Score a supplied branch direction without applying a token residual."""
         output = self._compute_geometry(
@@ -291,8 +296,56 @@ class ChronometricContortionLayer(nn.Module):
             action_context=action_context,
             branch_direction=branch_direction,
         )
+        output, library_applied = self._apply_branch_library(
+            output,
+            branch_library=branch_library,
+            branch_library_contexts=branch_library_contexts,
+            branch_library_blend=branch_library_blend,
+        )
         self._store_diagnostics(output)
+        if branch_library is not None:
+            self.last_metrics["chronometric_branch_library_applied"] = output.outcome_y.new_tensor(
+                float(library_applied)
+            ).detach()
         return output
+
+    def _apply_branch_library(
+        self,
+        output: ChronometricOutput,
+        *,
+        branch_library: dict[str, BranchLibraryEntry] | None,
+        branch_library_contexts: list[dict[str, Any]] | None,
+        branch_library_blend: float,
+    ) -> tuple[ChronometricOutput, int]:
+        if branch_library is None:
+            return output, 0
+        if branch_library_contexts is None:
+            raise ValueError("branch_library_contexts are required when branch_library is supplied")
+        if len(branch_library_contexts) != output.outcome_y.shape[0]:
+            raise ValueError(
+                "branch_library_contexts must match score batch size "
+                f"{output.outcome_y.shape[0]}, got {len(branch_library_contexts)}"
+            )
+        adjusted = output.outcome_y.clone()
+        applied = 0
+        clamped_blend = min(max(float(branch_library_blend), 0.0), 1.0)
+        for batch_index, context in enumerate(branch_library_contexts):
+            raw_mean = output.outcome_y[batch_index].mean()
+            lookup_context = dict(context)
+            lookup_context["pred_signed_y"] = float(raw_mean.detach().cpu().item())
+            adjusted_scalar, entry = blend_branch_library_signed_y(
+                lookup_context,
+                branch_library,
+                blend=clamped_blend,
+            )
+            if entry is None:
+                continue
+            adjusted_target = output.outcome_y.new_tensor(adjusted_scalar)
+            adjusted[batch_index] = output.outcome_y[batch_index] + (adjusted_target - raw_mean)
+            applied += 1
+        if applied == 0:
+            return output, 0
+        return replace(output, outcome_y=adjusted), applied
 
     def forward(
         self,
