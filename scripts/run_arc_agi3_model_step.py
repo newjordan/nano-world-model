@@ -106,6 +106,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     action = action_by_value(env.action_space, int(selected_action["action_value"]))
     action_data = selected_action.get("action_data")
     before_summary = summarize_frame_stack(getattr(obs, "frame", None))
+    observation_match = require_observation_artifact_match(
+        model_decision=model_decision,
+        obs=obs,
+        env=env,
+        frame_summary=before_summary,
+    )
     reasoning = actuator_reasoning_from_model_decision(model_decision)
     reasoning["run_label"] = args.run_label
 
@@ -129,6 +135,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             model_decision=model_decision,
             before_summary=before_summary,
             next_summary=next_summary,
+            observation_match=observation_match,
         )
     ]
     condition = condition_payload(
@@ -172,6 +179,7 @@ def trace_row(
     model_decision: dict[str, Any],
     before_summary: dict[str, Any],
     next_summary: dict[str, Any],
+    observation_match: dict[str, Any],
 ) -> dict[str, Any]:
     levels_completed = int(getattr(obs, "levels_completed", 0))
     next_levels_completed = int(getattr(next_obs, "levels_completed", 0))
@@ -197,6 +205,12 @@ def trace_row(
         "game_id": str(getattr(obs, "game_id", getattr(env.info, "game_id", ""))),
         "state_id": model_decision["state_id"],
         "decision_id": model_decision["decision_id"],
+        "observation_artifact": observation_match["artifact"],
+        "observation_artifact_sha256": observation_match["sha256"],
+        "observation_content_match": observation_match["content_match"],
+        "observation_guid_match": observation_match["guid_match"],
+        "model_observation_guid": observation_match["expected_guid"],
+        "current_observation_guid": observation_match["current_guid"],
         "observation_guid": str(getattr(obs, "guid", "")),
         "next_observation_guid": str(getattr(next_obs, "guid", "")),
         "state": state_name(getattr(obs, "state", None)),
@@ -234,6 +248,86 @@ def trace_row(
         "online_submission": False,
         "scorecard_submission": False,
     }
+
+
+def require_observation_artifact_match(
+    *,
+    model_decision: dict[str, Any],
+    obs: Any,
+    env: Any,
+    frame_summary: dict[str, Any],
+) -> dict[str, Any]:
+    flow = model_decision.get("standard_model_flow", {})
+    if not isinstance(flow, dict):
+        raise RuntimeError("ModelDecision standard_model_flow is missing")
+    artifact_ref = flow.get("observation_artifact")
+    artifact_path = resolve_model_artifact(artifact_ref)
+    expected = json.loads(artifact_path.read_text(encoding="utf-8"))
+    if not isinstance(expected, dict):
+        raise RuntimeError(f"observation_artifact is not a JSON object: {artifact_ref}")
+
+    current = {
+        "game_id": str(getattr(obs, "game_id", getattr(env.info, "game_id", ""))),
+        "state": state_name(getattr(obs, "state", None)),
+        "levels_completed": int(getattr(obs, "levels_completed", 0)),
+        "win_levels": int(getattr(obs, "win_levels", 0)),
+        "full_reset": bool(getattr(obs, "full_reset", False)),
+        "available_action_values": action_values(getattr(env, "action_space", [])),
+        "frame_stack_len": frame_summary["frame_stack_len"],
+        "latest_frame_shape": frame_summary["latest_frame_shape"],
+        "latest_frame_min": frame_summary["latest_frame_min"],
+        "latest_frame_max": frame_summary["latest_frame_max"],
+        "latest_frame_sha256": frame_summary["latest_frame_sha256"],
+    }
+    expected_frame = expected.get("frame") if isinstance(expected.get("frame"), dict) else {}
+    expected_values = {
+        "game_id": str(expected.get("game_id", "")),
+        "state": str(expected.get("state", "")),
+        "levels_completed": int(expected.get("levels_completed", 0)),
+        "win_levels": int(expected.get("win_levels", 0)),
+        "full_reset": bool(expected.get("full_reset", False)),
+        "available_action_values": [int(value) for value in expected.get("available_action_values", [])],
+        "frame_stack_len": expected_frame.get("frame_stack_len"),
+        "latest_frame_shape": expected_frame.get("latest_frame_shape"),
+        "latest_frame_min": expected_frame.get("latest_frame_min"),
+        "latest_frame_max": expected_frame.get("latest_frame_max"),
+        "latest_frame_sha256": expected_frame.get("latest_frame_sha256"),
+    }
+    mismatches = [key for key, current_value in current.items() if current_value != expected_values.get(key)]
+    if mismatches:
+        details = ", ".join(
+            f"{key}: current={current[key]!r} expected={expected_values.get(key)!r}"
+            for key in mismatches
+        )
+        raise RuntimeError(
+            "current observation does not match ModelDecision observation_artifact "
+            f"{artifact_ref}: {details}"
+        )
+
+    current_guid = str(getattr(obs, "guid", ""))
+    expected_guid = str(expected.get("guid", ""))
+    return {
+        "artifact": _repo_rel(artifact_path),
+        "sha256": _sha256(artifact_path),
+        "content_match": True,
+        "guid_match": current_guid == expected_guid,
+        "current_guid": current_guid,
+        "expected_guid": expected_guid,
+        "matched_fields": sorted(current),
+    }
+
+
+def resolve_model_artifact(artifact_ref: Any) -> Path:
+    if not isinstance(artifact_ref, str) or not artifact_ref.strip():
+        raise RuntimeError("ModelDecision observation_artifact is required")
+    if artifact_ref.startswith("artifact://"):
+        raise RuntimeError(f"ModelDecision observation_artifact is not a file path: {artifact_ref}")
+    path = Path(artifact_ref)
+    if not path.is_absolute():
+        path = ROOT / path
+    if not path.exists():
+        raise FileNotFoundError(path)
+    return path.resolve()
 
 
 def condition_payload(
@@ -321,10 +415,15 @@ def summarize_model_step(
         "nemo3_interim_confirmation_count": row.get("nemo3_interim_confirmation_count", 0),
         "chronometric_game_knowledge": row.get("chronometric_game_knowledge"),
         "chronometric_game_knowledge_score_surface": row.get("chronometric_game_knowledge_score_surface"),
+        "observation_artifact": row.get("observation_artifact"),
+        "observation_artifact_sha256": row.get("observation_artifact_sha256"),
+        "observation_content_match": row.get("observation_content_match"),
+        "observation_guid_match": row.get("observation_guid_match"),
         "valid_standard_model_flow_step": bool(
             len(trace_rows) == 1
             and model_decision.get("schema") == MODEL_DECISION_SCHEMA
             and row["chosen_action_value"] in row["available_action_values"]
+            and row.get("observation_content_match") is True
             and row.get("selected_action_source") == SELECTED_ACTION_SOURCE
             and row.get("chronometric_game_knowledge")
             and row.get("chronometric_game_knowledge_score_surface") == CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE
@@ -365,6 +464,8 @@ def format_results(metrics: dict[str, Any]) -> str:
         "",
         f"- valid standard model-flow step: `{metrics['valid_standard_model_flow_step']}`",
         f"- decision id: `{metrics['decision_id']}`",
+        f"- observation content match: `{metrics['observation_content_match']}`",
+        f"- observation GUID match: `{metrics['observation_guid_match']}`",
         f"- Nemo3 invoked: `{metrics['nemo3_invoked']}`",
         f"- action: `{metrics['chosen_action_name']}:{metrics['chosen_action_value']}`",
         f"- candidate action packets: `{metrics['candidate_action_packets']}`",

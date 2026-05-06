@@ -33,6 +33,7 @@ class FakeObs:
         self.state = state
         self.levels_completed = levels_completed
         self.win_levels = 7
+        self.full_reset = True
 
 
 class FakeAction:
@@ -118,6 +119,14 @@ def test_model_step_trace_row_records_model_decision_not_policy_loop():
     after = {"latest_frame_shape": [64, 64], "latest_frame_sha256": "b"}
     env = FakeEnv()
     env.action_space = [FakeAction()]
+    observation_match = {
+        "artifact": "artifact://obs",
+        "sha256": "e" * 64,
+        "content_match": True,
+        "guid_match": False,
+        "expected_guid": "model-guid",
+        "current_guid": "obs-guid",
+    }
 
     row = module.trace_row(
         args=args,
@@ -130,11 +139,15 @@ def test_model_step_trace_row_records_model_decision_not_policy_loop():
         model_decision=_decision(module),
         before_summary=before,
         next_summary=after,
+        observation_match=observation_match,
     )
 
     assert row["schema"] == module.TRACE_SCHEMA
     assert row["decision_id"] == "decision-001"
     assert row["standard_model_flow"] == list(module.STANDARD_MODEL_FLOW)
+    assert row["observation_artifact"] == "artifact://obs"
+    assert row["observation_content_match"] is True
+    assert row["observation_guid_match"] is False
     assert row["nemo3_invoked"] is True
     assert row["nemo3_role"] == "confirmation_not_action_source"
     assert row["nemo3_decision_delegated_to_nemo"] is False
@@ -158,6 +171,10 @@ def test_model_step_summary_requires_one_model_decision_actuator_step():
         "chosen_action_name": "ACTION1",
         "chosen_action_value": 1,
         "available_action_values": [1, 2, 3, 4],
+        "observation_artifact": "artifact://obs",
+        "observation_artifact_sha256": "e" * 64,
+        "observation_content_match": True,
+        "observation_guid_match": False,
         "frame_changed": True,
         "levels_completed": 0,
         "next_levels_completed": 1,
@@ -187,8 +204,108 @@ def test_model_step_summary_requires_one_model_decision_actuator_step():
 
     assert metrics["valid_standard_model_flow_step"] is True
     assert metrics["actuator_steps_executed"] == 1
+    assert metrics["observation_content_match"] is True
+    assert metrics["observation_guid_match"] is False
     assert metrics["nemo3_final_confirmation"] == "artifact://nemo3-final"
     assert metrics["nemo3_interim_confirmation_count"] == 0
     assert metrics["chronometric_game_knowledge"] == "artifact://game-knowledge"
     assert metrics["chronometric_game_knowledge_score_surface"] == module.CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE
     assert metrics["levels_completed_delta"] == 1
+
+
+def test_observation_artifact_match_requires_current_frame_content(tmp_path):
+    module = _load_module()
+    env = FakeEnv()
+    env.action_space = [FakeAction()]
+    obs = FakeObs()
+    frame_summary = {
+        "frame_stack_len": 1,
+        "latest_frame_shape": [64, 64],
+        "latest_frame_min": 0,
+        "latest_frame_max": 15,
+        "latest_frame_sha256": "frame-sha",
+    }
+    artifact = tmp_path / "observation.json"
+    artifact.write_text(
+        """{
+  "game_id": "ls20-9607627b",
+  "guid": "model-guid",
+  "state": "NOT_FINISHED",
+  "levels_completed": 0,
+  "win_levels": 7,
+  "full_reset": true,
+  "available_action_values": [1],
+  "frame": {
+    "frame_stack_len": 1,
+    "latest_frame_shape": [64, 64],
+    "latest_frame_min": 0,
+    "latest_frame_max": 15,
+    "latest_frame_sha256": "frame-sha"
+  }
+}
+""",
+        encoding="utf-8",
+    )
+    decision = _decision(module)
+    decision["standard_model_flow"]["observation_artifact"] = str(artifact)
+
+    match = module.require_observation_artifact_match(
+        model_decision=decision,
+        obs=obs,
+        env=env,
+        frame_summary=frame_summary,
+    )
+
+    assert match["content_match"] is True
+    assert match["guid_match"] is False
+    assert match["expected_guid"] == "model-guid"
+    assert match["current_guid"] == "obs-guid"
+
+
+def test_observation_artifact_match_rejects_frame_mismatch(tmp_path):
+    module = _load_module()
+    env = FakeEnv()
+    env.action_space = [FakeAction()]
+    obs = FakeObs()
+    frame_summary = {
+        "frame_stack_len": 1,
+        "latest_frame_shape": [64, 64],
+        "latest_frame_min": 0,
+        "latest_frame_max": 15,
+        "latest_frame_sha256": "current-frame-sha",
+    }
+    artifact = tmp_path / "observation.json"
+    artifact.write_text(
+        """{
+  "game_id": "ls20-9607627b",
+  "guid": "obs-guid",
+  "state": "NOT_FINISHED",
+  "levels_completed": 0,
+  "win_levels": 7,
+  "full_reset": true,
+  "available_action_values": [1],
+  "frame": {
+    "frame_stack_len": 1,
+    "latest_frame_shape": [64, 64],
+    "latest_frame_min": 0,
+    "latest_frame_max": 15,
+    "latest_frame_sha256": "model-frame-sha"
+  }
+}
+""",
+        encoding="utf-8",
+    )
+    decision = _decision(module)
+    decision["standard_model_flow"]["observation_artifact"] = str(artifact)
+
+    try:
+        module.require_observation_artifact_match(
+            model_decision=decision,
+            obs=obs,
+            env=env,
+            frame_summary=frame_summary,
+        )
+    except RuntimeError as error:
+        assert "latest_frame_sha256" in str(error)
+    else:
+        raise AssertionError("expected frame mismatch to fail closed")
