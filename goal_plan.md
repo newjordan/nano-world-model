@@ -74,16 +74,17 @@ iteration.
   features, paired the ka59 key, moved V016 heldout ka59 to `0.230412`, and
   reduced heldout `ACTION6|time_phase` MAE to `0.0136911`. V019B is diagnostic,
   not a clean heldout promotion.
+- V020: Added a train-built branch-library hotload path and applied it to V018
+  predictions. Result: adjusted `8` ACTION6 time-phase records, used no heldout
+  labels, moved V016 heldout ka59 from raw `-0.589080` to `0.250244`, and
+  reduced heldout `ACTION6|time_phase` MAE to `0.0`.
 
 ## Active Queue
 
-1. V020: convert V019B's transductive success into a non-transductive planner
-   mechanism.
-   Goal: generate or retrieve candidate branch pairs inside the world-model
-   planning surface so matched coordinate-family consistency is available
-   without using heldout eval features. Candidate directions: branch library
-   hotload, candidate-pair generator, or route calibration output into NanoWM
-   branch scoring with consistency over sampled branches.
+1. V021: integrate branch-library hotload into NanoWM chronometric branch
+   scoring.
+   Goal: move V020 from posthoc prediction adjustment into the actual planner
+   surface, while preserving the train-built/no-heldout-label condition.
 
 2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.

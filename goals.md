@@ -176,3 +176,19 @@ when the matching branch is available as an unlabeled candidate. The next
 research step is to make that mechanism non-transductive by generating or
 learning candidate branch pairs inside the world-model planner, instead of
 borrowing heldout features from the eval split.
+
+V020 converted the mechanism into a non-transductive branch-library hotload:
+
+- the library is built from train split targets only and keyed by ACTION6
+  time-phase coordinate geometry.
+- V020 adjusted `8` records total (`6` train, `2` heldout) and used no heldout
+  labels.
+- heldout `ACTION6|time_phase` reached signed-Y MAE `0.0`; heldout ka59 moved
+  from raw V18 `-0.589080` to `0.250244`.
+- overall heldout signed-Y MAE was `0.0180276`; top heldout error moved to
+  `ACTION5|time_phase`.
+
+This is now a plausible harness mechanism rather than a transductive training
+trick. The next target is integrating branch-library hotload into NanoWM
+chronometric branch scoring and then broadening the library beyond ACTION6
+time-phase.

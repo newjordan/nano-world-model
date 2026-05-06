@@ -2,6 +2,48 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V020 Branch-Library Hotload
+
+Artifacts:
+
+- `experiments/2026-05-05_chronometric_branch_library_v020_v018_geometry_predictions/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v020_branch_library_v018_geometry_predictions/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v020_branch_library_v018_geometry_predictions/`
+
+Condition:
+
+- source predictions:
+  `experiments/2026-05-05_chronometric_calibration_v018_geometry_v015_support_v016_holdout_balance_cpu/predictions.jsonl`
+- manifest:
+  `experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl`
+- branch library source split: `train`
+- branch library source field: `target_signed_y`
+- blend: `1.0`
+- min records per key: `1`
+- heldout labels used: `False`
+- training data promoted: `False`
+
+Metrics:
+
+- library entries: `4`
+- adjusted records: `8`
+- heldout adjusted records: `2`
+- heldout signed-Y MAE: `0.018027649731448037`
+- heldout progress accuracy: `1.0`
+- heldout `ACTION6|time_phase` signed-Y MAE: `0.0`
+- V016 heldout ka59 raw prediction: `-0.5890800952911377`
+- V016 heldout ka59 branch-library prediction: `0.250244140625`
+- top heldout bucket moved to `ACTION5|time_phase` at
+  `0.22145648300647736`
+
+Decision:
+
+V020 converts the V019B transductive consistency finding into a non-transductive
+inference mechanism: the branch library is built from train targets and applied
+by geometry key at prediction time. This should be promoted as a harness
+component candidate, pending integration into NanoWM chronometric branch
+scoring and broader non-ACTION6 coverage.
+
 ## V019 Branch Consistency Objective
 
 Artifacts:
