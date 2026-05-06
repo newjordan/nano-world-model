@@ -145,36 +145,49 @@ iteration.
   Result: `2/5` combined trusted, `3/5` sensory trusted, `2/5`
   outcome-imagination trusted, with isolated visual, temporal, and outcome-sign
   failures available for human review.
+- V035: Converted the ARC-Dream proxy eval branch-rank mismatch into a goal
+  artifact. Result: `48` reachable solved proxy maps became calibration cases,
+  all with terminal-positive branch rank `5`; cases split evenly across
+  `t2_action_coordinate` and `t3_object_relative_branching`, while the one
+  unsolved row remains isolated as `proxy_goal_unreachable_in_projection`.
 
 ## Active Queue
 
-1. Ingest V034 human labels after review. Goal: compare human accept/reject
+1. Run the V035 branch-rank goal loop. Goal: make every reachable solved
+   ARC-Dream proxy map rank the terminal-positive branch first while preserving
+   object identity, ray contacts, invariants, and quarantine boundaries.
+
+2. Projection-map reachability repair. Goal: separate bad proxy map generation
+   from kernel planner/value failures by eliminating unreachable generated
+   maps before treating a row as solver failure.
+
+3. Ingest V034 human labels after review. Goal: compare human accept/reject
    judgments against visual, temporal, and outcome-imagination trust signals.
 
-2. Outcome-imagined branch selection: feed V033 trusted visual+temporal+
+4. Outcome-imagined branch selection: feed V033 trusted visual+temporal+
    imagined-outcome records into V029-style candidate selection as auxiliary
    evidence.
    Goal: prove the internal map can constrain action choice without bypassing
    NanoWM scoring.
 
-3. Batch sensory-record builder: convert recorded state/action traces into
+5. Batch sensory-record builder: convert recorded state/action traces into
    confirmation-record JSONL for correlation sweeps.
    Goal: turn each datapoint into comparable visual and temporal evidence.
 
-4. Raw screenshot perception adapter: add a renderer/screenshot fixture or
+6. Raw screenshot perception adapter: add a renderer/screenshot fixture or
    detector stub that produces the palette-labeled image required by V031.
    Goal: separate image parsing accuracy from geometry/raycast correctness.
 
-5. Full NanoWM/CEM integration: wire chronometric scoring into the real
+7. Full NanoWM/CEM integration: wire chronometric scoring into the real
    planner path once heldout branch choice has a small deterministic smoke.
    Goal: avoid hiding scorer bugs inside diffusion rollout complexity.
 
-6. Fresh heldout family: build or select the next heldout family beyond
+8. Fresh heldout family: build or select the next heldout family beyond
    V015/V016 after the action-candidate manifest is available.
    Goal: test whether the mechanism survives a new family with real branch
    alternatives instead of polishing a nearly saturated split.
 
-7. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
+9. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
    but do not tune directly against it unless it grows on a new heldout family.
    Goal: prevent research drift into cosmetic residual chasing.
 

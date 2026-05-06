@@ -21,7 +21,10 @@ exist, V029 validates heldout branch choice on the V033 nonlocal candidate
 surface, V030 defines the A/B Q/A packet plus gridspace imagination raymap,
 V031 adds the labeled-image to grid, 3D geometry, and strict ray accuracy gate,
 V032 separates visual and temporal senses into confirmation records, and V033
-makes imagined signed-Y outcome a pre-action simulation channel.
+makes imagined signed-Y outcome a pre-action simulation channel. V035 turns the
+Dream Kernel ARC-Dream branch-rank mismatch into an explicit goal loop: every
+reachable solved proxy map must rank the terminal-positive branch first without
+weakening ray, identity, invariant, or quarantine gates.
 
 ## Hard Boundaries
 
@@ -45,6 +48,8 @@ makes imagined signed-Y outcome a pre-action simulation channel.
   or temporal sense inputs.
 - Keep imagined outcome values as pre-action simulation outputs that the
   planner may use for branch choice.
+- Do not weaken the Dream Kernel branch-rank gate to make planner integrity look
+  better. Fix the value calibration or mark the projection map as invalid.
 
 ## Active Metrics
 
@@ -53,6 +58,7 @@ makes imagined signed-Y outcome a pre-action simulation channel.
 - Heldout signed-Y MAE.
 - Heldout bucket signed-Y MAE by action, control label, movement, and time.
 - Top heldout false-progress probability.
+- Dream Kernel terminal-positive branch rank on reachable solved proxy maps.
 
 ## Current Best Checkpoint
 

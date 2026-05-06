@@ -2,6 +2,51 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V035 Dream Kernel Branch-Rank Calibration Goal
+
+Artifacts:
+
+- `scripts/build_dream_kernel_branch_rank_goal.py`
+- `tests/test_dream_kernel_branch_rank_goal.py`
+- `experiments/2026-05-06_goal_v035_dream_kernel_branch_rank_calibration/`
+
+Condition:
+
+- run label: `goal_v035_dream_kernel_branch_rank_calibration`
+- source eval:
+  `experiments/2026-05-06_arc_dream_curriculum_eval_v001_v017_support_scout/curriculum_eval_rows.jsonl`
+- source commit: `adbfe9e54957dda1c6f7de4d00ee381e14bd76ad`
+- git dirty: `True`
+- training data promoted: `False`
+- no ARC solve claim
+
+Verification:
+
+- `python -m py_compile scripts/build_dream_kernel_branch_rank_goal.py`
+- `python -m pytest tests/test_dream_kernel_branch_rank_goal.py`
+- result: `2 passed`
+- `python scripts/build_dream_kernel_branch_rank_goal.py`
+
+Metrics:
+
+- calibration cases: `48`
+- case tiers: `t2_action_coordinate: 24`,
+  `t3_object_relative_branching: 24`
+- terminal-positive branch rank before: `5` for all `48` cases
+- rank-gap stats: min `0.406575`, max `0.656575`, mean `0.531575`
+- stop rule:
+  `branch_rank_top_mismatch_count == 0 and proxy_goal_unreachable_in_projection_count == 0`
+
+Decision:
+
+V035 is the right calibration target from the first ARC-Dream proxy run. The
+kernel already solved `95/96` proxy maps with invariant and object-identity
+integrity intact. The remaining reusable signal is not basic navigation; it is
+branch value calibration, with `48` solved maps where the terminal-positive
+branch exists but ranks below earlier high-potential branches. This goal should
+be optimized without weakening ray, object identity, invariant, Nemo relay, or
+quarantine gates.
+
 ## V034 Sensory Smattering Human-Eval Batch
 
 Artifacts:

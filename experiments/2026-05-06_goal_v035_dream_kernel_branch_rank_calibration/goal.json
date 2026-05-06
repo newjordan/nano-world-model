@@ -1,0 +1,41 @@
+{
+  "baseline": {
+    "branch_rank_top_match_rate": 0.4895833333333333,
+    "failure_reasons": {
+      "branch_rank_top_mismatch": 48,
+      "passed_proxy_gate": 47,
+      "proxy_goal_unreachable_in_projection": 1
+    },
+    "planner_integrity_pass_rate": 0.4895833333333333,
+    "proxy_goal_solve_rate": 0.9895833333333334,
+    "terminal_branch_rank_counts": {
+      "1": 23,
+      "3": 24,
+      "5": 48,
+      "none": 1
+    }
+  },
+  "calibration_case_count": 48,
+  "goal_id": "goal_v035_dream_kernel_branch_rank_calibration",
+  "goal_name": "Dream Kernel branch-rank calibration",
+  "goal_statement": "For every reachable solved ARC-Dream proxy map, the internal branch matrix must rank the terminal-positive branch first.",
+  "iteration_constraints": [
+    "Use reachable solved proxy rows as calibration cases, not as ARC answer evidence.",
+    "Separate projection-map reachability fixes from branch-value calibration.",
+    "Nemo may produce semantic hypotheses, but Dream Kernel branch scoring remains the measured driver.",
+    "Do not weaken object identity, ray contact, or invariant gates to improve the score."
+  ],
+  "schema": "dream_kernel.goal.branch_rank_calibration.v001",
+  "source_row_count": 96,
+  "success_criteria": {
+    "arc_solve_claim": false,
+    "branch_rank_top_mismatch_count": 0,
+    "planner_integrity_pass_rate": 1.0,
+    "proxy_goal_unreachable_in_projection_count": 0,
+    "terminal_branch_rank_counts_allowed": {
+      "1": "all reachable solved proxy maps"
+    },
+    "training_data_promoted": false
+  },
+  "why_this_is_good": "The kernel already solves the maps and preserves object/ray integrity. The remaining failure is therefore a clean value-calibration target."
+}

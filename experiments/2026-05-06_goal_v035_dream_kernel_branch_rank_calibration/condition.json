@@ -1,0 +1,18 @@
+{
+  "arc_solve_claim": false,
+  "created_at_utc": "2026-05-06T18:46:04.258975+00:00",
+  "git_commit": "adbfe9e54957dda1c6f7de4d00ee381e14bd76ad",
+  "git_dirty": true,
+  "goal_stop_rule": "branch_rank_top_mismatch_count == 0 and proxy_goal_unreachable_in_projection_count == 0",
+  "metric_to_compare": "terminal_positive_branch_rank_1_on_reachable_solved_proxy_maps",
+  "run_kind": "dream_kernel_branch_rank_calibration_goal_definition",
+  "run_label": "goal_v035_dream_kernel_branch_rank_calibration",
+  "schema": "dream_kernel.goal.branch_rank_calibration.v001",
+  "script": "scripts/build_dream_kernel_branch_rank_goal.py",
+  "script_sha256": "4281acdbb1267d798ea6392309a628ed7f279d654671c8d3cfee0d2aee3c679f",
+  "source_eval_metrics": "experiments/2026-05-06_arc_dream_curriculum_eval_v001_v017_support_scout/metrics.json",
+  "source_eval_metrics_sha256": "2e8e3c3f8d55b2bfd959733b3c303c4a80b22b9aa592e7413e54bfa1e8aba06b",
+  "source_eval_rows": "experiments/2026-05-06_arc_dream_curriculum_eval_v001_v017_support_scout/curriculum_eval_rows.jsonl",
+  "source_eval_rows_sha256": "9ca4cbdb85cd993cd4428d45d2073157626292a0a19fdcb21af34c3b93dc1ed5",
+  "training_data_promoted": false
+}
