@@ -68,14 +68,22 @@ iteration.
   geometry interactions. Result: heldout signed-Y MAE improved to `0.0201822`,
   and V016 heldout ka59 improved from V017B `-0.670377` to `-0.589080`, but
   `ACTION6|time_phase` remained the top error at `0.430918`.
+- V019: Added branch-consistency objective over matched ACTION6 time-phase
+  coordinate keys. Result: train-only consistency found only tn36 pairs and
+  reproduced V018; V019B transductive consistency used unlabeled heldout
+  features, paired the ka59 key, moved V016 heldout ka59 to `0.230412`, and
+  reduced heldout `ACTION6|time_phase` MAE to `0.0136911`. V019B is diagnostic,
+  not a clean heldout promotion.
 
 ## Active Queue
 
-1. V019: add a branch-consistency or paired-family objective for ka59-like
-   ACTION6 time-phase rows.
-   Goal: force matched coordinate-family rows across object-relative and
-   controllability branches to share signed-Y polarity after V018 showed
-   passive geometry features are only a partial transfer mechanism.
+1. V020: convert V019B's transductive success into a non-transductive planner
+   mechanism.
+   Goal: generate or retrieve candidate branch pairs inside the world-model
+   planning surface so matched coordinate-family consistency is available
+   without using heldout eval features. Candidate directions: branch library
+   hotload, candidate-pair generator, or route calibration output into NanoWM
+   branch scoring with consistency over sampled branches.
 
 2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.

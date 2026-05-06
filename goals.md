@@ -157,3 +157,22 @@ Passive geometry features are useful but still insufficient. The next likely
 step is an explicit branch-consistency or paired-family objective that teaches
 matched coordinate-family rows to share signed-Y polarity across source
 families.
+
+V019 added explicit branch-consistency mechanics:
+
+- Train-only consistency was clean but ineffective for ka59 because train only
+  contained tn36 matched pairs (`3` pairs, key `x:61|y:1`), so it reproduced
+  V018.
+- V019B allowed unlabeled heldout branch features into consistency pairs while
+  still excluding heldout labels. This is a transductive diagnostic, not a
+  promotable heldout-quality claim.
+- V019B created `7` consistency pairs, including the ka59 key `x:28|y:30`, and
+  moved V016 heldout ka59 to `0.230412`.
+- Heldout `ACTION6|time_phase` dropped to signed-Y MAE `0.0136911`; the top
+  heldout bucket moved to `ACTION5|time_phase`.
+
+The mechanism is validated: matched branch consistency solves the ka59 polarity
+when the matching branch is available as an unlabeled candidate. The next
+research step is to make that mechanism non-transductive by generating or
+learning candidate branch pairs inside the world-model planner, instead of
+borrowing heldout features from the eval split.

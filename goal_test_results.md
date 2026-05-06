@@ -2,6 +2,61 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V019 Branch Consistency Objective
+
+Artifacts:
+
+- `experiments/2026-05-05_chronometric_calibration_v019_train_branch_consistency_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v019_train_branch_consistency_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v019_train_branch_consistency_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_calibration_v019b_transductive_branch_consistency_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v019b_transductive_branch_consistency_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v019b_transductive_branch_consistency_v016_holdout_cpu/`
+
+Condition:
+
+- manifest: `experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/`
+- heldout family:
+  `experiments/2026-05-04_v016_controllability_movement_scout/CONDITION.md`
+- requested device: `cpu`
+- seed: `20260505`
+- steps: `800`
+- narrow dominant `ACTION6|time_phase` signed balance enabled, max weight
+  `256`
+- branch-consistency weight: `1.0`
+- V019: train-only consistency pairs
+- V019B: transductive diagnostic using heldout features for consistency pairs
+  but recording `heldout_labels_used: False`
+- training data promoted: `False`
+
+Metrics:
+
+- V019 branch pairs: `3`, all train-to-train, all tn36 key `x:61|y:1`
+- V019 heldout signed-Y MAE: `0.02018224261701107`
+- V019 heldout `ACTION6|time_phase` signed-Y MAE: `0.43091824650764465`
+- V019 heldout V016 ka59 prediction: target `0.250244140625`, predicted
+  `-0.5890800952911377`
+- V019B branch pairs: `7`, with `4` train-to-heldout pairs and ka59 key
+  `x:28|y:30`
+- V019B heldout signed-Y MAE: `0.01702019013464451`
+- V019B heldout `ACTION6|time_phase` signed-Y MAE:
+  `0.013691052794456482`
+- V019B train V015 ka59 prediction: target `0.250244140625`, predicted
+  `0.23214775323867798`
+- V019B heldout V016 ka59 prediction: target `0.250244140625`, predicted
+  `0.23041227459907532`
+- V019B top heldout bucket moved to `ACTION5|time_phase` at
+  `0.2172355316579342`
+
+Decision:
+
+V019 train-only consistency is clean but cannot solve ka59 without matched train
+pairs. V019B validates the branch-consistency mechanism: the heldout labels are
+not used, but heldout features are used, so it is transductive diagnostic
+evidence rather than a clean heldout promotion. Next work should make the same
+pairing available non-transductively through planner-generated candidate
+branches or a hotloaded branch library.
+
 ## V018 Coordinate Geometry Features
 
 Artifacts:
