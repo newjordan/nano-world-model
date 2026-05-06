@@ -14,10 +14,10 @@ signals, phase/time features, and bounded branch calibration heads.
 
 ## Current Research Target
 
-Turn planner-facing branch scores into branch selection: V027 proves the
-validated branch-library/fallback calibration surface can flow through the
-NanoWM-compatible chronometric scoring API, so the next target is a runnable
-planner/objective path that chooses actions or branches from those scores.
+Build a heldout branch-choice surface. V027 proves branch scores flow through
+the NanoWM-compatible chronometric scoring API, and V028 proves deterministic
+selection works when multi-action state groups exist. The current blocker is
+data shape: V015 heldout rows have no multi-action groups under the state key.
 
 ## Hard Boundaries
 
@@ -93,6 +93,31 @@ chronometric scoring surface rather than only by the posthoc adjustment script.
 This is an integration smoke, not a new calibration metric. It closes the
 immediate API gap and leaves branch selection/planner objective wiring as the
 next active engineering target.
+
+V028 branch selection smoke:
+
+- selector:
+  `src/chronometric_branch_selection.py`
+- runnable harness:
+  `scripts/select_chronometric_branches.py`
+- artifact:
+  `experiments/2026-05-05_chronometric_branch_selection_v028_v015_holdout_cross_family/`
+
+V028 groups V027 planner-score rows by `split`, `task_id`, `frame_hash`, and
+`t`, then selects one branch per multi-action state group using the
+`library_or_calibration` score policy. Selection does not use target labels;
+targets are used only for diagnostics.
+
+- candidate records: `7732`
+- selectable multi-action groups: `774`
+- selected records: `774`
+- oracle signed-best match rate: `1.0`
+- heldout candidate records: `400`
+- heldout selected records: `0`
+
+The selector works on available multi-action groups, but those groups are all
+train-side in this manifest. The next useful research step is a heldout/action
+candidate manifest, not more selector tuning on V015.
 
 ## Checkpoint History
 
@@ -354,3 +379,15 @@ V027 moved that mechanism into a planner-facing scoring harness:
 
 The branch score API is now runnable. The next integration should consume these
 scores in branch selection or CEM/objective logic.
+
+V028 consumed V027 scores in deterministic branch selection:
+
+- added `src/chronometric_branch_selection.py`.
+- added `scripts/select_chronometric_branches.py`.
+- added focused branch-selection tests.
+- selected `774` train-side multi-action groups with oracle signed-best match
+  rate `1.0`.
+- found `0` heldout selectable groups under the current state key.
+
+The next bottleneck is not the selector. It is a heldout data surface that
+contains real action alternatives for the same state.

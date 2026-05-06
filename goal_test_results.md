@@ -2,6 +2,58 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V028 Chronometric Branch Selection Smoke
+
+Artifacts:
+
+- `src/chronometric_branch_selection.py`
+- `scripts/select_chronometric_branches.py`
+- `tests/test_chronometric_branch_selection.py`
+- `experiments/2026-05-05_chronometric_branch_selection_v028_v015_holdout_cross_family/`
+
+Condition:
+
+- input planner scores:
+  `experiments/2026-05-05_chronometric_planner_branch_score_v027_v015_holdout_cross_family/planner_scores.jsonl`
+- group fields: `split`, `task_id`, `frame_hash`, `t`
+- score policy: `library_or_calibration`
+- minimum group size: `2`
+- selection uses target labels: `False`
+- metrics use target labels: `True`
+- training data promoted: `False`
+- clean run condition: `git_dirty=False`
+
+Verification:
+
+- `python -m pytest tests/test_chronometric_branch_selection.py tests/test_chronometric_planner_scoring.py tests/test_chronometric_branch_library.py tests/test_chronometric_contortion.py`
+- result: `20 passed`
+- `python -m py_compile src/chronometric_branch_selection.py scripts/select_chronometric_branches.py`
+- `python scripts/select_chronometric_branches.py --run-label chronometric_branch_selection_v028_v015_holdout_cross_family --input experiments/2026-05-05_chronometric_planner_branch_score_v027_v015_holdout_cross_family/planner_scores.jsonl --out-dir experiments/2026-05-05_chronometric_branch_selection_v028_v015_holdout_cross_family --group-fields split task_id frame_hash t --score-policy library_or_calibration --min-group-size 2`
+
+Metrics:
+
+- candidate records: `7732`
+- candidate records by split: train `7332`, heldout `400`
+- groups: `2138`
+- selectable groups: `774`
+- selectable groups by split: train `774`
+- selected records: `774`
+- skipped groups: `1364`
+- branch-library-applied selected records: `680`
+- fallback selected records: `0`
+- oracle signed-best match rate: `1.0`
+- mean selected target signed-Y: `-0.1912128931484173`
+- progress-positive selected records: `1`
+- heldout selected records: `0`
+
+Decision:
+
+V028 proves the selector can consume V027 scores and make deterministic branch
+choices without target labels. It also exposes the next real blocker: this
+manifest has no heldout multi-action groups under the state key, so it cannot
+test heldout branch choice. The next research artifact should be a heldout
+action-candidate manifest rather than another selector tweak.
+
 ## V027 Planner-Facing Chronometric Branch Scoring
 
 Artifacts:

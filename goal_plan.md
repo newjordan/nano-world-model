@@ -110,22 +110,28 @@ iteration.
   compatible surface. Result: scored `7732` rows, applied the
   branch-library/fallback path to `6770`, applied `339` heldout rows, and
   matched applied references with max absolute diff `1.19209e-07`.
+- V028: Added deterministic branch selection over V027 planner scores. Result:
+  found `774` selectable multi-action groups and selected signed-best branches
+  with oracle match rate `1.0`, but all selectable groups were train-side; the
+  V015 heldout split had `400` candidate records and `0` multi-action heldout
+  groups.
 
 ## Active Queue
 
-1. Branch selection integration: consume V027 chronometric branch scores in a
-   branch/action selection objective.
-   Goal: move from branch scoring to actual branch choice.
+1. Heldout action-candidate manifest: build or select a heldout surface where
+   the same state has multiple candidate actions under the branch-selection
+   group key.
+   Goal: test branch choice on heldout alternatives instead of only train-side
+   replay alternatives.
 
 2. Full NanoWM/CEM integration: wire chronometric scoring into the real
-   planner path once the branch-selection objective has a small deterministic
-   smoke.
+   planner path once heldout branch choice has a small deterministic smoke.
    Goal: avoid hiding scorer bugs inside diffusion rollout complexity.
 
-3. Fresh heldout manifest: build or select the next heldout family beyond
-   V015/V016 after planner integration has a clean scoring surface.
-   Goal: test whether the mechanism survives a new family instead of polishing
-   a nearly saturated split.
+3. Fresh heldout family: build or select the next heldout family beyond
+   V015/V016 after the action-candidate manifest is available.
+   Goal: test whether the mechanism survives a new family with real branch
+   alternatives instead of polishing a nearly saturated split.
 
 4. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
    but do not tune directly against it unless it grows on a new heldout family.
