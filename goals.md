@@ -65,7 +65,12 @@ readiness gate is a `--nemo-mode live-relay` run before any challenge-step
 claim. V048 passes that live-relay producer gate: local vLLM served
 `nemotron_3_nano_omni` at `http://127.0.0.1:8000/v1/responses`, Nemo3 returned
 final JSON confirming the internally selected `ACTION1:1`, and the producer
-still executed `0` actuator steps.
+still executed `0` actuator steps. V049 connects that live-Nemo ModelDecision
+to the actuator runner: before stepping, the runner now checks that the current
+actuator observation content matches the ModelDecision observation artifact;
+the guarded one-step run consumed V048, executed exactly one local offline
+`ACTION1:1` step, and carried the Nemo3/chronometric SHA provenance into the
+trace.
 
 ## Hard Boundaries
 

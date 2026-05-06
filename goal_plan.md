@@ -221,6 +221,13 @@ iteration.
   `nemotron_3_nano_omni`, final confirmation JSON
   `confirms_selected_action=true`, selected action `ACTION1:1` from
   `world_model_internal_thinking`, and `0` actuator steps.
+- V049: Connected the V048 live-Nemo ModelDecision to the standard one-step
+  actuator runner. Result: `scripts/run_arc_agi3_model_step.py` now fails
+  closed unless the current actuator observation content matches the
+  ModelDecision observation artifact, then consumed the V048 decision, executed
+  exactly one offline `ls20` step with `ACTION1:1`, carried Nemo3 and
+  chronometric SHA provenance into the trace, and recorded no online submission
+  or solve claim.
 
 ## Active Queue
 
@@ -235,12 +242,12 @@ iteration.
    detector stub that produces the palette-labeled image required by V031.
    Goal: separate image parsing accuracy from geometry/raycast correctness.
 
-4. ARC-AGI-3 one-step actuator gate for `ls20`: consume the V048 live-Nemo
-   `arc_agi3.model_decision.v001` artifact with
-   `scripts/run_arc_agi3_model_step.py`.
-   Goal: prove the actuator only consumes a live-confirmed ModelDecision and
-   records exactly one local offline step with no online submission or solve
-   claim.
+4. ARC-AGI-3 multi-step mental loop for `ls20`: after the V049 one-step trace,
+   route the post-action observation back through the producer path and require
+   a fresh live-Nemo ModelDecision before the next action.
+   Goal: prove repeated observe -> 3D/world-state -> chronometric knowledge ->
+   branch simulation -> internal lock -> Nemo3 confirmation -> actuator cycles
+   work without direct action policy bypasses.
 
 5. Fresh heldout family: build or select the next heldout family beyond
    V015/V016 after the action-candidate manifest is available.

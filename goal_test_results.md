@@ -2,6 +2,72 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V049 ARC-AGI-3 Live Nemo3 One-Step Actuator Connection
+
+Artifacts:
+
+- `scripts/run_arc_agi3_model_step.py`
+- `tests/test_arc_agi3_model_step.py`
+- `experiments/2026-05-06_arc_agi3_model_step_v049_ls20_live_nemo3_action1/`
+
+Status:
+
+- added fail-closed actuator-side observation matching
+- current actuator observation must match the ModelDecision observation artifact
+  by game/state, levels, available actions, frame shape, frame min/max, and
+  frame sha256 before `env.step`
+- GUID match is recorded separately because independent reset processes create
+  different observation GUIDs for the same reset-state content
+- consumed V048 live-Nemo `arc_agi3.model_decision.v001`
+- executed exactly one offline local `ls20` actuator step
+- chosen action: `ACTION1:1`
+- selected action source: `world_model_internal_thinking`
+- Nemo3 final-confirmation SHA carried into actuator trace
+- chronometric game-knowledge SHA carried into actuator trace
+- frame changed after the action
+- level delta: `0`
+- no online submission, no score claim, no training data promotion
+
+Run metrics:
+
+- selected game: `ls20-9607627b`
+- input ModelDecision:
+  `experiments/2026-05-06_arc_agi3_model_decision_v048_ls20_live_nemo3_reset/model_decision.json`
+- valid standard model-flow step: `True`
+- actuator steps executed: `1`
+- observation content match: `True`
+- observation GUID match: `False`
+- observation artifact:
+  `experiments/2026-05-06_arc_agi3_model_decision_v048_ls20_live_nemo3_reset/observation.json`
+- observation artifact sha256:
+  `5ef54f73533af061d5ae5a10630d8b0bf31410b31ef65ea87ec487945043a9ff`
+- Nemo3 final-confirmation sha256:
+  `3cb558b93e5f45e3af3da8d687071b005e03a6dc91036c0ddc4e027663ca5deb`
+- chronometric game-knowledge sha256:
+  `df4c4aed883afed17c500d5c36d712dd51e37737b25698fef682f016d76609b6`
+- `nano-world-model` git dirty at run time: `False`
+- ARC toolkit source repo dirty at run time: `True`
+  (`/home/frosty40/world_model_1` had unrelated untracked experiment logs)
+
+Verification:
+
+- `python -m py_compile scripts/run_arc_agi3_model_step.py src/arc_agi3_model_flow.py`
+- `python -m pytest tests/test_arc_agi3_model_step.py tests/test_arc_agi3_model_flow.py`
+- result: `12 passed`
+- `python -m py_compile scripts/run_arc_agi3_model_decision_producer.py scripts/run_arc_agi3_model_step.py scripts/run_arc_agi3_closed_loop_smoke.py scripts/run_arc_agi3_io_smoke.py scripts/run_dream_kernel_cem_rollout_smoke.py scripts/run_dream_kernel_branch_choice_smoke.py scripts/build_arc_dream_curriculum.py scripts/run_arc_dream_curriculum_eval.py scripts/build_dream_kernel_branch_rank_goal.py src/arc_agi3_model_flow.py src/planning/cem_planner.py src/experiments/planning_experiment.py`
+- `python -m pytest tests/test_arc_agi3_model_decision_producer.py tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_closed_loop_smoke.py tests/test_arc_agi3_io_smoke.py tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `43 passed`
+- `/home/frosty40/world_model_1/.venv/bin/python scripts/run_arc_agi3_model_step.py --run-label arc_agi3_model_step_v049_ls20_live_nemo3_action1 --out-dir experiments/2026-05-06_arc_agi3_model_step_v049_ls20_live_nemo3_action1 --arc-repo /home/frosty40/world_model_1 --environments-dir /home/frosty40/world_model_1/environment_files --source-condition-artifact /home/frosty40/world_model_1/docs/arc-agi-3-env.md --model-decision-artifact experiments/2026-05-06_arc_agi3_model_decision_v048_ls20_live_nemo3_reset/model_decision.json --operation-mode OFFLINE --game ls20 --max-candidate-actions 8`
+- result: valid standard model-flow step, `1` actuator step, no online
+  submission, no ARC solve claim
+
+Decision:
+
+V049 proves the producer and actuator are connected for a single guarded local
+offline action. It does not prove a repeated game loop yet. The next gate is to
+feed the post-action observation back into the producer and require a fresh
+live-Nemo ModelDecision before action two.
+
 ## V048 ARC-AGI-3 Live Nemo3 ModelDecision Producer
 
 Artifacts:
