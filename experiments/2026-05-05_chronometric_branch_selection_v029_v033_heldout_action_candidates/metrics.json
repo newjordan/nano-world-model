@@ -1,0 +1,65 @@
+{
+  "by_split": {
+    "heldout": {
+      "branch_library_applied_selected": 168,
+      "fallback_selected": 0,
+      "mean_selection_score": -0.009025546227836741,
+      "mean_target_signed_y": -0.009034567039106146,
+      "oracle_signed_best_match_rate": 1.0,
+      "progress_positive_selected": 1,
+      "selected_records": 179
+    },
+    "train": {
+      "branch_library_applied_selected": 622,
+      "fallback_selected": 0,
+      "mean_selection_score": -0.2065968907345348,
+      "mean_target_signed_y": -0.2066794406162219,
+      "oracle_signed_best_match_rate": 1.0,
+      "progress_positive_selected": 1,
+      "selected_records": 712
+    }
+  },
+  "candidate_records": 6932,
+  "candidate_records_by_split": {
+    "heldout": 3112,
+    "train": 3820
+  },
+  "condition": {
+    "created_at_utc": "2026-05-06T03:08:53.908472+00:00",
+    "git_commit": "25d9aa80d24f59c2cf6c57b8b5f38581d4dfa24f",
+    "git_dirty": false,
+    "group_fields": [
+      "split",
+      "task_id",
+      "frame_hash",
+      "t"
+    ],
+    "input_planner_scores": "experiments/2026-05-05_chronometric_planner_branch_score_v029_v033_heldout_action_candidates/planner_scores.jsonl",
+    "input_planner_scores_sha256": "792f2dcbfb32a92a05e04f54baa135e8f538d16602770557b4e77c4306035677",
+    "metrics_use_target_labels": true,
+    "min_group_size": 2,
+    "run_kind": "branch_selection_smoke",
+    "run_label": "chronometric_branch_selection_v029_v033_heldout_action_candidates",
+    "score_policy": "library_or_calibration",
+    "script": "scripts/select_chronometric_branches.py",
+    "selection_uses_target_labels": false,
+    "training_data_promoted": false
+  },
+  "groups": 1608,
+  "overall": {
+    "branch_library_applied_selected": 790,
+    "fallback_selected": 0,
+    "mean_selection_score": -0.1669052289312812,
+    "mean_target_signed_y": -0.1669730069795174,
+    "oracle_signed_best_match_rate": 1.0,
+    "progress_positive_selected": 2,
+    "selected_records": 891
+  },
+  "selectable_groups": 891,
+  "selectable_groups_by_split": {
+    "heldout": 179,
+    "train": 712
+  },
+  "selected_records": 891,
+  "skipped_groups": 717
+}
