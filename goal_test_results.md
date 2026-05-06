@@ -2,6 +2,60 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V017 V015 Support With V016 Holdout
+
+Artifacts:
+
+- `experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/`
+- `experiments/2026-05-05_chronometric_calibration_v017_v015_support_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v017_v015_support_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v017_v015_support_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_calibration_v017b_v015_support_v016_holdout_dominant_balance_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v017b_v015_support_v016_holdout_dominant_balance_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v017b_v015_support_v016_holdout_dominant_balance_cpu/`
+
+Condition:
+
+- base manifest: V012 ACTION6 ten-task holdout
+- added support family:
+  `experiments/2026-05-04_v015_object_relative_movement_scout/CONDITION.md`
+- heldout family:
+  `experiments/2026-05-04_v016_controllability_movement_scout/CONDITION.md`
+- merged manifest rows: `7732`
+- train rows: `7332`
+- heldout rows: `400`
+- requested device: `cpu`
+- seed: `20260505`
+- steps: `800`
+- V017: no signed balancing
+- V017B: dominant `ACTION6|time_phase` signed balancing, max weight `256`
+- training data promoted: `False`
+
+Metrics:
+
+- V017 heldout signed-Y MAE: `0.023165112361311913`
+- V017 heldout progress accuracy: `1.0`
+- V017 `ACTION6|time_phase` signed-Y MAE: `0.6599542051553726`
+- V017 train V015 ka59 prediction: target `0.250244140625`, predicted
+  `-0.9720876216888428`
+- V017 heldout V016 ka59 prediction: target `0.250244140625`, predicted
+  `-0.9651800394058228`
+- V017B heldout signed-Y MAE: `0.034029360860586166`
+- V017B heldout progress accuracy: `1.0`
+- V017B `ACTION6|time_phase` signed-Y MAE: `0.46518605202436447`
+- V017B train V015 ka59 prediction: target `0.250244140625`, predicted
+  `0.23078583180904388`
+- V017B heldout V016 ka59 prediction: target `0.250244140625`, predicted
+  `-0.6703770160675049`
+
+Decision:
+
+V017 rejects plain support expansion as sufficient. V017B shows support plus
+narrow balancing can fit the support ka59 row and partially transfer, but the
+heldout controllability ka59 row remains negative. Next work should add
+geometry abstraction across object-relative and controllability coordinate
+families, not simply add more weight.
+
 ## V014-V016 ACTION6 Time-Phase Feature And Balance Iterations
 
 Artifacts:

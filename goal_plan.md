@@ -58,15 +58,21 @@ iteration.
   in train, the V015-heldout target bucket improved to `0.225540` and stopped
   being the top error; V016B still failed when the V016/ka59 pattern was held
   out and absent from train (`0.633624`).
+- V017: Added V015 object-relative family as support while holding out V016
+  controllability movement. Result: support alone did not fit even the train
+  V015 ka59 row (`-0.972088`); support plus narrow balance fit train ka59
+  (`0.230786`) and partially improved V016 heldout ka59 (`-0.670377`), but
+  `ACTION6|time_phase` remained the top heldout error at `0.465186`.
 
 ## Active Queue
 
-1. V017: build a coordinate-family coverage or abstraction probe for the
-   ka59-like ACTION6 time-phase branch.
-   Goal: transfer the time-phase sign without requiring the exact heldout
-   coordinate family in train. Candidate directions: coordinate-normalized
-   relative-position features, paired coordinate-family support rows, or a
-   small geometry-aware branch consistency objective.
+1. V018: add a geometry abstraction probe for the ka59-like ACTION6 time-phase
+   branch.
+   Goal: connect object-relative and controllability ka59-like rows after V017
+   showed support plus balance is only partial. Candidate directions:
+   coordinate-centered/radial/wall-distance features, movement-coordinate
+   alignment features, or a small branch-consistency objective over matched
+   coordinate-family rows.
 
 2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.

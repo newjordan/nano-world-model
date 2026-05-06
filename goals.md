@@ -131,3 +131,16 @@ The active blocker is therefore not just loss pressure. The chronometric
 surface needs coordinate-family coverage or a geometry-aware coordinate
 abstraction that can transfer the ka59-like time-phase branch without seeing
 that exact support pattern.
+
+V017 tested the coordinate-family coverage hypothesis directly by adding V015
+object-relative ka59 support while holding out V016 controllability:
+
+- coverage alone still failed, leaving V015 train ka59 at `-0.972088` and V016
+  heldout ka59 at `-0.965180`.
+- coverage plus narrow dominant-bucket balance fit the V015 train ka59 row
+  (`0.230786`) and partially moved V016 heldout ka59 (`-0.670377`), but the
+  heldout `ACTION6|time_phase` bucket remained the top error at `0.465186`.
+
+The next active blocker is now sharper: a geometry abstraction must connect
+object-relative and controllability ka59-like branches, not simply add more
+rows or more rare-bucket weight.
