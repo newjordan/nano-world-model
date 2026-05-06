@@ -120,19 +120,29 @@ iteration.
   branch-library scoring to `2937` heldout rows, selected `179` heldout
   multi-action groups, and reached heldout oracle signed-best match rate `1.0`
   without target labels in selection.
+- V030: Added the A/B-centered open Q/A overlay packet with an internal
+  imagination frame. Result: unrestricted objective-modifier questions,
+  free-form modifier names, confidence validation, branch-score row references,
+  2D/3D/latent raytrace probes, and a deterministic gridspace raymap producer
+  are now represented without hardcoded gameplay taxonomy.
 
 ## Active Queue
 
-1. Full NanoWM/CEM integration: wire chronometric scoring into the real
+1. Ray accuracy gate: compare grid-imagination ray hits against known transition
+   outcomes and branch-selection failures.
+   Goal: make the internal map a trust signal before it influences action
+   choice.
+
+2. Full NanoWM/CEM integration: wire chronometric scoring into the real
    planner path once heldout branch choice has a small deterministic smoke.
    Goal: avoid hiding scorer bugs inside diffusion rollout complexity.
 
-2. Fresh heldout family: build or select the next heldout family beyond
+3. Fresh heldout family: build or select the next heldout family beyond
    V015/V016 after the action-candidate manifest is available.
    Goal: test whether the mechanism survives a new family with real branch
    alternatives instead of polishing a nearly saturated split.
 
-3. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
+4. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
    but do not tune directly against it unless it grows on a new heldout family.
    Goal: prevent research drift into cosmetic residual chasing.
 

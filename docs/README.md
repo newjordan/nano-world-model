@@ -12,6 +12,8 @@ docs/
 ├── evaluation.md         (eval workflow + main result tables + sampling)
 ├── project_intent_and_boundaries.md
 │                         (chronometric fork boundary + ARC quarantine rules)
+├── chronometric_ab_qa_overlay_v030.md
+│                         (A/B-centered open Q/A overlay for Nemo + NanoWM)
 ├── chronometric_testing.md
 │                         (first mechanics smoke and bridge-manifest gate)
 ├── datasets/
@@ -29,6 +31,7 @@ docs/
 - **[Project Intent And Boundaries](project_intent_and_boundaries.md)** — canonical split between this chronometric model body and the quarantined ARC scaffold/control repo.
 - **[Chronometric Contortion Foundation](chronometric_contortion_foundation.md)** — installed 4D event-state, learned 4x4 K tensor, log-time phase, projector constraint, and potential-family hook.
 - **[Chronometric Foundation Review V002](chronometric_foundation_review_v002.md)** — stricter audit of what is installed, what is still placeholder, and the staged path before ARC/data integration.
+- **[Chronometric A/B Q/A Overlay V030](chronometric_ab_qa_overlay_v030.md)** — A/B-centered open question loop for Nemo-style semantic reasoning feeding NanoWM branch scoring.
 - **[Chronometric Testing](chronometric_testing.md)** — dated mechanics smoke condition, gates, and the bridge-manifest schema used before ARC data can enter NanoWM tests.
 - **[Evaluation](evaluation.md)** — `experiment=evaluate_only`, scheduling modes, metric definitions, headline numbers on each domain.
 - **[Datasets](datasets/README.md)** — DINO-WM (5 envs), RT-1 fractal, CSGO. Download / split / format / config.

@@ -2,6 +2,50 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V030 A/B Q/A Overlay With Imagination Frame
+
+Artifacts:
+
+- `docs/chronometric_ab_qa_overlay_v030.md`
+- `src/chronometric_ab_overlay.py`
+- `src/chronometric_grid_imagination.py`
+- `tests/test_chronometric_ab_overlay.py`
+- `tests/test_chronometric_grid_imagination.py`
+
+Condition:
+
+- no training run
+- no ARC solve claim
+- no Nemo call yet
+- interface-only implementation for Nemo-to-NanoWM planning packets
+- modifier names are unrestricted
+- confidence values are validated in `[0, 1]`
+- internal imagination frame supports `grid2d`, `voxel3d`, `mesh3d`,
+  `latent3d`, `semantic3d`, or `mixed`
+- raytrace/probe questions are first-class confidence-bearing trust signals
+- gridspace imagination producer maps playable cells to height `0`, raises
+  non-playable blockers, anchors rays to non-wall objects, and exports those
+  rays as imagination-frame probes
+- training data promoted: `False`
+
+Verification:
+
+- `python -m py_compile src/chronometric_ab_overlay.py src/chronometric_grid_imagination.py`
+- `python -m pytest tests/test_chronometric_ab_overlay.py tests/test_chronometric_grid_imagination.py tests/test_chronometric_branch_selection.py tests/test_chronometric_planner_scoring.py tests/test_chronometric_branch_library.py tests/test_chronometric_contortion.py`
+- result: `28 passed`
+
+Decision:
+
+V030 removes the brittle hardcoded gameplay taxonomy from the planned Nemo
+interface. The root planning object is now A, B, dimensional gridspace, open
+questions, unrestricted objective modifiers, candidate branches, and an
+internal imagination frame with raytrace/probe trust checks. For grid games,
+the first internal drawing method is now explicit: playable cells stay flat,
+non-playable cells become raised blockers, and non-wall objects emit rays.
+The next useful work is a ray accuracy gate that compares imagined ray
+contacts against known transition outcomes before those rays influence action
+choice.
+
 ## V029 V033 Heldout Action-Candidate Branch Choice
 
 Artifacts:

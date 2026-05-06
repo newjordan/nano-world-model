@@ -14,10 +14,11 @@ signals, phase/time features, and bounded branch calibration heads.
 
 ## Current Research Target
 
-Wire branch choice into the real planner path. V027 proves branch scores flow
-through the NanoWM-compatible chronometric scoring API, V028 proves
-deterministic selection works when multi-action state groups exist, and V029
-validates heldout branch choice on the V033 nonlocal candidate surface.
+Build the ray accuracy gate before full planner wiring. V027 proves branch
+scores flow through the NanoWM-compatible chronometric scoring API, V028 proves
+deterministic selection works when multi-action state groups exist, V029
+validates heldout branch choice on the V033 nonlocal candidate surface, and
+V030 defines the A/B Q/A packet plus gridspace imagination raymap.
 
 ## Hard Boundaries
 
@@ -31,6 +32,10 @@ validates heldout branch choice on the V033 nonlocal candidate surface.
   `goal_progress.level_delta`.
 - Record every run under `experiments/` with condition, metrics, predictions or
   analysis output, and a short result report.
+- Do not hardcode gameplay concept lists as the planner ontology. Concepts like
+  mirrors, traps, fuel, locks, or hazards may emerge as hypotheses, but the
+  root interface is A/B state, open questions, dimensional gridspace, modifier
+  confidence, and candidate branches.
 
 ## Active Metrics
 
