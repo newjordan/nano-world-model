@@ -14,6 +14,10 @@ BRANCH_LIBRARY_SCOPES = (
     "dominant_translation",
     "time_phase_translation",
 )
+BRANCH_LIBRARY_FALLBACK_SCOPES = (
+    "none",
+    "dominant_translation_potential",
+)
 GRID_CELL_COUNT = 4096
 
 
@@ -108,7 +112,10 @@ def blend_branch_library_signed_y(
     library: dict[str, BranchLibraryEntry],
     *,
     blend: float,
+    fallback_scope: str = "none",
 ) -> tuple[float, BranchLibraryEntry | None]:
+    if fallback_scope not in BRANCH_LIBRARY_FALLBACK_SCOPES:
+        raise ValueError(f"unknown branch library fallback scope: {fallback_scope}")
     raw_prediction = _number(row.get("pred_signed_y"))
     entry = None
     for key in branch_library_candidate_keys(row):
@@ -116,9 +123,29 @@ def blend_branch_library_signed_y(
         if entry is not None:
             break
     if entry is None:
+        entry = branch_library_fallback_entry(row, fallback_scope=fallback_scope)
+    if entry is None:
         return raw_prediction, None
     clamped_blend = min(max(float(blend), 0.0), 1.0)
     return (1.0 - clamped_blend) * raw_prediction + clamped_blend * entry.signed_y_mean, entry
+
+
+def branch_library_fallback_entry(row: dict[str, Any], *, fallback_scope: str) -> BranchLibraryEntry | None:
+    if fallback_scope == "none":
+        return None
+    if fallback_scope == "dominant_translation_potential":
+        key = dominant_translation_grid_key(row)
+        if key is None:
+            return None
+        signed_y = _family_lookup(row).get("transition.changed_cells", 0.0)
+        if signed_y <= 0.0:
+            return None
+        return BranchLibraryEntry(
+            key=f"fallback:dominant_translation_potential|{key}",
+            records=0,
+            signed_y_mean=signed_y,
+        )
+    raise ValueError(f"unknown branch library fallback scope: {fallback_scope}")
 
 
 def _action_control_grid_key(row: dict[str, Any], control_label: str, *, grid_scale: int) -> str:

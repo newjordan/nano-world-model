@@ -18,6 +18,7 @@ SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
 from chronometric_branch_library import (  # noqa: E402
+    BRANCH_LIBRARY_FALLBACK_SCOPES,
     BRANCH_LIBRARY_SCOPES,
     blend_branch_library_signed_y,
     build_chronometric_branch_library,
@@ -92,7 +93,15 @@ def apply_library(args: argparse.Namespace) -> dict[str, Any]:
         min_records=args.min_records,
         scope=args.library_scope,
     )
-    adjusted = [_adjust_prediction(row, library, blend=args.blend) for row in joined]
+    adjusted = [
+        _adjust_prediction(
+            row,
+            library,
+            blend=args.blend,
+            fallback_scope=args.fallback_scope,
+        )
+        for row in joined
+    ]
     split_rows: dict[str, list[dict[str, Any]]] = {}
     for row in adjusted:
         split_rows.setdefault(str(row.get("split", "unknown")), []).append(row)
@@ -113,6 +122,12 @@ def apply_library(args: argparse.Namespace) -> dict[str, Any]:
         "blend": args.blend,
         "min_records": args.min_records,
         "library_scope": args.library_scope,
+        "fallback_scope": args.fallback_scope,
+        "fallback_source_field": (
+            "potential_family_vector.transition.changed_cells"
+            if args.fallback_scope == "dominant_translation_potential"
+            else None
+        ),
         "library_key_strategy": "action_control_grid_coordinate_or_changed_cells",
         "library_source_split": "train",
         "library_source_field": "target_signed_y",
@@ -128,8 +143,13 @@ def apply_library(args: argparse.Namespace) -> dict[str, Any]:
         "library": library_summary,
         "library_entries": len(library),
         "adjusted_records": sum(1 for row in adjusted if row.get("branch_library_applied")),
+        "fallback_records": sum(1 for row in adjusted if row.get("branch_library_fallback_applied")),
         "adjusted_records_by_split": {
             split: sum(1 for row in rows if row.get("branch_library_applied"))
+            for split, rows in sorted(split_rows.items())
+        },
+        "fallback_records_by_split": {
+            split: sum(1 for row in rows if row.get("branch_library_fallback_applied"))
             for split, rows in sorted(split_rows.items())
         },
         "by_split": {split: summarize_rows(rows) for split, rows in sorted(split_rows.items())},
@@ -148,12 +168,20 @@ def _adjust_prediction(
     library: dict[str, Any],
     *,
     blend: float,
+    fallback_scope: str,
 ) -> dict[str, Any]:
-    adjusted_signed, entry = blend_branch_library_signed_y(row, library, blend=blend)
+    adjusted_signed, entry = blend_branch_library_signed_y(
+        row,
+        library,
+        blend=blend,
+        fallback_scope=fallback_scope,
+    )
+    fallback_applied = entry is not None and entry.records == 0 and entry.key.startswith("fallback:")
     output = dict(row)
     output["pred_signed_y_raw"] = row.get("pred_signed_y")
     output["pred_signed_y"] = adjusted_signed
     output["branch_library_applied"] = entry is not None
+    output["branch_library_fallback_applied"] = fallback_applied
     output["branch_library_key"] = entry.key if entry is not None else None
     output["branch_library_records"] = entry.records if entry is not None else 0
     output["branch_library_signed_y"] = entry.signed_y_mean if entry is not None else None
@@ -190,9 +218,12 @@ def _format_results(summary: dict[str, Any]) -> str:
             f"- blend: `{condition['blend']}`",
             f"- min records: `{condition['min_records']}`",
             f"- library scope: `{condition['library_scope']}`",
+            f"- fallback scope: `{condition['fallback_scope']}`",
+            f"- fallback source field: `{condition['fallback_source_field']}`",
             f"- library key strategy: `{condition['library_key_strategy']}`",
             f"- library entries: `{summary['library_entries']}`",
             f"- adjusted records: `{summary['adjusted_records']}`",
+            f"- fallback records: `{summary['fallback_records']}`",
             f"- heldout labels used: `{condition['heldout_labels_used']}`",
             f"- training data promoted: `{condition['training_data_promoted']}`",
             "",
@@ -202,6 +233,7 @@ def _format_results(summary: dict[str, Any]) -> str:
             f"- heldout signed-Y MAE: `{heldout.get('signed_mae')}`",
             f"- heldout progress accuracy: `{heldout.get('progress_accuracy')}`",
             f"- heldout adjusted records: `{summary['adjusted_records_by_split'].get('heldout')}`",
+            f"- heldout fallback records: `{summary['fallback_records_by_split'].get('heldout')}`",
             "",
         ]
     )
@@ -217,6 +249,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--blend", type=float, default=1.0)
     parser.add_argument("--min-records", type=int, default=1)
     parser.add_argument("--library-scope", choices=BRANCH_LIBRARY_SCOPES, default="action6_time_phase")
+    parser.add_argument("--fallback-scope", choices=BRANCH_LIBRARY_FALLBACK_SCOPES, default="none")
     return parser.parse_args()
 
 
@@ -228,6 +261,7 @@ def main() -> int:
             {
                 "library_entries": summary["library_entries"],
                 "adjusted_records": summary["adjusted_records"],
+                "fallback_records": summary["fallback_records"],
                 "heldout_signed_mae": heldout.get("signed_mae"),
                 "heldout_progress_accuracy": heldout.get("progress_accuracy"),
             },

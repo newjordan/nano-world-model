@@ -126,6 +126,34 @@ class ChronometricContortionTests(unittest.TestCase):
         self.assertTrue(torch.allclose(adjusted.outcome_y[1], raw.outcome_y[1], atol=1e-6))
         self.assertEqual(float(layer.last_metrics["chronometric_branch_library_applied"].item()), 1.0)
 
+    def test_branch_library_translation_fallback_adjusts_score_branch_outcome(self):
+        layer = chrono.ChronometricContortionLayer(hidden_size=16)
+        tokens = torch.randn(1, 4, 16)
+        branch = torch.tensor([[0.0, 1.0, 0.0, 0.0]])
+        contexts = [
+            {
+                "action_id": "ACTION5",
+                "control_label": "dominant_group:translation",
+                "action_context": [0.5, 0.0, 0.0, 0.0, 0.0234375, 0.0, 0.0, 1.0],
+                "changed_cells": 96,
+                "potential_family_names": ["transition.changed_cells"],
+                "potential_family_vector": [0.0234375],
+            }
+        ]
+
+        adjusted = layer.score_branch(
+            tokens,
+            branch,
+            branch_library={},
+            branch_library_contexts=contexts,
+            branch_library_blend=1.0,
+            branch_library_fallback_scope="dominant_translation_potential",
+        )
+
+        self.assertTrue(torch.allclose(adjusted.outcome_y[0].mean(), torch.tensor(0.0234375), atol=1e-6))
+        self.assertEqual(float(layer.last_metrics["chronometric_branch_library_applied"].item()), 1.0)
+        self.assertEqual(float(layer.last_metrics["chronometric_branch_library_fallback_applied"].item()), 1.0)
+
     def test_nanowm_audit_mode_tracks_metrics_without_changing_output_when_runtime_deps_are_available(self):
         try:
             from models.nanowm import NanoWM

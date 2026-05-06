@@ -99,3 +99,32 @@ def test_time_phase_translation_scope_builds_translation_grid_prototypes():
     assert library["ACTION5|dominant_group:translation|no_coord|changed:48"].records == 1
     assert adjusted == 0.01171875
     assert entry is not None
+
+
+def test_translation_potential_fallback_uses_safe_observed_potential():
+    heldout = _row("heldout", 0.0, 0.0, 0.0, -0.25)
+    heldout.update(
+        {
+            "action_id": "ACTION5",
+            "control_label": "dominant_group:translation",
+            "action_context": [0.5, 0.0, 0.0, 0.0, 0.0234375, 0.0, 0.0, 1.0],
+            "changed_cells": 96,
+            "potential_family_names": ["transition.changed_cells"],
+            "potential_family_vector": [0.0234375],
+        }
+    )
+
+    default_adjusted, default_entry = blend_branch_library_signed_y(heldout, {}, blend=1.0)
+    fallback_adjusted, fallback_entry = blend_branch_library_signed_y(
+        heldout,
+        {},
+        blend=1.0,
+        fallback_scope="dominant_translation_potential",
+    )
+
+    assert default_adjusted == -0.25
+    assert default_entry is None
+    assert fallback_adjusted == 0.0234375
+    assert fallback_entry is not None
+    assert fallback_entry.records == 0
+    assert fallback_entry.key.startswith("fallback:dominant_translation_potential|")

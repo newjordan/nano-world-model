@@ -289,6 +289,7 @@ class ChronometricContortionLayer(nn.Module):
         branch_library: dict[str, BranchLibraryEntry] | None = None,
         branch_library_contexts: list[dict[str, Any]] | None = None,
         branch_library_blend: float = 1.0,
+        branch_library_fallback_scope: str = "none",
     ) -> ChronometricOutput:
         """Score a supplied branch direction without applying a token residual."""
         output = self._compute_geometry(
@@ -301,11 +302,15 @@ class ChronometricContortionLayer(nn.Module):
             branch_library=branch_library,
             branch_library_contexts=branch_library_contexts,
             branch_library_blend=branch_library_blend,
+            branch_library_fallback_scope=branch_library_fallback_scope,
         )
         self._store_diagnostics(output)
-        if branch_library is not None:
+        if branch_library is not None or branch_library_fallback_scope != "none":
             self.last_metrics["chronometric_branch_library_applied"] = output.outcome_y.new_tensor(
-                float(library_applied)
+                float(library_applied[0])
+            ).detach()
+            self.last_metrics["chronometric_branch_library_fallback_applied"] = output.outcome_y.new_tensor(
+                float(library_applied[1])
             ).detach()
         return output
 
@@ -316,11 +321,13 @@ class ChronometricContortionLayer(nn.Module):
         branch_library: dict[str, BranchLibraryEntry] | None,
         branch_library_contexts: list[dict[str, Any]] | None,
         branch_library_blend: float,
-    ) -> tuple[ChronometricOutput, int]:
-        if branch_library is None:
-            return output, 0
+        branch_library_fallback_scope: str,
+    ) -> tuple[ChronometricOutput, tuple[int, int]]:
+        if branch_library is None and branch_library_fallback_scope == "none":
+            return output, (0, 0)
+        lookup_library = branch_library or {}
         if branch_library_contexts is None:
-            raise ValueError("branch_library_contexts are required when branch_library is supplied")
+            raise ValueError("branch_library_contexts are required when branch library lookup or fallback is supplied")
         if len(branch_library_contexts) != output.outcome_y.shape[0]:
             raise ValueError(
                 "branch_library_contexts must match score batch size "
@@ -328,6 +335,7 @@ class ChronometricContortionLayer(nn.Module):
             )
         adjusted = output.outcome_y.clone()
         applied = 0
+        fallback_applied = 0
         clamped_blend = min(max(float(branch_library_blend), 0.0), 1.0)
         for batch_index, context in enumerate(branch_library_contexts):
             raw_mean = output.outcome_y[batch_index].mean()
@@ -335,17 +343,20 @@ class ChronometricContortionLayer(nn.Module):
             lookup_context["pred_signed_y"] = float(raw_mean.detach().cpu().item())
             adjusted_scalar, entry = blend_branch_library_signed_y(
                 lookup_context,
-                branch_library,
+                lookup_library,
                 blend=clamped_blend,
+                fallback_scope=branch_library_fallback_scope,
             )
             if entry is None:
                 continue
             adjusted_target = output.outcome_y.new_tensor(adjusted_scalar)
             adjusted[batch_index] = output.outcome_y[batch_index] + (adjusted_target - raw_mean)
             applied += 1
+            if entry.records == 0 and entry.key.startswith("fallback:"):
+                fallback_applied += 1
         if applied == 0:
-            return output, 0
-        return replace(output, outcome_y=adjusted), applied
+            return output, (0, 0)
+        return replace(output, outcome_y=adjusted), (applied, fallback_applied)
 
     def forward(
         self,

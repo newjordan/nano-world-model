@@ -792,6 +792,7 @@ class NanoWM(nn.Module):
         branch_library=None,
         branch_library_contexts=None,
         branch_library_blend=1.0,
+        branch_library_fallback_scope="none",
     ):
         if not self.use_chronometric:
             raise RuntimeError("chronometric branch scoring requested while chronometric is disabled")
@@ -802,6 +803,7 @@ class NanoWM(nn.Module):
             branch_library=branch_library,
             branch_library_contexts=branch_library_contexts,
             branch_library_blend=branch_library_blend,
+            branch_library_fallback_scope=branch_library_fallback_scope,
         )
 
 
