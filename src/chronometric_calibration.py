@@ -39,6 +39,14 @@ FEATURE_NAMES = (
     "action6_time_phase_eta",
     "action6_coordinate_time_phase_eta",
     "action6_coordinate_transition_eta",
+    "action_data_x_centered",
+    "action_data_y_centered",
+    "action_data_center_l2",
+    "action_data_wall_distance",
+    "movement_magnitude_norm",
+    "action_movement_alignment",
+    "action6_time_phase_wall_distance",
+    "action6_time_phase_center_l2",
 )
 
 LEAKAGE_EXCLUDED_FIELDS = (
@@ -134,20 +142,35 @@ def calibration_features(record: dict[str, Any], *, max_steps: float = 100.0) ->
     family = _family_lookup(record)
     action_value_norm = _get_sequence_number(action_context, 0)
     has_action_data = _get_sequence_number(action_context, 1)
+    action_x_norm = _get_sequence_number(action_context, 2)
+    action_y_norm = _get_sequence_number(action_context, 3)
+    movement_dx_norm = _get_sequence_number(movement, 0) / width
+    movement_dy_norm = _get_sequence_number(movement, 1) / height
     transition_changed_eta = family.get("transition.changed_cells", 0.0)
     time_phase_eta = family.get("time_phase.repeated_effect_size", 0.0)
     is_action6 = 1.0 if _is_action6(record, action_value_norm) else 0.0
     coordinate_gate = 1.0 if has_action_data > 0.5 else 0.0
+    action_x_centered = coordinate_gate * (action_x_norm - 0.5)
+    action_y_centered = coordinate_gate * (action_y_norm - 0.5)
+    action_center_l2 = math.hypot(action_x_centered, action_y_centered)
+    action_wall_distance = coordinate_gate * min(
+        max(action_x_norm, 0.0),
+        max(action_y_norm, 0.0),
+        max(1.0 - action_x_norm, 0.0),
+        max(1.0 - action_y_norm, 0.0),
+    )
+    movement_magnitude_norm = math.hypot(movement_dx_norm, movement_dy_norm)
+    action_movement_alignment = action_x_centered * movement_dx_norm + action_y_centered * movement_dy_norm
 
     return [
         min(max(_number(record.get("t")) / max_steps, 0.0), 1.0),
         action_value_norm,
         has_action_data,
-        _get_sequence_number(action_context, 2),
-        _get_sequence_number(action_context, 3),
+        action_x_norm,
+        action_y_norm,
         _get_sequence_number(action_context, 4),
-        _get_sequence_number(movement, 0) / width,
-        _get_sequence_number(movement, 1) / height,
+        movement_dx_norm,
+        movement_dy_norm,
         math.sin(phase_theta),
         math.cos(phase_theta),
         transition_changed_eta,
@@ -163,6 +186,14 @@ def calibration_features(record: dict[str, Any], *, max_steps: float = 100.0) ->
         is_action6 * time_phase_eta,
         is_action6 * coordinate_gate * time_phase_eta,
         is_action6 * coordinate_gate * transition_changed_eta,
+        action_x_centered,
+        action_y_centered,
+        action_center_l2,
+        action_wall_distance,
+        movement_magnitude_norm,
+        action_movement_alignment,
+        is_action6 * coordinate_gate * time_phase_eta * action_wall_distance,
+        is_action6 * coordinate_gate * time_phase_eta * action_center_l2,
     ]
 
 

@@ -1,4 +1,5 @@
 import copy
+import math
 import sys
 from pathlib import Path
 
@@ -85,6 +86,12 @@ def test_calibration_features_include_safe_potential_family_inputs():
     assert features["action6_time_phase_eta"] == 0.0
     assert features["action6_coordinate_time_phase_eta"] == 0.0
     assert features["action6_coordinate_transition_eta"] == 0.0
+    assert math.isclose(features["action_data_x_centered"], -0.3)
+    assert math.isclose(features["action_data_y_centered"], -0.2)
+    assert math.isclose(features["action_data_center_l2"], math.hypot(-0.3, -0.2))
+    assert features["action_data_wall_distance"] == 0.2
+    assert features["action6_time_phase_wall_distance"] == 0.0
+    assert features["action6_time_phase_center_l2"] == 0.0
     assert "goal_progress_level_delta" not in features
 
 
@@ -106,6 +113,11 @@ def test_calibration_features_include_safe_action6_time_phase_interactions():
     assert features["action6_time_phase_eta"] == 0.25
     assert features["action6_coordinate_time_phase_eta"] == 0.25
     assert features["action6_coordinate_transition_eta"] == 0.000244140625
+    assert math.isclose(features["action_data_x_centered"], -0.3)
+    assert math.isclose(features["action_data_y_centered"], -0.2)
+    assert features["action_data_wall_distance"] == 0.2
+    assert math.isclose(features["action6_time_phase_wall_distance"], 0.25 * 0.2)
+    assert math.isclose(features["action6_time_phase_center_l2"], 0.25 * math.hypot(-0.3, -0.2))
     assert "goal_progress_level_delta" not in features
 
 
