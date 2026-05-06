@@ -1,0 +1,2347 @@
+{
+  "adjusted_records": 6770,
+  "adjusted_records_by_split": {
+    "heldout": 335,
+    "train": 6435
+  },
+  "by_split": {
+    "heldout": {
+      "max_progress_prob": 0.0014542012941092253,
+      "mean_progress_prob": 3.567228773108079e-05,
+      "positive_best_rank": null,
+      "positive_mean_rank": null,
+      "positive_records": 0,
+      "progress_accuracy": 1.0,
+      "progress_bce": 3.5678917657129544e-05,
+      "records": 400,
+      "signed_bias": 9.615391492843628e-05,
+      "signed_mae": 9.615391492843628e-05,
+      "top_false_positive": {
+        "action_id": "ACTION6",
+        "control_label": "dominant_group:stasis_loop",
+        "pred_progress_prob": 0.0014542012941092253,
+        "pred_progress_rank": 1,
+        "pred_signed_y": -1.0,
+        "progress_label": "no_level_progress",
+        "source_artifact_path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_tn36_seed0.transitions.jsonl",
+        "split": "heldout",
+        "t": 5,
+        "target_progress": 0.0,
+        "target_signed_y": -1.0
+      },
+      "worst_signed_error": {
+        "action_id": "ACTION6",
+        "control_label": "stasis_no_change",
+        "pred_progress_prob": 3.047502104891464e-06,
+        "pred_progress_rank": 281,
+        "pred_signed_y": -0.9974484443664551,
+        "progress_label": "no_level_progress",
+        "source_artifact_path": "experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/v016_current_state_v016_controllability_ft09_seed0.transitions.jsonl",
+        "split": "heldout",
+        "t": 8,
+        "target_progress": 0.0,
+        "target_signed_y": -1.0
+      }
+    },
+    "train": {
+      "max_progress_prob": 1.0,
+      "mean_progress_prob": 0.00712118558723407,
+      "positive_best_rank": 1,
+      "positive_mean_rank": 26.5,
+      "positive_records": 52,
+      "progress_accuracy": 1.0,
+      "progress_bce": 2.8990063030453234e-05,
+      "records": 7332,
+      "signed_bias": 5.426063149988619e-05,
+      "signed_mae": 5.528278774858757e-05,
+      "top_false_positive": {
+        "action_id": "ACTION6",
+        "control_label": "dominant_group:stasis_loop",
+        "pred_progress_prob": 0.0017402744852006435,
+        "pred_progress_rank": 53,
+        "pred_signed_y": -1.0,
+        "progress_label": "no_level_progress",
+        "source_artifact_path": "experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/grid/transition_events/v011_action6_heatmap_tn36_stride4_seed0.transitions.jsonl",
+        "split": "train",
+        "t": 24,
+        "target_progress": 0.0,
+        "target_signed_y": -1.0
+      },
+      "worst_signed_error": {
+        "action_id": "ACTION6",
+        "control_label": "stasis_no_change",
+        "pred_progress_prob": 3.047502104891464e-06,
+        "pred_progress_rank": 6661,
+        "pred_signed_y": -0.9974484443664551,
+        "progress_label": "no_level_progress",
+        "source_artifact_path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_ft09_seed0.transitions.jsonl",
+        "split": "train",
+        "t": 8,
+        "target_progress": 0.0,
+        "target_signed_y": -1.0
+      }
+    }
+  },
+  "condition": {
+    "blend": 1.0,
+    "calibration_metrics": "experiments/2026-05-05_chronometric_calibration_v018_geometry_v015_support_v016_holdout_balance_cpu/metrics.json",
+    "calibration_metrics_sha256": "b326fe8d1645f2d9366e09c514971f00f2bd2e9671caa77e148f23d801a318e3",
+    "created_at_utc": "2026-05-06T02:30:02.050263+00:00",
+    "fallback_scope": "time_phase_translation_potential",
+    "fallback_source_field": "potential_family_vector.time_phase.repeated_effect_size+transition.changed_cells;transition.changed_cells",
+    "git_commit": "bcfd99c4d67dfac01ecb75a0acaccd88d22059d3",
+    "git_dirty": false,
+    "heldout_labels_used": false,
+    "input_predictions": "experiments/2026-05-05_chronometric_calibration_v018_geometry_v015_support_v016_holdout_balance_cpu/predictions.jsonl",
+    "input_predictions_sha256": "27446bb6015bdf110a6d4d277fb3af25d49f310ba1af9ab9ec168742a53f1ca7",
+    "library_key_strategy": "action_control_grid_coordinate_or_changed_cells",
+    "library_scope": "time_phase_translation_stasis_loop",
+    "library_source_field": "target_signed_y",
+    "library_source_split": "train",
+    "manifest": "experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl",
+    "manifest_sha256": "c9db243d749dd37cacc1ceb1896f59477ef8bcd014a46f9c1560dd8ebcd2045b",
+    "min_records": 1,
+    "run_kind": "branch_library_posthoc_inference",
+    "run_label": "chronometric_branch_library_v025_stasis_loop_scope_v018_geometry_predictions",
+    "script": "scripts/apply_chronometric_branch_library.py",
+    "training_data_promoted": false
+  },
+  "fallback_records": 20,
+  "fallback_records_by_split": {
+    "heldout": 20,
+    "train": 0
+  },
+  "library": {
+    "ACTION1|dominant_group:stasis_loop|t:32|changed:2": {
+      "records": 1,
+      "signed_y_mean": -0.74951171875
+    },
+    "ACTION1|dominant_group:stasis_loop|t:35|changed:2": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION1|dominant_group:stasis_loop|t:40|changed:64": {
+      "records": 1,
+      "signed_y_mean": -0.734375
+    },
+    "ACTION1|dominant_group:stasis_loop|t:41|changed:64": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION1|dominant_group:stasis_loop|t:42|changed:66": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION1|dominant_group:time_phase|no_coord|changed:100": {
+      "records": 1,
+      "signed_y_mean": 0.2744140625
+    },
+    "ACTION1|dominant_group:time_phase|no_coord|changed:19": {
+      "records": 3,
+      "signed_y_mean": 0.254638671875
+    },
+    "ACTION1|dominant_group:time_phase|no_coord|changed:50": {
+      "records": 52,
+      "signed_y_mean": 0.26220703125
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:1": {
+      "records": 15,
+      "signed_y_mean": 0.000244140625
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:10": {
+      "records": 1,
+      "signed_y_mean": 0.00244140625
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:100": {
+      "records": 316,
+      "signed_y_mean": 0.0244140625
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:102": {
+      "records": 1,
+      "signed_y_mean": 0.02490234375
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:11": {
+      "records": 6,
+      "signed_y_mean": 0.002685546875
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:12": {
+      "records": 14,
+      "signed_y_mean": 0.0029296875
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:13": {
+      "records": 2,
+      "signed_y_mean": 0.003173828125
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:14": {
+      "records": 2,
+      "signed_y_mean": 0.00341796875
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:15": {
+      "records": 3,
+      "signed_y_mean": 0.003662109375
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:16": {
+      "records": 7,
+      "signed_y_mean": 0.00390625
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:19": {
+      "records": 5,
+      "signed_y_mean": 0.004638671875
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:2": {
+      "records": 35,
+      "signed_y_mean": 0.00048828125
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:20": {
+      "records": 15,
+      "signed_y_mean": 0.0048828125
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:22": {
+      "records": 1,
+      "signed_y_mean": 0.00537109375
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:49": {
+      "records": 3,
+      "signed_y_mean": 0.011962890625
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:50": {
+      "records": 156,
+      "signed_y_mean": 0.01220703125
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:64": {
+      "records": 39,
+      "signed_y_mean": 0.015625
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:66": {
+      "records": 29,
+      "signed_y_mean": 0.01611328125
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:7": {
+      "records": 7,
+      "signed_y_mean": 0.001708984375
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:8": {
+      "records": 12,
+      "signed_y_mean": 0.001953125
+    },
+    "ACTION1|dominant_group:translation|no_coord|changed:9": {
+      "records": 29,
+      "signed_y_mean": 0.002197265625
+    },
+    "ACTION2|dominant_group:time_phase|no_coord|changed:1": {
+      "records": 1,
+      "signed_y_mean": 0.250244140625
+    },
+    "ACTION2|dominant_group:time_phase|no_coord|changed:100": {
+      "records": 1,
+      "signed_y_mean": 0.2744140625
+    },
+    "ACTION2|dominant_group:time_phase|no_coord|changed:19": {
+      "records": 5,
+      "signed_y_mean": 0.254638671875
+    },
+    "ACTION2|dominant_group:time_phase|no_coord|changed:64": {
+      "records": 40,
+      "signed_y_mean": 0.265625
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:1": {
+      "records": 38,
+      "signed_y_mean": 0.000244140625
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:10": {
+      "records": 2,
+      "signed_y_mean": 0.00244140625
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:100": {
+      "records": 2,
+      "signed_y_mean": 0.0244140625
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:102": {
+      "records": 2,
+      "signed_y_mean": 0.02490234375
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:11": {
+      "records": 7,
+      "signed_y_mean": 0.002685546875
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:12": {
+      "records": 9,
+      "signed_y_mean": 0.0029296875
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:13": {
+      "records": 3,
+      "signed_y_mean": 0.003173828125
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:14": {
+      "records": 1,
+      "signed_y_mean": 0.00341796875
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:15": {
+      "records": 5,
+      "signed_y_mean": 0.003662109375
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:16": {
+      "records": 7,
+      "signed_y_mean": 0.00390625
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:18": {
+      "records": 9,
+      "signed_y_mean": 0.00439453125
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:19": {
+      "records": 7,
+      "signed_y_mean": 0.004638671875
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:2": {
+      "records": 53,
+      "signed_y_mean": 0.00048828125
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:20": {
+      "records": 3,
+      "signed_y_mean": 0.0048828125
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:4": {
+      "records": 1,
+      "signed_y_mean": 0.0009765625
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:48": {
+      "records": 7,
+      "signed_y_mean": 0.01171875
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:49": {
+      "records": 2,
+      "signed_y_mean": 0.011962890625
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:50": {
+      "records": 1,
+      "signed_y_mean": 0.01220703125
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:52": {
+      "records": 1,
+      "signed_y_mean": 0.0126953125
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:64": {
+      "records": 209,
+      "signed_y_mean": 0.015625
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:66": {
+      "records": 182,
+      "signed_y_mean": 0.01611328125
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:7": {
+      "records": 5,
+      "signed_y_mean": 0.001708984375
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:72": {
+      "records": 1,
+      "signed_y_mean": 0.017578125
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:73": {
+      "records": 1,
+      "signed_y_mean": 0.017822265625
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:8": {
+      "records": 28,
+      "signed_y_mean": 0.001953125
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:9": {
+      "records": 21,
+      "signed_y_mean": 0.002197265625
+    },
+    "ACTION2|dominant_group:translation|no_coord|changed:97": {
+      "records": 1,
+      "signed_y_mean": 0.023681640625
+    },
+    "ACTION3|dominant_group:time_phase|no_coord|changed:1": {
+      "records": 3,
+      "signed_y_mean": 0.250244140625
+    },
+    "ACTION3|dominant_group:time_phase|no_coord|changed:19": {
+      "records": 4,
+      "signed_y_mean": 0.254638671875
+    },
+    "ACTION3|dominant_group:time_phase|no_coord|changed:36": {
+      "records": 2,
+      "signed_y_mean": 0.2587890625
+    },
+    "ACTION3|dominant_group:time_phase|no_coord|changed:64": {
+      "records": 194,
+      "signed_y_mean": 0.265625
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:1": {
+      "records": 3,
+      "signed_y_mean": 0.000244140625
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:100": {
+      "records": 6,
+      "signed_y_mean": 0.0244140625
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:102": {
+      "records": 209,
+      "signed_y_mean": 0.02490234375
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:18": {
+      "records": 5,
+      "signed_y_mean": 0.00439453125
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:19": {
+      "records": 51,
+      "signed_y_mean": 0.004638671875
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:2": {
+      "records": 217,
+      "signed_y_mean": 0.00048828125
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:20": {
+      "records": 2,
+      "signed_y_mean": 0.0048828125
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:28": {
+      "records": 5,
+      "signed_y_mean": 0.0068359375
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:29": {
+      "records": 19,
+      "signed_y_mean": 0.007080078125
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:32": {
+      "records": 6,
+      "signed_y_mean": 0.0078125
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:36": {
+      "records": 25,
+      "signed_y_mean": 0.0087890625
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:48": {
+      "records": 1,
+      "signed_y_mean": 0.01171875
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:49": {
+      "records": 2,
+      "signed_y_mean": 0.011962890625
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:50": {
+      "records": 53,
+      "signed_y_mean": 0.01220703125
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:64": {
+      "records": 717,
+      "signed_y_mean": 0.015625
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:66": {
+      "records": 714,
+      "signed_y_mean": 0.01611328125
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:8": {
+      "records": 26,
+      "signed_y_mean": 0.001953125
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:96": {
+      "records": 1,
+      "signed_y_mean": 0.0234375
+    },
+    "ACTION3|dominant_group:translation|no_coord|changed:97": {
+      "records": 1,
+      "signed_y_mean": 0.023681640625
+    },
+    "ACTION4|dominant_group:time_phase|no_coord|changed:1": {
+      "records": 3,
+      "signed_y_mean": 0.250244140625
+    },
+    "ACTION4|dominant_group:time_phase|no_coord|changed:19": {
+      "records": 15,
+      "signed_y_mean": 0.254638671875
+    },
+    "ACTION4|dominant_group:time_phase|no_coord|changed:36": {
+      "records": 2,
+      "signed_y_mean": 0.2587890625
+    },
+    "ACTION4|dominant_group:time_phase|no_coord|changed:64": {
+      "records": 200,
+      "signed_y_mean": 0.265625
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:1": {
+      "records": 6,
+      "signed_y_mean": 0.000244140625
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:100": {
+      "records": 56,
+      "signed_y_mean": 0.0244140625
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:102": {
+      "records": 159,
+      "signed_y_mean": 0.02490234375
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:16": {
+      "records": 2,
+      "signed_y_mean": 0.00390625
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:18": {
+      "records": 21,
+      "signed_y_mean": 0.00439453125
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:19": {
+      "records": 11,
+      "signed_y_mean": 0.004638671875
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:2": {
+      "records": 14,
+      "signed_y_mean": 0.00048828125
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:20": {
+      "records": 11,
+      "signed_y_mean": 0.0048828125
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:28": {
+      "records": 3,
+      "signed_y_mean": 0.0068359375
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:29": {
+      "records": 26,
+      "signed_y_mean": 0.007080078125
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:32": {
+      "records": 12,
+      "signed_y_mean": 0.0078125
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:36": {
+      "records": 11,
+      "signed_y_mean": 0.0087890625
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:48": {
+      "records": 8,
+      "signed_y_mean": 0.01171875
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:49": {
+      "records": 32,
+      "signed_y_mean": 0.011962890625
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:50": {
+      "records": 52,
+      "signed_y_mean": 0.01220703125
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:52": {
+      "records": 104,
+      "signed_y_mean": 0.0126953125
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:64": {
+      "records": 682,
+      "signed_y_mean": 0.015625
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:66": {
+      "records": 558,
+      "signed_y_mean": 0.01611328125
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:73": {
+      "records": 3,
+      "signed_y_mean": 0.017822265625
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:8": {
+      "records": 20,
+      "signed_y_mean": 0.001953125
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:9": {
+      "records": 7,
+      "signed_y_mean": 0.002197265625
+    },
+    "ACTION4|dominant_group:translation|no_coord|changed:96": {
+      "records": 2,
+      "signed_y_mean": 0.0234375
+    },
+    "ACTION5|dominant_group:stasis_loop|t:10|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:11|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:12|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:13|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:14|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:15|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:16|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:17|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:18|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:19|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:20|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:21|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:22|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:23|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:24|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:25|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:26|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:27|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:28|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:29|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:2|changed:1": {
+      "records": 3,
+      "signed_y_mean": -0.499755859375
+    },
+    "ACTION5|dominant_group:stasis_loop|t:30|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:31|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:32|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:32|changed:2": {
+      "records": 1,
+      "signed_y_mean": -0.74951171875
+    },
+    "ACTION5|dominant_group:stasis_loop|t:33|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:34|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:35|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:35|changed:2": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:36|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:37|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:38|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:39|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:3|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:42|changed:2": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:4|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:5|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:6|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:7|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:8|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:stasis_loop|t:9|changed:1": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION5|dominant_group:time_phase|no_coord|changed:1": {
+      "records": 3,
+      "signed_y_mean": 0.250244140625
+    },
+    "ACTION5|dominant_group:translation|no_coord|changed:1": {
+      "records": 6,
+      "signed_y_mean": 0.000244140625
+    },
+    "ACTION5|dominant_group:translation|no_coord|changed:2": {
+      "records": 61,
+      "signed_y_mean": 0.00048828125
+    },
+    "ACTION5|dominant_group:translation|no_coord|changed:71": {
+      "records": 23,
+      "signed_y_mean": 0.017333984375
+    },
+    "ACTION5|dominant_group:translation|no_coord|changed:72": {
+      "records": 4,
+      "signed_y_mean": 0.017578125
+    },
+    "ACTION5|dominant_group:translation|no_coord|changed:95": {
+      "records": 4,
+      "signed_y_mean": 0.023193359375
+    },
+    "ACTION6|dominant_group:stasis_loop|t:100|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:101|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:102|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:103|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:104|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:105|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:106|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:107|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:108|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:109|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:10|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:10|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:110|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:111|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:112|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:113|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:114|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:115|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:116|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:117|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:118|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:119|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:11|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:11|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:120|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:121|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:122|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:123|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:124|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:125|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:126|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:127|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:128|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:129|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:12|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:12|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:130|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:131|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:132|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:133|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:134|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:135|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:136|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:137|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:138|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:139|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:13|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:13|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:140|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:141|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:142|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:143|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:144|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:145|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:146|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:147|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:148|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:149|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:14|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:14|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:150|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:151|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:152|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:153|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:154|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:155|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:156|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:157|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:158|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:159|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:15|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:15|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:160|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:161|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:162|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:162|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:163|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:163|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:164|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:164|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:165|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:165|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:166|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:166|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:167|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:167|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:168|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:169|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:16|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:16|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:170|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:171|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:172|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:173|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:174|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:175|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:176|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:177|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:178|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:179|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:179|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:17|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:17|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:180|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:180|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:181|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:181|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:182|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:182|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:183|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:183|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:184|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:184|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:185|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:186|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:187|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:188|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:189|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:18|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:18|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:190|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:191|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:192|changed:4": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:193|changed:4": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:194|changed:4": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:195|changed:4": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:196|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:196|changed:4": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:197|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:197|changed:4": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:198|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:199|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:19|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:19|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:200|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:200|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:201|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:201|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:202|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:203|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:204|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:205|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:206|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:207|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:208|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:209|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:20|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:20|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:210|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:211|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:212|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:213|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:213|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:214|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:214|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:215|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:216|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:217|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:217|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:218|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:218|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:219|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:21|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:21|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:220|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:221|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:222|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:223|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:224|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:225|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:226|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:227|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:228|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:229|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:22|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:22|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:230|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:230|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:231|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:231|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:232|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:232|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:233|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:233|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:234|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:234|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:235|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:235|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:236|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:237|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:238|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:239|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:23|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:23|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:240|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:241|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:242|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:243|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:244|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:245|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:246|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:247|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:247|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:248|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:248|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:249|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:249|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:24|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:24|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:250|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:250|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:251|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:251|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:252|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:252|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:253|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:254|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:255|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:256|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:257|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:258|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:259|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:25|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:25|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:260|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:261|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:262|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:263|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:264|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:265|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:266|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:267|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:268|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:269|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:26|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:26|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:270|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:271|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:272|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:273|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:274|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:275|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:276|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:277|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:278|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:279|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:27|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:27|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:280|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:281|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:282|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:283|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:284|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:285|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:286|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:287|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:288|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:289|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:28|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:28|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:290|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:291|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:292|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:293|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:294|changed:4": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:295|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:296|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:297|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:298|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:299|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:29|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:29|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:2|changed:1": {
+      "records": 4,
+      "signed_y_mean": -0.499755859375
+    },
+    "ACTION6|dominant_group:stasis_loop|t:2|changed:38": {
+      "records": 1,
+      "signed_y_mean": -0.49072265625
+    },
+    "ACTION6|dominant_group:stasis_loop|t:300|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:301|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:302|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:303|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:304|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:305|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:306|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:307|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:308|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:309|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:30|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:30|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:310|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:311|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:312|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:313|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:314|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:315|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:316|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:317|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:318|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:319|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:31|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:320|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:321|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:32|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:33|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:34|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:35|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:36|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:37|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:38|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:39|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:3|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:3|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:40|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:41|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:42|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:43|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:44|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:45|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:46|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:47|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:48|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:49|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:4|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:4|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:50|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:51|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:52|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:53|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:54|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:55|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:56|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:57|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:58|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:59|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:5|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:5|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:5|changed:4": {
+      "records": 3,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:60|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:61|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:62|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:63|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:64|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:65|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:66|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:67|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:68|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:69|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:6|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:6|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:70|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:71|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:72|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:73|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:74|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:75|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:76|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:77|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:78|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:79|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:7|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:7|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:80|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:81|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:82|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:83|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:84|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:85|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:86|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:87|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:88|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:89|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:8|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:8|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:90|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:91|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:92|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:93|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:94|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:95|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:96|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:97|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:98|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:99|changed:1": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:9|changed:1": {
+      "records": 4,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:stasis_loop|t:9|changed:38": {
+      "records": 1,
+      "signed_y_mean": -1.0
+    },
+    "ACTION6|dominant_group:time_phase|coord:x:28|y:30|changed:1": {
+      "records": 1,
+      "signed_y_mean": 0.250244140625
+    },
+    "ACTION6|dominant_group:time_phase|coord:x:44|y:36|changed:38": {
+      "records": 1,
+      "signed_y_mean": 0.25927734375
+    },
+    "ACTION6|dominant_group:time_phase|coord:x:4|y:0|changed:1": {
+      "records": 1,
+      "signed_y_mean": 0.250244140625
+    },
+    "ACTION6|dominant_group:time_phase|coord:x:61|y:1|changed:1": {
+      "records": 3,
+      "signed_y_mean": 0.250244140625
+    },
+    "ACTION6|dominant_group:translation|coord:x:0|y:0|changed:1": {
+      "records": 1,
+      "signed_y_mean": 0.000244140625
+    },
+    "ACTION6|dominant_group:translation|coord:x:28|y:30|changed:1": {
+      "records": 3,
+      "signed_y_mean": 0.000244140625
+    },
+    "ACTION6|dominant_group:translation|coord:x:28|y:30|changed:2": {
+      "records": 7,
+      "signed_y_mean": 0.00048828125
+    },
+    "ACTION6|dominant_group:translation|coord:x:28|y:30|changed:3": {
+      "records": 1,
+      "signed_y_mean": 0.000732421875
+    },
+    "ACTION6|dominant_group:translation|coord:x:30|y:25|changed:1": {
+      "records": 3,
+      "signed_y_mean": 0.000244140625
+    },
+    "ACTION6|dominant_group:translation|coord:x:36|y:36|changed:38": {
+      "records": 1,
+      "signed_y_mean": 0.00927734375
+    }
+  },
+  "library_entries": 548,
+  "overall": {
+    "max_progress_prob": 1.0,
+    "mean_progress_prob": 0.006754630320834535,
+    "positive_best_rank": 1,
+    "positive_mean_rank": 26.5,
+    "positive_records": 52,
+    "progress_accuracy": 1.0,
+    "progress_bce": 2.933609793095382e-05,
+    "records": 7732,
+    "signed_bias": 5.642789913716245e-05,
+    "signed_mae": 5.739717611795377e-05,
+    "top_false_positive": {
+      "action_id": "ACTION6",
+      "control_label": "dominant_group:stasis_loop",
+      "pred_progress_prob": 0.0017402744852006435,
+      "pred_progress_rank": 53,
+      "pred_signed_y": -1.0,
+      "progress_label": "no_level_progress",
+      "source_artifact_path": "experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/grid/transition_events/v011_action6_heatmap_tn36_stride4_seed0.transitions.jsonl",
+      "split": "train",
+      "t": 24,
+      "target_progress": 0.0,
+      "target_signed_y": -1.0
+    },
+    "worst_signed_error": {
+      "action_id": "ACTION6",
+      "control_label": "stasis_no_change",
+      "pred_progress_prob": 3.047502104891464e-06,
+      "pred_progress_rank": 6661,
+      "pred_signed_y": -0.9974484443664551,
+      "progress_label": "no_level_progress",
+      "source_artifact_path": "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/grid/transition_events/v019b_current_state_v019b_target_discriminated_ft09_seed0.transitions.jsonl",
+      "split": "train",
+      "t": 8,
+      "target_progress": 0.0,
+      "target_signed_y": -1.0
+    }
+  }
+}
