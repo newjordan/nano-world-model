@@ -1,0 +1,54 @@
+{
+  "case_count": 5,
+  "created_at": "2026-05-06T04:47:12.728634+00:00",
+  "git_commit": "108ab1585dd2000c60b6dff717adf4747dc040cb",
+  "git_dirty": false,
+  "human_eval_required": true,
+  "labels": [
+    {
+      "name": "playable",
+      "rgb": [
+        0,
+        0,
+        0
+      ],
+      "value": 0
+    },
+    {
+      "name": "self_or_object",
+      "rgb": [
+        0,
+        255,
+        0
+      ],
+      "value": 2
+    },
+    {
+      "name": "objective",
+      "rgb": [
+        0,
+        0,
+        255
+      ],
+      "value": 3
+    },
+    {
+      "name": "wall",
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "value": 9
+    }
+  ],
+  "playable_values": [
+    0
+  ],
+  "run_label": "chronometric_sensory_smattering_v034_human_eval",
+  "run_type": "chronometric_sensory_smattering_v034",
+  "training_data_promoted": false,
+  "wall_values": [
+    9
+  ]
+}

@@ -141,11 +141,15 @@ iteration.
   human-review cases cover direct positive movement, wall-blocked movement,
   temporal miss, visual map misread, and outcome-sign miss; the harness writes
   condition, metrics, records, results, and a `HUMAN_EVAL.md` review sheet.
+- V034 run: Executed the human-eval smattering batch under clean conditions.
+  Result: `2/5` combined trusted, `3/5` sensory trusted, `2/5`
+  outcome-imagination trusted, with isolated visual, temporal, and outcome-sign
+  failures available for human review.
 
 ## Active Queue
 
-1. Run and review V034 human-eval batch. Goal: compare the system's trust
-   signals and imagined outcomes against human labels before scaling.
+1. Ingest V034 human labels after review. Goal: compare human accept/reject
+   judgments against visual, temporal, and outcome-imagination trust signals.
 
 2. Outcome-imagined branch selection: feed V033 trusted visual+temporal+
    imagined-outcome records into V029-style candidate selection as auxiliary

@@ -2,6 +2,49 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V034 Sensory Smattering Human-Eval Batch
+
+Artifacts:
+
+- `docs/chronometric_sensory_smattering_v034.md`
+- `scripts/run_chronometric_sensory_smattering.py`
+- `tests/test_chronometric_sensory_smattering.py`
+- `experiments/2026-05-06_chronometric_sensory_smattering_v034_human_eval/`
+
+Condition:
+
+- run label: `chronometric_sensory_smattering_v034_human_eval`
+- run type: `chronometric_sensory_smattering_v034`
+- source commit: `108ab1585dd2000c60b6dff717adf4747dc040cb`
+- git dirty: `False`
+- case count: `5`
+- human eval required: `True`
+- training data promoted: `False`
+- no ARC solve claim
+
+Verification:
+
+- `python -m py_compile scripts/run_chronometric_sensory_smattering.py src/chronometric_sensory_alignment.py src/chronometric_map_perception.py`
+- `python -m pytest tests/test_chronometric_sensory_smattering.py tests/test_chronometric_sensory_alignment.py tests/test_chronometric_map_perception.py tests/test_chronometric_ab_overlay.py tests/test_chronometric_grid_imagination.py tests/test_chronometric_branch_selection.py tests/test_chronometric_planner_scoring.py tests/test_chronometric_branch_library.py tests/test_chronometric_contortion.py`
+- result: `44 passed`
+- `python scripts/run_chronometric_sensory_smattering.py --run-label chronometric_sensory_smattering_v034_human_eval --out-dir experiments/2026-05-06_chronometric_sensory_smattering_v034_human_eval`
+
+Metrics:
+
+- trusted count: `2 / 5`
+- sensory trusted count: `3 / 5`
+- outcome-imagination trusted count: `2 / 5`
+- failed by reason: `visual.map: 1`, `temporal.transition: 1`,
+  `outcome.outcome_polarity_match: 3`
+
+Decision:
+
+V034 creates the first hand-review surface for this system:
+`HUMAN_EVAL.md`. The batch deliberately includes clean passes and isolated
+failure modes so human review can judge whether the system's confidence and
+imagined outcomes align with intuitive gameplay assessment before we scale to
+larger trace batches.
+
 ## V033 Pre-Action Outcome Imagination
 
 Artifacts:
