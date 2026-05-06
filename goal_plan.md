@@ -63,16 +63,19 @@ iteration.
   V015 ka59 row (`-0.972088`); support plus narrow balance fit train ka59
   (`0.230786`) and partially improved V016 heldout ka59 (`-0.670377`), but
   `ACTION6|time_phase` remained the top heldout error at `0.465186`.
+- V018: Added coordinate geometry features: centered x/y, center radius,
+  wall-distance, movement magnitude, movement alignment, and ACTION6 time-phase
+  geometry interactions. Result: heldout signed-Y MAE improved to `0.0201822`,
+  and V016 heldout ka59 improved from V017B `-0.670377` to `-0.589080`, but
+  `ACTION6|time_phase` remained the top error at `0.430918`.
 
 ## Active Queue
 
-1. V018: add a geometry abstraction probe for the ka59-like ACTION6 time-phase
-   branch.
-   Goal: connect object-relative and controllability ka59-like rows after V017
-   showed support plus balance is only partial. Candidate directions:
-   coordinate-centered/radial/wall-distance features, movement-coordinate
-   alignment features, or a small branch-consistency objective over matched
-   coordinate-family rows.
+1. V019: add a branch-consistency or paired-family objective for ka59-like
+   ACTION6 time-phase rows.
+   Goal: force matched coordinate-family rows across object-relative and
+   controllability branches to share signed-Y polarity after V018 showed
+   passive geometry features are only a partial transfer mechanism.
 
 2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.

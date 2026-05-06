@@ -2,6 +2,49 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V018 Coordinate Geometry Features
+
+Artifacts:
+
+- `experiments/2026-05-05_chronometric_calibration_v018_geometry_v015_support_v016_holdout_balance_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v018_geometry_v015_support_v016_holdout_balance_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v018_geometry_v015_support_v016_holdout_balance_cpu/`
+
+Condition:
+
+- manifest: `experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/`
+- heldout family:
+  `experiments/2026-05-04_v016_controllability_movement_scout/CONDITION.md`
+- requested device: `cpu`
+- seed: `20260505`
+- steps: `800`
+- narrow dominant `ACTION6|time_phase` signed balance enabled, max weight
+  `256`
+- changed input representation only versus V017B: added coordinate-centered,
+  radial, wall-distance, movement-magnitude, movement-alignment, and
+  ACTION6/time-phase geometry interaction features
+- training data promoted: `False`
+
+Metrics:
+
+- heldout total: `0.1835705190896988`
+- heldout signed-Y MAE: `0.02018224261701107`
+- heldout progress accuracy: `1.0`
+- top heldout bucket: `ACTION6|time_phase`
+- top heldout bucket signed-Y MAE: `0.43091824650764465`
+- train V015 ka59 prediction: target `0.250244140625`, predicted
+  `0.225009948015213`
+- heldout V016 ka59 prediction: target `0.250244140625`, predicted
+  `-0.5890800952911377`
+
+Decision:
+
+V018 improves aggregate heldout signed-Y and moves the heldout ka59 row in the
+right direction versus V017B, but does not flip it positive. Passive geometry
+features are useful but insufficient. Next work should test an explicit
+branch-consistency or paired-family objective over matched coordinate-family
+rows.
+
 ## V017 V015 Support With V016 Holdout
 
 Artifacts:

@@ -144,3 +144,16 @@ object-relative ka59 support while holding out V016 controllability:
 The next active blocker is now sharper: a geometry abstraction must connect
 object-relative and controllability ka59-like branches, not simply add more
 rows or more rare-bucket weight.
+
+V018 added coordinate-centered, radial, wall-distance, movement-magnitude, and
+movement-alignment features. It helped but did not solve the branch transfer:
+
+- heldout signed-Y MAE improved to `0.0201822`.
+- V016 heldout ka59 moved from V017B `-0.670377` to `-0.589080`.
+- `ACTION6|time_phase` remained the top heldout bucket at signed-Y MAE
+  `0.430918`.
+
+Passive geometry features are useful but still insufficient. The next likely
+step is an explicit branch-consistency or paired-family objective that teaches
+matched coordinate-family rows to share signed-Y polarity across source
+families.
