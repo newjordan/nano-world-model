@@ -14,7 +14,9 @@ from chronometric_calibration import (  # noqa: E402
     ChronometricCalibrationMLP,
     calibration_example,
     calibration_features,
+    examples_to_action6_time_phase_mask,
     examples_to_negative_control_mask,
+    is_action6_coordinate_time_phase_record,
     records_with_temporal_context,
     split_examples_by_group,
 )
@@ -105,6 +107,37 @@ def test_calibration_features_include_safe_action6_time_phase_interactions():
     assert features["action6_coordinate_time_phase_eta"] == 0.25
     assert features["action6_coordinate_transition_eta"] == 0.000244140625
     assert "goal_progress_level_delta" not in features
+
+
+def test_action6_time_phase_mask_uses_safe_bucket_fields():
+    match = synthetic_bridge_records()[0]
+    match["action_id"] = "ACTION6"
+    match["action_context"] = [0.6, 1.0, 0.2, 0.3, 0.125, 1.0, 1.0, 1.0]
+    match["potential_family_names"] = [
+        "transition.changed_cells",
+        "time_phase.repeated_effect_size",
+    ]
+    match["potential_family_vector"] = [0.000244140625, 0.25]
+
+    no_time_phase = copy.deepcopy(match)
+    no_time_phase["potential_family_vector"] = [0.000244140625, 0.0]
+
+    no_coordinate = copy.deepcopy(match)
+    no_coordinate["action_context"] = [0.6, 0.0, 0.2, 0.3, 0.125, 1.0, 1.0, 1.0]
+
+    not_action6 = copy.deepcopy(match)
+    not_action6["action_id"] = "ACTION4"
+    not_action6["action_context"][0] = 0.4
+
+    assert is_action6_coordinate_time_phase_record(match)
+    assert not is_action6_coordinate_time_phase_record(no_time_phase)
+    assert not is_action6_coordinate_time_phase_record(no_coordinate)
+    assert not is_action6_coordinate_time_phase_record(not_action6)
+
+    examples = [calibration_example(record) for record in (match, no_time_phase, no_coordinate, not_action6)]
+    mask = examples_to_action6_time_phase_mask(examples, device=torch.device("cpu"))
+
+    assert mask.squeeze(-1).tolist() == [1.0, 0.0, 0.0, 0.0]
 
 
 def test_records_with_temporal_context_adds_prior_only_loop_features():

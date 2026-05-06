@@ -102,6 +102,26 @@ def _family_lookup(record: dict[str, Any]) -> dict[str, float]:
     return {str(name): _number(vector[index]) for index, name in enumerate(names) if index < len(vector)}
 
 
+def _is_action6(record: dict[str, Any], action_value_norm: float | None = None) -> bool:
+    if action_value_norm is None:
+        action_value_norm = _get_sequence_number(record.get("action_context"), 0)
+    action_id = str(record.get("action_id", "")).upper()
+    return action_id == "ACTION6" or math.isclose(action_value_norm, 0.6)
+
+
+def is_action6_coordinate_time_phase_record(record: dict[str, Any]) -> bool:
+    """Return whether a row belongs to the safe ACTION6 coordinate time-phase bucket."""
+    action_context = record.get("action_context")
+    action_value_norm = _get_sequence_number(action_context, 0)
+    has_action_data = _get_sequence_number(action_context, 1)
+    family = _family_lookup(record)
+    return (
+        _is_action6(record, action_value_norm)
+        and has_action_data > 0.5
+        and family.get("time_phase.repeated_effect_size", 0.0) > 0.0
+    )
+
+
 def calibration_features(record: dict[str, Any], *, max_steps: float = 100.0) -> list[float]:
     """Build a calibration input vector without direct outcome-label leakage."""
     action_context = record.get("action_context")
@@ -115,8 +135,7 @@ def calibration_features(record: dict[str, Any], *, max_steps: float = 100.0) ->
     has_action_data = _get_sequence_number(action_context, 1)
     transition_changed_eta = family.get("transition.changed_cells", 0.0)
     time_phase_eta = family.get("time_phase.repeated_effect_size", 0.0)
-    action_id = str(record.get("action_id", "")).upper()
-    is_action6 = 1.0 if action_id == "ACTION6" or math.isclose(action_value_norm, 0.6) else 0.0
+    is_action6 = 1.0 if _is_action6(record, action_value_norm) else 0.0
     coordinate_gate = 1.0 if has_action_data > 0.5 else 0.0
 
     return [
@@ -157,6 +176,15 @@ def calibration_example(record: dict[str, Any]) -> CalibrationExample:
         progress=1.0 if record.get("progress_label") == "progress_level_delta_positive" else 0.0,
         family_vector=[_number(value) for value in family_vector],
     )
+
+
+def examples_to_action6_time_phase_mask(
+    examples: list[CalibrationExample],
+    *,
+    device: torch.device,
+) -> torch.Tensor:
+    mask = [1.0 if is_action6_coordinate_time_phase_record(example.record) else 0.0 for example in examples]
+    return torch.tensor(mask, dtype=torch.float32, device=device).view(-1, 1)
 
 
 def load_calibration_examples(path: Path) -> list[CalibrationExample]:

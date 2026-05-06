@@ -24,6 +24,7 @@ from chronometric_calibration import (  # noqa: E402
     FEATURE_NAMES,
     LEAKAGE_EXCLUDED_FIELDS,
     ChronometricCalibrationMLP,
+    examples_to_action6_time_phase_mask,
     examples_to_negative_control_mask,
     examples_to_tensors,
     load_calibration_examples,
@@ -112,11 +113,16 @@ def _loss(
     signed_weight: float,
     progress_weight: float,
     family_weight: float,
+    signed_loss_weight: torch.Tensor | None = None,
     negative_control_mask: torch.Tensor | None = None,
     negative_control_weight: float = 0.0,
     negative_control_margin: float = -0.5,
 ) -> tuple[torch.Tensor, dict[str, float]]:
-    signed_loss = F.mse_loss(outputs["signed_y"], signed_y)
+    signed_error = (outputs["signed_y"] - signed_y).pow(2)
+    if signed_loss_weight is None:
+        signed_loss = signed_error.mean()
+    else:
+        signed_loss = (signed_error * signed_loss_weight).sum() / signed_loss_weight.sum().clamp_min(1.0)
     progress_loss = F.binary_cross_entropy_with_logits(
         outputs["progress_logit"],
         progress,
@@ -151,6 +157,7 @@ def _evaluate(
     families: torch.Tensor,
     pos_weight: torch.Tensor,
     args: argparse.Namespace,
+    signed_loss_weight: torch.Tensor | None = None,
     negative_control_mask: torch.Tensor | None = None,
 ) -> dict[str, Any]:
     with torch.no_grad():
@@ -164,6 +171,7 @@ def _evaluate(
             signed_weight=args.signed_weight,
             progress_weight=args.progress_weight,
             family_weight=args.family_weight,
+            signed_loss_weight=signed_loss_weight,
             negative_control_mask=negative_control_mask,
             negative_control_weight=args.negative_control_weight,
             negative_control_margin=args.negative_control_margin,
@@ -200,6 +208,7 @@ def _baseline_metrics(
     families: torch.Tensor,
     pos_weight: torch.Tensor,
     args: argparse.Namespace,
+    signed_loss_weight: torch.Tensor | None = None,
     negative_control_mask: torch.Tensor | None = None,
 ) -> dict[str, Any]:
     reference = _baseline_reference(signed_y, progress, families)
@@ -210,6 +219,7 @@ def _baseline_metrics(
         families,
         pos_weight,
         args,
+        signed_loss_weight=signed_loss_weight,
         negative_control_mask=negative_control_mask,
     )
 
@@ -233,6 +243,7 @@ def _baseline_metrics_from_reference(
     families: torch.Tensor,
     pos_weight: torch.Tensor,
     args: argparse.Namespace,
+    signed_loss_weight: torch.Tensor | None = None,
     negative_control_mask: torch.Tensor | None = None,
 ) -> dict[str, Any]:
     signed_mean = reference["signed_mean"].expand_as(signed_y)
@@ -252,6 +263,7 @@ def _baseline_metrics_from_reference(
         signed_weight=args.signed_weight,
         progress_weight=args.progress_weight,
         family_weight=args.family_weight,
+        signed_loss_weight=signed_loss_weight,
         negative_control_mask=negative_control_mask,
         negative_control_weight=args.negative_control_weight,
         negative_control_margin=args.negative_control_margin,
@@ -267,6 +279,30 @@ def _baseline_metrics_from_reference(
         "positive_progress_count": positive_count,
         "positive_progress_best_rank": None,
         "positive_progress_mean_rank": None,
+    }
+
+
+def _signed_loss_weights(
+    action6_time_phase_mask: torch.Tensor,
+    *,
+    balance_action6_time_phase_signed: bool,
+    signed_balance_max_weight: float,
+) -> tuple[torch.Tensor | None, dict[str, float | int | bool | None]]:
+    match_count = int(action6_time_phase_mask.sum().detach().cpu().item())
+    total_count = int(action6_time_phase_mask.numel())
+    applied_weight = 1.0
+    weights = None
+    if balance_action6_time_phase_signed and match_count > 0:
+        nonmatch_count = max(total_count - match_count, 1)
+        applied_weight = min(float(signed_balance_max_weight), max(1.0, nonmatch_count / match_count))
+        weights = torch.ones_like(action6_time_phase_mask)
+        weights[action6_time_phase_mask > 0.5] = applied_weight
+    return weights, {
+        "enabled": bool(balance_action6_time_phase_signed),
+        "action6_time_phase_records": match_count,
+        "total_records": total_count,
+        "applied_action6_time_phase_weight": applied_weight if weights is not None else None,
+        "max_weight": float(signed_balance_max_weight),
     }
 
 
@@ -289,15 +325,29 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
     )
     train_x_raw, train_signed_y, train_progress, train_families = examples_to_tensors(split.train, device=device)
     train_negative_control_mask = examples_to_negative_control_mask(split.train, device=device)
+    train_action6_time_phase_mask = examples_to_action6_time_phase_mask(split.train, device=device)
+    train_signed_loss_weight, train_signed_balance = _signed_loss_weights(
+        train_action6_time_phase_mask,
+        balance_action6_time_phase_signed=args.balance_action6_time_phase_signed,
+        signed_balance_max_weight=args.signed_balance_max_weight,
+    )
     train_x, feature_mean, feature_std = _standardize(train_x_raw)
     heldout_tensors = None
     heldout_negative_control_mask = None
+    heldout_signed_loss_weight = None
+    heldout_signed_balance = None
     if split.heldout:
         heldout_x_raw, heldout_signed_y, heldout_progress, heldout_families = examples_to_tensors(
             split.heldout,
             device=device,
         )
         heldout_negative_control_mask = examples_to_negative_control_mask(split.heldout, device=device)
+        heldout_action6_time_phase_mask = examples_to_action6_time_phase_mask(split.heldout, device=device)
+        heldout_signed_loss_weight, heldout_signed_balance = _signed_loss_weights(
+            heldout_action6_time_phase_mask,
+            balance_action6_time_phase_signed=args.balance_action6_time_phase_signed,
+            signed_balance_max_weight=args.signed_balance_max_weight,
+        )
         heldout_tensors = (
             _standardize_with(heldout_x_raw, feature_mean, feature_std),
             heldout_signed_y,
@@ -322,6 +372,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         train_families,
         pos_weight,
         args,
+        signed_loss_weight=train_signed_loss_weight,
         negative_control_mask=train_negative_control_mask,
     )
     initial = _evaluate(
@@ -332,6 +383,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         train_families,
         pos_weight,
         args,
+        signed_loss_weight=train_signed_loss_weight,
         negative_control_mask=train_negative_control_mask,
     )
     heldout_baseline = None
@@ -345,6 +397,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             heldout_families,
             pos_weight,
             args,
+            signed_loss_weight=heldout_signed_loss_weight,
             negative_control_mask=heldout_negative_control_mask,
         )
         heldout_initial = _evaluate(
@@ -355,6 +408,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             heldout_families,
             pos_weight,
             args,
+            signed_loss_weight=heldout_signed_loss_weight,
             negative_control_mask=heldout_negative_control_mask,
         )
     checkpoints: list[dict[str, float | int]] = []
@@ -370,6 +424,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             signed_weight=args.signed_weight,
             progress_weight=args.progress_weight,
             family_weight=args.family_weight,
+            signed_loss_weight=train_signed_loss_weight,
             negative_control_mask=train_negative_control_mask,
             negative_control_weight=args.negative_control_weight,
             negative_control_margin=args.negative_control_margin,
@@ -388,6 +443,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
         train_families,
         pos_weight,
         args,
+        signed_loss_weight=train_signed_loss_weight,
         negative_control_mask=train_negative_control_mask,
     )
     heldout_final = None
@@ -402,6 +458,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             heldout_families,
             pos_weight,
             args,
+            signed_loss_weight=heldout_signed_loss_weight,
             negative_control_mask=heldout_negative_control_mask,
         )
         predictions.extend(_predictions(model, heldout_x, split.heldout, split_name="heldout"))
@@ -467,6 +524,11 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
                 if heldout_negative_control_mask is not None
                 else 0
             ),
+        },
+        "signed_objective_balancing": {
+            "bucket": "action6_coordinate_time_phase",
+            "train": train_signed_balance,
+            "heldout": heldout_signed_balance,
         },
         "feature_names": list(FEATURE_NAMES),
         "leakage_excluded_fields": list(LEAKAGE_EXCLUDED_FIELDS),
@@ -557,6 +619,8 @@ def _format_results(summary: dict[str, Any]) -> str:
     heldout_baseline = summary.get("heldout_baseline")
     split_strategy = condition.get("split_strategy") or {}
     auxiliary = condition.get("auxiliary_objectives") or {}
+    signed_balance = condition.get("signed_objective_balancing") or {}
+    train_signed_balance = signed_balance.get("train") or {}
     status = "supervised fit smoke for a small chronometric calibration head."
     claim = (
         "This is not a held-out quality claim. It verifies that bridge rows can drive a learned "
@@ -591,6 +655,9 @@ def _format_results(summary: dict[str, Any]) -> str:
         f"- steps: `{condition['steps']}`",
         f"- negative-control weight: `{auxiliary.get('negative_control_weight')}`",
         f"- negative-control margin: `{auxiliary.get('negative_control_margin')}`",
+        f"- ACTION6 time-phase signed balance: `{train_signed_balance.get('enabled')}`",
+        f"- ACTION6 time-phase train records: `{train_signed_balance.get('action6_time_phase_records')}`",
+        f"- ACTION6 time-phase signed weight: `{train_signed_balance.get('applied_action6_time_phase_weight')}`",
         f"- training data promoted: `{condition['training_data_promoted']}`",
         "",
         "## Metrics",
@@ -669,6 +736,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--signed-weight", type=float, default=1.0)
     parser.add_argument("--progress-weight", type=float, default=1.0)
     parser.add_argument("--family-weight", type=float, default=0.25)
+    parser.add_argument(
+        "--balance-action6-time-phase-signed",
+        action="store_true",
+        help="Balance signed-Y loss for the safe ACTION6 coordinate time-phase bucket.",
+    )
+    parser.add_argument(
+        "--signed-balance-max-weight",
+        type=float,
+        default=256.0,
+        help="Maximum rare-bucket signed-Y loss weight when ACTION6 time-phase balancing is enabled.",
+    )
     parser.add_argument(
         "--negative-control-weight",
         type=float,
