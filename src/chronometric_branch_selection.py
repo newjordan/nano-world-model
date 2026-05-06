@@ -86,14 +86,24 @@ def summarize_branch_selection(
     by_split: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in selected:
         by_split[str(row.get("split", "unknown"))].append(row)
+    candidate_splits = sorted({str(row.get("split", "unknown")) for row in candidates} | set(by_split))
+    selectable_by_split: dict[str, int] = defaultdict(int)
+    for group_rows in selectable:
+        split = str(group_rows[0].get("split", "unknown"))
+        selectable_by_split[split] += 1
+    candidate_records_by_split: dict[str, int] = defaultdict(int)
+    for row in candidates:
+        candidate_records_by_split[str(row.get("split", "unknown"))] += 1
 
     return {
         "candidate_records": len(candidates),
+        "candidate_records_by_split": dict(sorted(candidate_records_by_split.items())),
         "groups": len(all_groups),
         "selectable_groups": len(selectable),
+        "selectable_groups_by_split": dict(sorted(selectable_by_split.items())),
         "selected_records": len(selected),
         "skipped_groups": len(all_groups) - len(selectable),
-        "by_split": {split: _summarize_selected(rows) for split, rows in sorted(by_split.items())},
+        "by_split": {split: _summarize_selected(by_split.get(split, [])) for split in candidate_splits},
         "overall": _summarize_selected(selected),
     }
 
