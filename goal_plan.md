@@ -82,13 +82,18 @@ iteration.
   and `NanoWM.score_chronometric_branch`. Result: planner-facing branch scoring
   can now apply train-built geometry-key prototypes through row-like branch
   contexts while leaving normal residual forward passes unchanged.
+- V022: Broadened branch-library support beyond ACTION6 time-phase using
+  explicit `dominant_time_phase`, `dominant_translation`, and combined
+  `time_phase_translation` scopes. Result: heldout signed-Y MAE improved from
+  V020 `0.0180276` to `0.0064036` with progress accuracy `1.0`; the blocker
+  moved to missing exact ACTION5 translation prototypes.
 
 ## Active Queue
 
-1. V022: broaden branch-library support beyond ACTION6 time-phase.
-   Goal: make the hotload mechanism cover the new top heldout family
-   (`ACTION5|time_phase`) and translation residuals without using direct
-   heldout labels.
+1. V023: add a safe fallback for missing translation prototypes.
+   Goal: handle heldout ACTION5 translation rows whose changed-cell counts are
+   absent from the train-built library, using observation-derived potential
+   context rather than direct heldout labels.
 
 2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.

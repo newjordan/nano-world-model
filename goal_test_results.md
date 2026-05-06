@@ -2,6 +2,61 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V022 Time-Phase And Translation Branch Library
+
+Artifacts:
+
+- `src/chronometric_branch_library.py`
+- `scripts/apply_chronometric_branch_library.py`
+- `tests/test_chronometric_branch_library.py`
+- `experiments/2026-05-05_chronometric_branch_library_v022_time_phase_translation_v018_geometry_predictions/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v022_time_phase_translation_branch_library/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v022_time_phase_translation_branch_library/`
+
+Condition:
+
+- source predictions:
+  `experiments/2026-05-05_chronometric_calibration_v018_geometry_v015_support_v016_holdout_balance_cpu/predictions.jsonl`
+- manifest:
+  `experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl`
+- branch library source split: `train`
+- branch library source field: `target_signed_y`
+- library scope: `time_phase_translation`
+- library key strategy: `action_control_grid_coordinate_or_changed_cells`
+- blend: `1.0`
+- min records per key: `1`
+- heldout labels used: `False`
+- training data promoted: `False`
+- clean diagnostic condition: `git_dirty=False`
+
+Verification:
+
+- `python -m pytest tests/test_chronometric_branch_library.py tests/test_chronometric_contortion.py tests/test_chronometric_calibration.py`
+- result: `24 passed`
+- `python -m py_compile src/chronometric_branch_library.py scripts/apply_chronometric_branch_library.py`
+
+Metrics:
+
+- library entries: `120`
+- adjusted records: `6057`
+- heldout adjusted records: `239`
+- heldout signed-Y MAE: `0.006403598150645848`
+- heldout progress accuracy: `1.0`
+- heldout translation signed-Y MAE: `0.007187304803649679`
+- heldout time-phase signed-Y MAE: `0.0053871463645588265`
+- top heldout action-control bucket:
+  `ACTION5|dominant_group:translation` at signed-Y MAE
+  `0.07512006014197443`
+
+Decision:
+
+V022 confirms the branch-library hotload is not just an ACTION6/ka59 special
+case. Broad train-built grid prototypes fix the prior ACTION5 time-phase
+blocker and sharply reduce translation error without using heldout labels. The
+remaining ACTION5 translation errors are missing exact changed-cell prototypes
+for heldout movement rows, so the next step should test an observation-derived
+translation fallback rather than another calibrator weight.
+
 ## V021 Branch-Library Scoring Integration
 
 Artifacts:

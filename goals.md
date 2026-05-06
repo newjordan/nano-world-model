@@ -205,3 +205,22 @@ V021 integrated the branch-library hotload into `score_branch`:
 
 This moves the V020 mechanism from a posthoc JSON adjustment into the actual
 planner-facing branch scoring surface.
+
+V022 broadened the branch-library grid beyond legacy ACTION6 time-phase:
+
+- added explicit library scopes for legacy `action6_time_phase`,
+  `dominant_time_phase`, `dominant_translation`, and combined
+  `time_phase_translation`.
+- V022 used the combined scope on the same V018 prediction base, with train
+  targets only and no heldout labels.
+- library entries increased from V020 `4` to `120`; adjusted heldout records
+  increased from `2` to `239`.
+- heldout signed-Y MAE improved from V020 `0.0180276` to `0.0064036`, with
+  progress accuracy still `1.0`.
+- heldout time-phase MAE dropped to `0.00538715`; translation MAE dropped to
+  `0.0071873`.
+
+The remaining top residual is now
+`ACTION5|dominant_group:translation` at signed-Y MAE `0.0751201`. The
+failure rows are mostly missing exact changed-cell prototypes for the heldout
+`g50t` movement pattern, not an ACTION6 time-phase issue.
