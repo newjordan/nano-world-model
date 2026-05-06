@@ -14,10 +14,10 @@ signals, phase/time features, and bounded branch calibration heads.
 
 ## Current Research Target
 
-Move the validated branch-library/fallback calibration surface into planner
-usage: branch scores should consume train-built chronometric prototypes,
-potential-family fallbacks, and row-like branch context during world-model
-planning rather than only through posthoc JSON adjustment.
+Turn planner-facing branch scores into branch selection: V027 proves the
+validated branch-library/fallback calibration surface can flow through the
+NanoWM-compatible chronometric scoring API, so the next target is a runnable
+planner/objective path that chooses actions or branches from those scores.
 
 ## Hard Boundaries
 
@@ -68,6 +68,31 @@ V026 validates that the V025 mechanism transfers across the V016 and V015
 heldout families. The remaining residual is tiny non-progress
 stasis-no-change bias, so the next useful work is planner/C-model integration
 or a fresh heldout manifest, not more manual knob tuning on V015/V016.
+
+V027 planner-facing scoring smoke:
+
+- scorer:
+  `src/chronometric_planner_scoring.py`
+- runnable harness:
+  `scripts/score_chronometric_planner_branches.py`
+- artifact:
+  `experiments/2026-05-05_chronometric_planner_branch_score_v027_v015_holdout_cross_family/`
+
+V027 scores all V015-heldout cross-family rows through a
+`score_chronometric_branch`/`score_branch` compatible path. It verifies that
+the train-built branch library and potential fallbacks are applied by the
+chronometric scoring surface rather than only by the posthoc adjustment script.
+
+- records scored: `7732`
+- planner-applied records: `6770`
+- planner-fallback records: `23`
+- heldout planner-applied records: `339`
+- heldout applied target signed-Y MAE: `3.4879953504312003e-09`
+- heldout unapplied records: `61`
+
+This is an integration smoke, not a new calibration metric. It closes the
+immediate API gap and leaves branch selection/planner objective wiring as the
+next active engineering target.
 
 ## Checkpoint History
 
@@ -317,3 +342,15 @@ object-relative heldout family:
 This cross-family check is the first strong evidence that the chronometric
 prototype/fallback mechanism is reusable across these movement families rather
 than only saturating the V016 heldout split.
+
+V027 moved that mechanism into a planner-facing scoring harness:
+
+- added `src/chronometric_planner_scoring.py`.
+- added `scripts/score_chronometric_planner_branches.py`.
+- added focused tests for the NanoWM-compatible scoring surface.
+- scored `7732` V015-heldout cross-family rows through the scorer.
+- matched applied branch-library/fallback references with max absolute diff
+  `1.1920928955078125e-07`.
+
+The branch score API is now runnable. The next integration should consume these
+scores in branch selection or CEM/objective logic.

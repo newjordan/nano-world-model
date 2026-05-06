@@ -105,20 +105,29 @@ iteration.
   `0.00000922248`, translation/time-phase/stasis-loop MAE stayed `0.0`,
   progress accuracy stayed `1.0`, and the only residual was tiny
   stasis-no-change bias.
+- V027: Added a planner-facing branch scoring harness that routes row-like
+  branch contexts through a `score_chronometric_branch`/`score_branch`
+  compatible surface. Result: scored `7732` rows, applied the
+  branch-library/fallback path to `6770`, applied `339` heldout rows, and
+  matched applied references with max absolute diff `1.19209e-07`.
 
 ## Active Queue
 
-1. C-model/planner integration: route branch-library and fallback outputs into
-   NanoWM chronometric branch scoring under a runnable planner-facing path.
-   Goal: move from posthoc calibration evidence to world-model branch
-   selection.
+1. Branch selection integration: consume V027 chronometric branch scores in a
+   branch/action selection objective.
+   Goal: move from branch scoring to actual branch choice.
 
-2. Fresh heldout manifest: build or select the next heldout family beyond
+2. Full NanoWM/CEM integration: wire chronometric scoring into the real
+   planner path once the branch-selection objective has a small deterministic
+   smoke.
+   Goal: avoid hiding scorer bugs inside diffusion rollout complexity.
+
+3. Fresh heldout manifest: build or select the next heldout family beyond
    V015/V016 after planner integration has a clean scoring surface.
    Goal: test whether the mechanism survives a new family instead of polishing
    a nearly saturated split.
 
-3. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
+4. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
    but do not tune directly against it unless it grows on a new heldout family.
    Goal: prevent research drift into cosmetic residual chasing.
 
