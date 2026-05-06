@@ -2,6 +2,41 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V021 Branch-Library Scoring Integration
+
+Artifacts:
+
+- `src/chronometric_branch_library.py`
+- `scripts/apply_chronometric_branch_library.py`
+- `src/models/chronometric_contortion.py`
+- `src/models/nanowm.py`
+- `tests/test_chronometric_branch_library.py`
+- `tests/test_chronometric_contortion.py`
+
+Condition:
+
+- no new calibration run
+- implementation moves V020 branch-library adjustment into planner-facing
+  scoring
+- normal residual forward passes are unchanged
+- branch-library scoring requires caller-supplied row-like branch contexts
+- heldout labels used: `False`
+- training data promoted: `False`
+
+Verification:
+
+- `python -m pytest tests/test_chronometric_contortion.py tests/test_chronometric_branch_library.py tests/test_chronometric_calibration.py`
+- result: `22 passed`
+- `python -m py_compile src/models/chronometric_contortion.py src/models/nanowm.py`
+
+Decision:
+
+V021 is a harness integration checkpoint. The branch library is no longer only
+a posthoc JSON operation; NanoWM chronometric branch scoring can apply it during
+planner scoring. Next work should broaden library keys beyond
+`ACTION6|time_phase`, starting with the V020 top residual
+`ACTION5|time_phase`.
+
 ## V020 Branch-Library Hotload
 
 Artifacts:

@@ -192,3 +192,16 @@ This is now a plausible harness mechanism rather than a transductive training
 trick. The next target is integrating branch-library hotload into NanoWM
 chronometric branch scoring and then broadening the library beyond ACTION6
 time-phase.
+
+V021 integrated the branch-library hotload into `score_branch`:
+
+- `ChronometricContortionLayer.score_branch` now accepts a train-built branch
+  library plus row-like branch contexts and adjusts scored `outcome_y` by
+  geometry key.
+- `NanoWM.score_chronometric_branch` forwards the optional branch-library
+  inputs, keeping normal residual forward passes unchanged.
+- The scoring hook records `chronometric_branch_library_applied` in
+  chronometric metrics.
+
+This moves the V020 mechanism from a posthoc JSON adjustment into the actual
+planner-facing branch scoring surface.

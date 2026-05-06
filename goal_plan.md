@@ -78,13 +78,17 @@ iteration.
   predictions. Result: adjusted `8` ACTION6 time-phase records, used no heldout
   labels, moved V016 heldout ka59 from raw `-0.589080` to `0.250244`, and
   reduced heldout `ACTION6|time_phase` MAE to `0.0`.
+- V021: Integrated branch-library hotload into `ChronometricContortionLayer`
+  and `NanoWM.score_chronometric_branch`. Result: planner-facing branch scoring
+  can now apply train-built geometry-key prototypes through row-like branch
+  contexts while leaving normal residual forward passes unchanged.
 
 ## Active Queue
 
-1. V021: integrate branch-library hotload into NanoWM chronometric branch
-   scoring.
-   Goal: move V020 from posthoc prediction adjustment into the actual planner
-   surface, while preserving the train-built/no-heldout-label condition.
+1. V022: broaden branch-library support beyond ACTION6 time-phase.
+   Goal: make the hotload mechanism cover the new top heldout family
+   (`ACTION5|time_phase`) and translation residuals without using direct
+   heldout labels.
 
 2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.
