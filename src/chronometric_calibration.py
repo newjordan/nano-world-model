@@ -110,7 +110,7 @@ def _is_action6(record: dict[str, Any], action_value_norm: float | None = None) 
 
 
 def is_action6_coordinate_time_phase_record(record: dict[str, Any]) -> bool:
-    """Return whether a row belongs to the safe ACTION6 coordinate time-phase bucket."""
+    """Return whether a row belongs to the ACTION6 coordinate dominant time-phase bucket."""
     action_context = record.get("action_context")
     action_value_norm = _get_sequence_number(action_context, 0)
     has_action_data = _get_sequence_number(action_context, 1)
@@ -118,6 +118,7 @@ def is_action6_coordinate_time_phase_record(record: dict[str, Any]) -> bool:
     return (
         _is_action6(record, action_value_norm)
         and has_action_data > 0.5
+        and record.get("control_label") == "dominant_group:time_phase"
         and family.get("time_phase.repeated_effect_size", 0.0) > 0.0
     )
 

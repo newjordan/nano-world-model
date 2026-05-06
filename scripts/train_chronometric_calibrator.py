@@ -526,7 +526,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             ),
         },
         "signed_objective_balancing": {
-            "bucket": "action6_coordinate_time_phase",
+            "bucket": "action6_coordinate_dominant_time_phase",
             "train": train_signed_balance,
             "heldout": heldout_signed_balance,
         },

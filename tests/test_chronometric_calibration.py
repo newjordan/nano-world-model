@@ -112,6 +112,7 @@ def test_calibration_features_include_safe_action6_time_phase_interactions():
 def test_action6_time_phase_mask_uses_safe_bucket_fields():
     match = synthetic_bridge_records()[0]
     match["action_id"] = "ACTION6"
+    match["control_label"] = "dominant_group:time_phase"
     match["action_context"] = [0.6, 1.0, 0.2, 0.3, 0.125, 1.0, 1.0, 1.0]
     match["potential_family_names"] = [
         "transition.changed_cells",
@@ -129,15 +130,22 @@ def test_action6_time_phase_mask_uses_safe_bucket_fields():
     not_action6["action_id"] = "ACTION4"
     not_action6["action_context"][0] = 0.4
 
+    not_dominant_time_phase = copy.deepcopy(match)
+    not_dominant_time_phase["control_label"] = "dominant_group:translation"
+
     assert is_action6_coordinate_time_phase_record(match)
     assert not is_action6_coordinate_time_phase_record(no_time_phase)
     assert not is_action6_coordinate_time_phase_record(no_coordinate)
     assert not is_action6_coordinate_time_phase_record(not_action6)
+    assert not is_action6_coordinate_time_phase_record(not_dominant_time_phase)
 
-    examples = [calibration_example(record) for record in (match, no_time_phase, no_coordinate, not_action6)]
+    examples = [
+        calibration_example(record)
+        for record in (match, no_time_phase, no_coordinate, not_action6, not_dominant_time_phase)
+    ]
     mask = examples_to_action6_time_phase_mask(examples, device=torch.device("cpu"))
 
-    assert mask.squeeze(-1).tolist() == [1.0, 0.0, 0.0, 0.0]
+    assert mask.squeeze(-1).tolist() == [1.0, 0.0, 0.0, 0.0, 0.0]
 
 
 def test_records_with_temporal_context_adds_prior_only_loop_features():
