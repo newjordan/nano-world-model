@@ -2,6 +2,90 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V054/V055 ARC-AGI-3 Standard Model Solve Scouts
+
+Artifacts:
+
+- `scripts/run_arc_agi3_model_solve_scout.py`
+- `tests/test_arc_agi3_model_solve_scout.py`
+- `experiments/2026-05-06_arc_agi3_model_solve_scout_v054_ls20_live_nemo3_mlp_loop/`
+- `experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/`
+
+Status:
+
+- added a bounded offline solve-scout runner that keeps one local `ls20`
+  environment alive
+- every action requires a fresh standard ModelDecision
+- every ModelDecision invokes live Nemo3 final confirmation
+- every pre-action MLP consultation after step 0 consumes prior post-action MLP
+  update candidates as context
+- every post-action observation writes a candidate-only MLP update artifact
+- MLP weights are not silently updated
+- no online submission, no official ARC solve claim, no training data promotion
+
+V054 run metrics:
+
+- selected game: `ls20-9607627b`
+- max steps: `12`
+- valid model solve scout: `True`
+- offline solve detected: `False`
+- stop reason: `max_steps_exhausted`
+- model decisions: `12`
+- actuator steps executed: `12`
+- live Nemo3 external invocations: `12`
+- post-action MLP update candidates: `12`
+- feedback context valid: `True`
+- levels completed: `0 -> 0`
+- win levels final: `7`
+- changed frame steps: `12`
+- `nano-world-model` git dirty at run time: `False`
+
+V055 run metrics:
+
+- selected game: `ls20-9607627b`
+- max steps: `40`
+- comparator:
+  `experiments/2026-05-06_arc_agi3_model_solve_scout_v054_ls20_live_nemo3_mlp_loop/metrics.json`
+- valid model solve scout: `True`
+- offline solve detected: `False`
+- stop reason: `max_steps_exhausted`
+- model decisions: `40`
+- actuator steps executed: `40`
+- live Nemo3 external invocations: `40`
+- post-action MLP update candidates: `40`
+- feedback context valid: `True`
+- invalid ModelDecision count: `0`
+- invalid model-flow step count: `0`
+- levels completed: `0 -> 0`
+- win levels final: `7`
+- changed frame steps: `40`
+- action counts: `ACTION1:1` x `22`, `ACTION2:2` x `13`, `ACTION3:3` x `1`,
+  `ACTION4:4` x `4`
+- MLP weights updated: `False`
+- `nano-world-model` git dirty at run time: `False`
+
+Verification:
+
+- `python -m py_compile src/arc_agi3_model_flow.py scripts/run_arc_agi3_model_decision_producer.py scripts/run_arc_agi3_model_step.py scripts/run_arc_agi3_model_solve_scout.py`
+- `python -m pytest tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_decision_producer.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_model_solve_scout.py`
+- result: `20 passed`
+- `python -m py_compile scripts/run_arc_agi3_model_decision_producer.py scripts/run_arc_agi3_model_step.py scripts/run_arc_agi3_model_solve_scout.py scripts/run_arc_agi3_closed_loop_smoke.py scripts/run_arc_agi3_io_smoke.py scripts/run_dream_kernel_cem_rollout_smoke.py scripts/run_dream_kernel_branch_choice_smoke.py scripts/build_arc_dream_curriculum.py scripts/run_arc_dream_curriculum_eval.py scripts/build_dream_kernel_branch_rank_goal.py src/arc_agi3_model_flow.py src/planning/cem_planner.py src/experiments/planning_experiment.py`
+- `python -m pytest tests/test_arc_agi3_model_decision_producer.py tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_model_solve_scout.py tests/test_arc_agi3_closed_loop_smoke.py tests/test_arc_agi3_io_smoke.py tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `47 passed`
+- `/home/frosty40/world_model_1/.venv/bin/python scripts/run_arc_agi3_model_solve_scout.py --run-label arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40 --out-dir experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40 --arc-repo /home/frosty40/world_model_1 --environments-dir /home/frosty40/world_model_1/environment_files --source-condition-artifact /home/frosty40/world_model_1/docs/arc-agi-3-env.md --operation-mode OFFLINE --game ls20 --max-candidate-actions 8 --max-steps 40 --nemo-mode live-relay --nemo-relay-url http://127.0.0.1:8000/v1/responses --nemo-model nemotron_3_nano_omni --nemo-timeout 180 --post-action-mlp-update-mode candidate-only --historical-comparator v054_12_step_standard_model_solve_scout --historical-comparator-artifact experiments/2026-05-06_arc_agi3_model_solve_scout_v054_ls20_live_nemo3_mlp_loop/metrics.json`
+- result: valid model solve scout, `40` standard-flow actions, offline solve
+  not detected, no online submission, no official ARC solve claim
+
+Decision:
+
+The connected system can run repeated standard model cycles, but it cannot yet
+solve `ls20` under the current branch scoring. V055 is the first honest answer
+to the solve-readiness question: the loop is valid, live, and recurrent, but
+not goal-directed enough to complete a level. The next fix is not more actuator
+plumbing; it is value/goal calibration for ARC observations so branch scoring
+can prefer actions that increase `levels_completed` rather than only actions
+that change the frame.
+
 ## V052/V053 ARC-AGI-3 Live Nemo3 MLP-Connected Model Loop
 
 Artifacts:

@@ -242,6 +242,12 @@ iteration.
   flow; V053 consumed that artifact, executed exactly one offline action, wrote
   a candidate-only post-action MLP update, and recorded no online submission or
   solve claim.
+- V054/V055: Added and ran the bounded standard-model solve scout. Result: the
+  loop successfully repeated ModelDecision -> live Nemo3 confirmation ->
+  actuator -> post-action MLP update-candidate for `12` and then `40` offline
+  `ls20` actions with `0` invalid decisions, `0` invalid actuator steps, and
+  feedback context carried into every post-step MLP consultation. It did not
+  solve: levels stayed `0 -> 0` against `win_levels=7`.
 
 ## Active Queue
 
@@ -256,14 +262,11 @@ iteration.
    detector stub that produces the palette-labeled image required by V031.
    Goal: separate image parsing accuracy from geometry/raycast correctness.
 
-4. ARC-AGI-3 multi-step mental loop for `ls20`: after the V053 one-step trace,
-   route the post-action observation and candidate-only MLP update back into
-   the next producer pass, then require a fresh live-Nemo ModelDecision before
-   action two.
-   Goal: prove repeated observe -> 3D/world-state -> chronometric knowledge ->
-   MLP consultation -> branch simulation -> internal lock -> Nemo3
-   confirmation -> actuator -> post-action MLP update-candidate cycles work
-   without direct action policy bypasses or silent weight updates.
+4. ARC-AGI-3 goal/value calibration for `ls20`: use V054/V055 traces to add a
+   goal-directed branch signal that can distinguish frame-changing motion from
+   actions that actually increase `levels_completed`.
+   Goal: keep the repeated standard loop intact while making branch simulation
+   optimize local solve progress, not just stable MLP priors and frame change.
 
 5. Fresh heldout family: build or select the next heldout family beyond
    V015/V016 after the action-candidate manifest is available.

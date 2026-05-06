@@ -1,0 +1,64 @@
+{
+  "actuator_steps_executed": 0,
+  "arc_solve_claim": false,
+  "confirmation_mode": "live-relay",
+  "confirms_selected_action": true,
+  "created_after_internal_thinking_lock": true,
+  "created_at_utc": "2026-05-06T22:52:09.523488+00:00",
+  "created_before_actuator_step": true,
+  "decision_delegated_to_nemo": false,
+  "external_nemo3_model_invoked": true,
+  "model": "nemotron_3_nano_omni",
+  "nemo_supplied_action": false,
+  "packet": {
+    "branch_simulation": {
+      "candidate_count": 4,
+      "schema": "arc_agi3.branch_simulation.v001",
+      "score_surface": "NanoWM.score_chronometric_branch",
+      "selected_branch_id": "ls20:reset:5dfaeedc-ed6f-4ff2-a677-3ba8a777d797:action:4"
+    },
+    "instruction": "Confirm or reject this internally selected action. Do not provide a replacement action. Return compact JSON with confirms_selected_action, selected_action_value, nemo_supplied_action=false, and confidence.",
+    "internal_thinking_lock": {
+      "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/029_model_decision/internal_thinking_lock.json",
+      "sha256": "bd67d38ffe041ebd98a955466661ae539b277371d9cfff934c6b397dbd079aed"
+    },
+    "schema": "arc_agi3.nemo3_final_confirmation_packet.v001",
+    "selected_action_name": "ACTION4",
+    "selected_action_value": 4,
+    "selected_branch": {
+      "action_name": "ACTION4",
+      "action_value": 4,
+      "branch_id": "ls20:reset:5dfaeedc-ed6f-4ff2-a677-3ba8a777d797:action:4",
+      "score": 0.698573,
+      "score_components": {
+        "candidate_rank_prior": 0.25,
+        "mlp_prior": 0.72114,
+        "stable_action_context": 0.990469,
+        "world_structure_prior": 1.0
+      },
+      "score_surface": "NanoWM.score_chronometric_branch"
+    },
+    "state_id": "ls20:reset:5dfaeedc-ed6f-4ff2-a677-3ba8a777d797",
+    "trust_flags": {
+      "branch_selection_trusted": true,
+      "geometry_trusted": true,
+      "map_trusted": true,
+      "ray_trusted": true,
+      "temporal_trusted": true
+    }
+  },
+  "relay_url": "http://127.0.0.1:8000/v1/responses",
+  "response": {
+    "model": "nemotron_3_nano_omni",
+    "relay_error": null,
+    "relay_ok": true,
+    "relay_url": "http://127.0.0.1:8000/v1/responses",
+    "response_text": "{\"confirms_selected_action\":true,\"selected_action_value\":4,\"nemo_supplied_action\":false,\"confidence\":0.99}"
+  },
+  "role": "confirmation_not_action_source",
+  "schema": "arc_agi3.nemo3_final_confirmation.v001",
+  "selected_action_name": "ACTION4",
+  "selected_action_value": 4,
+  "state_id": "ls20:reset:5dfaeedc-ed6f-4ff2-a677-3ba8a777d797",
+  "training_data_promoted": false
+}

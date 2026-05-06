@@ -76,7 +76,11 @@ before branch simulation, branch scores consume those priors, and the actuator
 must write a candidate-only `arc_agi3.post_action_mlp_update_candidate.v001`
 artifact after the step. V053 records `mlp_weights_updated=False` and
 `training_data_promoted=False`; update candidates are evidence for a later
-promotion gate, not silent online learning.
+promotion gate, not silent online learning. V054/V055 then run the repeated
+standard loop as an offline solve scout. The loop holds for `40` live-Nemo
+ModelDecision/action cycles with post-action MLP feedback context, but does
+not solve `ls20`: levels stay `0 -> 0` against `win_levels=7`. The current
+blocker is branch-value calibration, not actuator connectivity.
 
 ## Hard Boundaries
 
@@ -98,8 +102,9 @@ promotion gate, not silent online learning.
   reports trusted labels, geometry, and ray contacts.
 - Do not run non-I/O ARC actions from a direct `env.action_space` policy. The
   only standard execution route is observation -> 3D/world state -> internal
-  chronometric game-knowledge link -> branch simulation -> trust checks ->
-  ModelDecision artifact -> actuator step.
+  chronometric game-knowledge link -> MLP consultation -> branch simulation ->
+  trust checks -> internal-thinking lock -> Nemo3 final confirmation ->
+  ModelDecision artifact -> actuator step -> post-action MLP update candidate.
 - Do not execute an ARC actuator step unless the ModelDecision contains a
   locked internal-thinking artifact that predates the actuator step and binds
   to the selected action.
@@ -140,6 +145,9 @@ promotion gate, not silent online learning.
   branch simulation, locked internal-thinking artifact, ModelDecision artifact,
   mandatory Nemo3 final signoff, post-action MLP update-candidate capture, and
   at most one actuator step.
+- ARC-AGI-3 offline solve-scout validity: repeated standard model-flow actions,
+  live Nemo3 invocation count, post-action MLP feedback context continuity,
+  levels-completed delta, and offline solve detection.
 
 ## Current Best Checkpoint
 

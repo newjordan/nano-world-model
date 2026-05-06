@@ -1,0 +1,136 @@
+{
+  "actuator_steps_executed": 0,
+  "arc_solve_claim": false,
+  "branch_ambiguity_gap_threshold": 0.0,
+  "branches": [
+    {
+      "action_data": null,
+      "action_name": "ACTION2",
+      "action_value": 2,
+      "arc_solve_claim": false,
+      "branch_id": "ls20:reset:5dfaeedc-ed6f-4ff2-a677-3ba8a777d797:action:2",
+      "chronometric_game_knowledge_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/023_model_decision/chronometric_game_knowledge.json",
+      "chronometric_game_knowledge_sha256": "1d005309d4ad0cd4e9777465d75392f967fd7ba3069f5dff020e6200ad870af3",
+      "game_name": "ls20",
+      "mlp_consultation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/023_model_decision/mlp_consultation.json",
+      "mlp_consultation_sha256": "d5a8e8a4dfde7fe2c9ee4b0e4b4f7abac72e0853c5ed65b5e65b4380d16c491e",
+      "prediction": {
+        "confidence": 0.70828,
+        "imagined_signed_y": 0.716561,
+        "observed_after_action": null,
+        "post_action_calibration": false
+      },
+      "score": 0.716561,
+      "score_components": {
+        "candidate_rank_prior": 0.75,
+        "mlp_prior": 0.476138,
+        "stable_action_context": 0.954422,
+        "world_structure_prior": 1.0
+      },
+      "score_surface": "NanoWM.score_chronometric_branch",
+      "selected": true,
+      "training_data_promoted": false
+    },
+    {
+      "action_data": null,
+      "action_name": "ACTION1",
+      "action_value": 1,
+      "arc_solve_claim": false,
+      "branch_id": "ls20:reset:5dfaeedc-ed6f-4ff2-a677-3ba8a777d797:action:1",
+      "chronometric_game_knowledge_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/023_model_decision/chronometric_game_knowledge.json",
+      "chronometric_game_knowledge_sha256": "1d005309d4ad0cd4e9777465d75392f967fd7ba3069f5dff020e6200ad870af3",
+      "game_name": "ls20",
+      "mlp_consultation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/023_model_decision/mlp_consultation.json",
+      "mlp_consultation_sha256": "d5a8e8a4dfde7fe2c9ee4b0e4b4f7abac72e0853c5ed65b5e65b4380d16c491e",
+      "prediction": {
+        "confidence": 0.658942,
+        "imagined_signed_y": 0.617885,
+        "observed_after_action": null,
+        "post_action_calibration": false
+      },
+      "score": 0.617885,
+      "score_components": {
+        "candidate_rank_prior": 1.0,
+        "mlp_prior": 0.372337,
+        "stable_action_context": 0.4758,
+        "world_structure_prior": 1.0
+      },
+      "score_surface": "NanoWM.score_chronometric_branch",
+      "selected": false,
+      "training_data_promoted": false
+    },
+    {
+      "action_data": null,
+      "action_name": "ACTION3",
+      "action_value": 3,
+      "arc_solve_claim": false,
+      "branch_id": "ls20:reset:5dfaeedc-ed6f-4ff2-a677-3ba8a777d797:action:3",
+      "chronometric_game_knowledge_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/023_model_decision/chronometric_game_knowledge.json",
+      "chronometric_game_knowledge_sha256": "1d005309d4ad0cd4e9777465d75392f967fd7ba3069f5dff020e6200ad870af3",
+      "game_name": "ls20",
+      "mlp_consultation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/023_model_decision/mlp_consultation.json",
+      "mlp_consultation_sha256": "d5a8e8a4dfde7fe2c9ee4b0e4b4f7abac72e0853c5ed65b5e65b4380d16c491e",
+      "prediction": {
+        "confidence": 0.633415,
+        "imagined_signed_y": 0.56683,
+        "observed_after_action": null,
+        "post_action_calibration": false
+      },
+      "score": 0.56683,
+      "score_components": {
+        "candidate_rank_prior": 0.5,
+        "mlp_prior": 0.575134,
+        "stable_action_context": 0.447107,
+        "world_structure_prior": 1.0
+      },
+      "score_surface": "NanoWM.score_chronometric_branch",
+      "selected": false,
+      "training_data_promoted": false
+    },
+    {
+      "action_data": null,
+      "action_name": "ACTION4",
+      "action_value": 4,
+      "arc_solve_claim": false,
+      "branch_id": "ls20:reset:5dfaeedc-ed6f-4ff2-a677-3ba8a777d797:action:4",
+      "chronometric_game_knowledge_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/023_model_decision/chronometric_game_knowledge.json",
+      "chronometric_game_knowledge_sha256": "1d005309d4ad0cd4e9777465d75392f967fd7ba3069f5dff020e6200ad870af3",
+      "game_name": "ls20",
+      "mlp_consultation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/023_model_decision/mlp_consultation.json",
+      "mlp_consultation_sha256": "d5a8e8a4dfde7fe2c9ee4b0e4b4f7abac72e0853c5ed65b5e65b4380d16c491e",
+      "prediction": {
+        "confidence": 0.53531,
+        "imagined_signed_y": 0.37062,
+        "observed_after_action": null,
+        "post_action_calibration": false
+      },
+      "score": 0.37062,
+      "score_components": {
+        "candidate_rank_prior": 0.25,
+        "mlp_prior": 0.122287,
+        "stable_action_context": 0.636822,
+        "world_structure_prior": 1.0
+      },
+      "score_surface": "NanoWM.score_chronometric_branch",
+      "selected": false,
+      "training_data_promoted": false
+    }
+  ],
+  "candidate_count": 4,
+  "chronometric_game_knowledge_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/023_model_decision/chronometric_game_knowledge.json",
+  "chronometric_game_knowledge_sha256": "1d005309d4ad0cd4e9777465d75392f967fd7ba3069f5dff020e6200ad870af3",
+  "created_at_utc": "2026-05-06T22:51:41.775929+00:00",
+  "game_name": "ls20",
+  "mlp_consultation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v055_ls20_live_nemo3_mlp_loop_40/steps/023_model_decision/mlp_consultation.json",
+  "mlp_consultation_sha256": "d5a8e8a4dfde7fe2c9ee4b0e4b4f7abac72e0853c5ed65b5e65b4380d16c491e",
+  "schema": "arc_agi3.branch_simulation.v001",
+  "score_surface": "NanoWM.score_chronometric_branch",
+  "selected_action_name": "ACTION2",
+  "selected_action_value": 2,
+  "selected_branch_id": "ls20:reset:5dfaeedc-ed6f-4ff2-a677-3ba8a777d797:action:2",
+  "selection_policy": "chronometric_score_argmax_v047_reset_contract",
+  "selection_source": "world_model_internal_thinking",
+  "simulation_surface": "arc_agi3_reset_branch_simulation_v047",
+  "state_id": "ls20:reset:5dfaeedc-ed6f-4ff2-a677-3ba8a777d797",
+  "training_data_promoted": false
+}
