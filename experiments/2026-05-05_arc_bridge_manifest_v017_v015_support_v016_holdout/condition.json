@@ -1,0 +1,38 @@
+{
+  "arc_data_used": true,
+  "created_at_utc": "2026-05-06T01:21:15.282141+00:00",
+  "generator_commit": "88f673ccfd40b793998809528a00b32e5b9aa905",
+  "generator_dirty": false,
+  "generator_repo": "/home/frosty40/nano-world-model",
+  "output_manifest": "experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl",
+  "quarantine_status": "control_source: arc_scaffold_non_chronometric",
+  "run_kind": "bridge_manifest_merge",
+  "run_label": "arc_bridge_manifest_v017_v015_support_v016_holdout",
+  "script": "scripts/merge_chronometric_bridge_manifests.py",
+  "source_manifests": [
+    {
+      "path": "experiments/2026-05-05_arc_bridge_manifest_v012_action6_ten_task_holdout/arc_bridge_manifest.jsonl",
+      "records": 7332,
+      "sha256": "ff69f57c04961215c860ebca693fdfe62a058127e47685c11c1a568f893c8b5a",
+      "source_condition_artifacts": [
+        "experiments/2026-05-04_v009_ft09_action6_affordance_sweep/CONDITION.md",
+        "experiments/2026-05-04_v010_ft09_targeted_coordinate_scout/CONDITION.md",
+        "experiments/2026-05-04_v011_tn36_action6_coordinate_heatmap/CONDITION.md",
+        "experiments/2026-05-04_v016_controllability_movement_scout/CONDITION.md",
+        "experiments/2026-05-04_v019b_target_discriminated_scorer_scout/CONDITION.md",
+        "experiments/2026-05-04_v023_mirror_hazard_current_state_scout/CONDITION.md",
+        "experiments/2026-05-05_v031b_post_progress_avoidance_replay_retry/CONDITION.md",
+        "experiments/2026-05-05_v033_post_progress_nonlocal_replay/CONDITION.md"
+      ]
+    },
+    {
+      "path": "experiments/2026-05-05_arc_bridge_manifest_v013_v015_action6_holdout_family/arc_bridge_manifest.jsonl",
+      "records": 400,
+      "sha256": "c5566b850aa953dc47d8c089718f2ea2bc52876e5cd934096117650972a49061",
+      "source_condition_artifacts": [
+        "experiments/2026-05-04_v015_object_relative_movement_scout/CONDITION.md"
+      ]
+    }
+  ],
+  "training_data_promoted": false
+}
