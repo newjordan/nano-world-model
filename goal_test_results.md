@@ -2,6 +2,61 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V014-V016 ACTION6 Time-Phase Feature And Balance Iterations
+
+Artifacts:
+
+- `experiments/2026-05-05_chronometric_calibration_v014_action6_time_phase_features_v015_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_calibration_v014b_action6_time_phase_features_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v014_action6_time_phase_features_v015_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v014b_action6_time_phase_features_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_calibration_v015_action6_time_phase_signed_balance_v015_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_calibration_v016_action6_dominant_time_phase_balance_v015_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_calibration_v016b_action6_dominant_time_phase_balance_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v016_action6_dominant_time_phase_balance_v015_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v016b_action6_dominant_time_phase_balance_v016_holdout_cpu/`
+
+Condition:
+
+- base comparators: V013 with V015 held out, and V012 with V016 held out
+- requested device: `cpu`
+- seed: `20260505`
+- steps: `800`
+- V014 changed input representation only: added safe coordinate/ACTION6/time
+  interaction features; direct outcome fields stayed excluded
+- V015 changed objective only: broad ACTION6 time-phase signed balancing,
+  later recorded as a failed mask scout
+- V016 changed objective only from V014: dominant
+  `ACTION6|time_phase` signed balancing, max weight `256`
+- training data promoted: `False`
+
+Metrics:
+
+- V014 V015-heldout signed-Y MAE: `0.016086839139461517`
+- V014 V015-heldout `ACTION6|time_phase` signed-Y MAE: `0.6634646356105804`
+- V014B V016-heldout signed-Y MAE: `0.03931467607617378`
+- V014B V016-heldout `ACTION6|time_phase` signed-Y MAE: `0.6844081915915012`
+- V015 broad balance selected `484` train rows and worsened V015-heldout
+  signed-Y MAE to `0.028554601594805717`
+- V016 dominant balance selected `6` train rows and `2` heldout rows on the
+  V015-heldout condition; V015-heldout signed-Y MAE was
+  `0.023143382743000984`
+- V016 improved V015-heldout `ACTION6|time_phase` signed-Y MAE to
+  `0.22553975135087967`; the top heldout error moved to
+  `ACTION5|time_phase` at `0.26319148298352957`
+- V016B selected only `4` train rows for the V016-heldout condition and failed
+  the missing ka59-like heldout branch: `ACTION6|time_phase` signed-Y MAE
+  `0.6336235329508781`
+
+Decision:
+
+V014 features are useful and should stay. V015 broad balancing is not promoted.
+V016 narrow balancing proves the model can learn the rare time-phase sign when
+the coordinate family has matching support, but V016B proves this does not
+generalize when the ka59-like family is absent from train. Next work should
+target coordinate-family coverage or a geometry-aware coordinate abstraction,
+not stronger scalar loss weighting.
+
 ## V013 ACTION6 Support With V015 Heldout
 
 Artifacts:

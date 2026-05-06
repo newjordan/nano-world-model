@@ -109,3 +109,25 @@ V012/V013 isolate the ACTION6 residual:
 The current blocker is now precise: coordinate-bearing ACTION6 time-phase
 polarity. More generic support data improves ACTION6 overall, but does not
 teach the rare time-phase sign correctly.
+
+V014/V016 split that blocker into representation, objective, and coverage
+pieces:
+
+- V014 added safe ACTION6/time-phase interaction features. V015 heldout
+  aggregate improved to signed-Y MAE `0.0160868`, but the two-row
+  `ACTION6|dominant_group:time_phase` bucket stayed bad at signed-Y MAE
+  `0.663465`.
+- V015 broad time-phase balancing was a failed scout: it selected `484` train
+  rows instead of the intended tiny dominant bucket and worsened heldout
+  aggregate MAE to `0.0285546`.
+- V016 narrowed balancing to dominant `ACTION6|time_phase` rows. With matching
+  V016/ka59 support in train and V015 held out, the target bucket improved from
+  V014 `0.663465` to `0.225540`; top heldout error moved to
+  `ACTION5|time_phase`. The V016B comparator still failed when the heldout
+  V016/ka59 pattern was absent from train, leaving `ACTION6|time_phase` at
+  `0.633624`.
+
+The active blocker is therefore not just loss pressure. The chronometric
+surface needs coordinate-family coverage or a geometry-aware coordinate
+abstraction that can transfer the ka59-like time-phase branch without seeing
+that exact support pattern.

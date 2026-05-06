@@ -44,13 +44,29 @@ iteration.
 - V013: Added V016 as support and held out V015 object-relative movement.
   Result: ACTION6 aggregate improved to `0.0513169`, but time-phase remained
   high at `0.159137`; generic support data is not enough.
+- V014: Added safe coordinate/ACTION6/time-phase interaction features and
+  reran V013/V012 comparable holdouts. Result: V015 heldout aggregate improved
+  to signed-Y MAE `0.0160868`, and V016 heldout improved to `0.0393147`, but
+  the two-row `ACTION6|dominant_group:time_phase` bucket remained the top
+  error at `0.663465` and `0.684408`.
+- V015: Added an opt-in signed-Y balancing objective for ACTION6 time-phase
+  rows. Result: failed scout because the initial mask selected all ACTION6
+  rows with nonzero time-phase potential (`484` train rows), not just the rare
+  dominant bucket, and worsened V015 heldout aggregate to `0.0285546`.
+- V016: Narrowed signed-Y balancing to dominant
+  `ACTION6|dominant_group:time_phase` rows. Result: with matching ka59 support
+  in train, the V015-heldout target bucket improved to `0.225540` and stopped
+  being the top error; V016B still failed when the V016/ka59 pattern was held
+  out and absent from train (`0.633624`).
 
 ## Active Queue
 
-1. V014: add an explicit coordinate-bearing ACTION6 time-phase polarity feature
-   or support-check runner, then rerun V012/V013 comparable holdouts.
-   Goal: fix rare time-phase signed-Y polarity without weakening stasis or
-   progress separation.
+1. V017: build a coordinate-family coverage or abstraction probe for the
+   ka59-like ACTION6 time-phase branch.
+   Goal: transfer the time-phase sign without requiring the exact heldout
+   coordinate family in train. Candidate directions: coordinate-normalized
+   relative-position features, paired coordinate-family support rows, or a
+   small geometry-aware branch consistency objective.
 
 2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.
