@@ -2,6 +2,74 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V026 V015-Heldout Cross-Family Branch Library Validation
+
+Artifacts:
+
+- `experiments/2026-05-05_chronometric_calibration_v016_action6_dominant_time_phase_balance_v015_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_branch_library_v026_v015_holdout_cross_family_v016_predictions/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v026_v015_holdout_cross_family/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v026_v015_holdout_cross_family/`
+
+Condition:
+
+- source predictions:
+  `experiments/2026-05-05_chronometric_calibration_v016_action6_dominant_time_phase_balance_v015_holdout_cpu/predictions.jsonl`
+- source calibration metrics:
+  `experiments/2026-05-05_chronometric_calibration_v016_action6_dominant_time_phase_balance_v015_holdout_cpu/metrics.json`
+- manifest:
+  `experiments/2026-05-05_arc_bridge_manifest_v013_action6_support_v015_holdout/arc_bridge_manifest.jsonl`
+- heldout family:
+  `experiments/2026-05-04_v015_object_relative_movement_scout/CONDITION.md`
+- branch library source split: `train`
+- library scope: `time_phase_translation_stasis_loop`
+- fallback scope: `time_phase_translation_potential`
+- heldout labels used: `False`
+- training data promoted: `False`
+- clean inference/diagnostic condition: `git_dirty=False`
+
+Verification:
+
+- `python scripts/apply_chronometric_branch_library.py --run-label chronometric_branch_library_v026_v015_holdout_cross_family_v016_predictions --manifest experiments/2026-05-05_arc_bridge_manifest_v013_action6_support_v015_holdout/arc_bridge_manifest.jsonl --predictions experiments/2026-05-05_chronometric_calibration_v016_action6_dominant_time_phase_balance_v015_holdout_cpu/predictions.jsonl --calibration-metrics experiments/2026-05-05_chronometric_calibration_v016_action6_dominant_time_phase_balance_v015_holdout_cpu/metrics.json --out-dir experiments/2026-05-05_chronometric_branch_library_v026_v015_holdout_cross_family_v016_predictions --blend 1.0 --min-records 1 --library-scope time_phase_translation_stasis_loop --fallback-scope time_phase_translation_potential`
+- `python scripts/analyze_chronometric_error_buckets.py --run-label chronometric_bucket_eval_v026_v015_holdout_cross_family --manifest experiments/2026-05-05_arc_bridge_manifest_v013_action6_support_v015_holdout/arc_bridge_manifest.jsonl --predictions experiments/2026-05-05_chronometric_branch_library_v026_v015_holdout_cross_family_v016_predictions/predictions.jsonl --calibration-metrics experiments/2026-05-05_chronometric_branch_library_v026_v015_holdout_cross_family_v016_predictions/metrics.json --out-dir experiments/2026-05-05_chronometric_bucket_eval_v026_v015_holdout_cross_family`
+- `python scripts/analyze_chronometric_feature_coverage.py --run-label chronometric_feature_coverage_v026_v015_holdout_cross_family --manifest experiments/2026-05-05_arc_bridge_manifest_v013_action6_support_v015_holdout/arc_bridge_manifest.jsonl --predictions experiments/2026-05-05_chronometric_branch_library_v026_v015_holdout_cross_family_v016_predictions/predictions.jsonl --out-dir experiments/2026-05-05_chronometric_feature_coverage_v026_v015_holdout_cross_family`
+- `jq` condition checks confirmed inference, bucket diagnostics, and rerun
+  feature diagnostics recorded `git_dirty=False`.
+- no code changed in V026; this checkpoint is posthoc inference plus
+  diagnostics over existing V025 mechanics.
+
+Metrics:
+
+- source calibration heldout signed-Y MAE:
+  `0.023143382743000984`
+- V026 heldout signed-Y MAE: `0.000009222477674484252`
+- heldout progress accuracy: `1.0`
+- heldout records: `400`
+- heldout progress-positive records: `0`
+- library entries: `550`
+- adjusted records: `6770`
+- heldout adjusted records: `339`
+- fallback records: `23`
+- heldout fallback records: `23`
+- heldout translation signed-Y MAE: `0.0`
+- heldout time-phase signed-Y MAE: `0.0`
+- heldout stasis-loop signed-Y MAE: `0.0`
+- heldout stasis-no-change signed-Y MAE: `0.000060475263439241`
+- top heldout false-progress probability: `0.0034957625903189182`
+- top feature residual:
+  `ACTION1|stasis_no_change` at signed-Y MAE
+  `0.00026741623878479004`
+
+Decision:
+
+V026 validates the V025 branch-library/fallback stack across the V016/V015
+family flip. The mechanism is no longer only a V016-heldout saturation result:
+it transfers to the V015 object-relative heldout family and reduces the source
+calibration error by roughly three orders of magnitude without heldout labels.
+The next useful work is a planner-facing scoring path or a fresh heldout
+manifest; direct tuning against the tiny stasis-no-change residual is not a
+priority.
+
 ## V025 Stasis-Loop Branch Library Scope
 
 Artifacts:

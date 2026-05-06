@@ -99,17 +99,28 @@ iteration.
   with time-separated stasis-loop keys. Result: heldout signed-Y MAE improved
   to `0.0000961539`, translation/time-phase/stasis-loop MAE all reached `0.0`,
   and progress accuracy stayed `1.0`.
+- V026: Validated the V025 branch-library/fallback stack on the flipped V015
+  object-relative heldout family using V016-source calibration predictions.
+  Result: source calibration heldout signed-Y MAE `0.0231434` dropped to
+  `0.00000922248`, translation/time-phase/stasis-loop MAE stayed `0.0`,
+  progress accuracy stayed `1.0`, and the only residual was tiny
+  stasis-no-change bias.
 
 ## Active Queue
 
-1. Cross-family validation: rerun the broader library/fallback stack on a
-   different heldout family or build the next bridge manifest.
-   Goal: verify V025 is a reusable chronometric mechanism, not just saturation
-   of the V016 heldout family.
+1. C-model/planner integration: route branch-library and fallback outputs into
+   NanoWM chronometric branch scoring under a runnable planner-facing path.
+   Goal: move from posthoc calibration evidence to world-model branch
+   selection.
 
-2. C-model integration: route the calibration head output back into NanoWM
-   chronometric branch scoring.
-   Goal: move from posthoc calibration to world-model-planner scoring.
+2. Fresh heldout manifest: build or select the next heldout family beyond
+   V015/V016 after planner integration has a clean scoring surface.
+   Goal: test whether the mechanism survives a new family instead of polishing
+   a nearly saturated split.
+
+3. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
+   but do not tune directly against it unless it grows on a new heldout family.
+   Goal: prevent research drift into cosmetic residual chasing.
 
 ## Stop Rules
 

@@ -14,9 +14,10 @@ signals, phase/time features, and bounded branch calibration heads.
 
 ## Current Research Target
 
-Turn bridge-manifest rows into a learnable chronometric calibration surface that
-can separate progress branches from non-progress branches and localize signed-Y
-failure families without manual scorer knob tuning.
+Move the validated branch-library/fallback calibration surface into planner
+usage: branch scores should consume train-built chronometric prototypes,
+potential-family fallbacks, and row-like branch context during world-model
+planning rather than only through posthoc JSON adjustment.
 
 ## Hard Boundaries
 
@@ -40,6 +41,35 @@ failure families without manual scorer knob tuning.
 - Top heldout false-progress probability.
 
 ## Current Best Checkpoint
+
+V026 cross-family branch-library validation:
+
+- inference:
+  `experiments/2026-05-05_chronometric_branch_library_v026_v015_holdout_cross_family_v016_predictions/`
+- bucket diagnostics:
+  `experiments/2026-05-05_chronometric_bucket_eval_v026_v015_holdout_cross_family/`
+- feature diagnostics:
+  `experiments/2026-05-05_chronometric_feature_coverage_v026_v015_holdout_cross_family/`
+
+V026 applies the V025 library/fallback stack to the V015 object-relative
+heldout family from the V016 source calibration. It uses train targets only,
+uses no heldout labels, and records clean `git_dirty=False` conditions.
+
+- source calibration heldout signed-Y MAE: `0.023143382743000984`
+- V026 heldout signed-Y MAE: `0.000009222477674484252`
+- heldout progress accuracy: `1.0`
+- library entries: `550`
+- adjusted records: `6770`, including `339` heldout records
+- fallback records: `23`, all heldout
+- heldout translation/time-phase/stasis-loop signed-Y MAE: `0.0`
+- heldout stasis-no-change signed-Y MAE: `0.000060475263439241`
+
+V026 validates that the V025 mechanism transfers across the V016 and V015
+heldout families. The remaining residual is tiny non-progress
+stasis-no-change bias, so the next useful work is planner/C-model integration
+or a fresh heldout manifest, not more manual knob tuning on V015/V016.
+
+## Checkpoint History
 
 V007 safe potential inputs:
 
@@ -269,3 +299,21 @@ V025 broadened the train-built branch library to stasis-loop behavior:
 The remaining residual is now tiny stasis-no-change bias, led by
 `ACTION1|stasis_no_change` at signed-Y MAE `0.00101436`. This suggests the
 current heldout family is nearly saturated as a calibration target.
+
+V026 validated the same branch-library/fallback stack on the flipped V015
+object-relative heldout family:
+
+- source calibration:
+  `experiments/2026-05-05_chronometric_calibration_v016_action6_dominant_time_phase_balance_v015_holdout_cpu/`
+- branch-library inference:
+  `experiments/2026-05-05_chronometric_branch_library_v026_v015_holdout_cross_family_v016_predictions/`
+- source calibration heldout signed-Y MAE was `0.023143382743000984`.
+- V026 heldout signed-Y MAE was `0.000009222477674484252`.
+- heldout translation, time-phase, and stasis-loop MAE all reached `0.0`;
+  progress accuracy stayed `1.0`.
+- the only remaining control residual was stasis-no-change at signed-Y MAE
+  `0.000060475263439241`.
+
+This cross-family check is the first strong evidence that the chronometric
+prototype/fallback mechanism is reusable across these movement families rather
+than only saturating the V016 heldout split.
