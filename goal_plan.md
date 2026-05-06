@@ -214,6 +214,13 @@ iteration.
   and executes `0` actuator steps. The recorded run used explicit
   `contract-local` Nemo mode, so it is a contract/path proof, not a live
   external Nemo3 invocation.
+- V048: Ran the same producer through the live Nemo3 relay. Result: the real
+  `ls20-9607627b` reset observation emitted a valid
+  `arc_agi3.model_decision.v001` artifact chain with
+  `nemo3_external_model_invoked=True`, relay model
+  `nemotron_3_nano_omni`, final confirmation JSON
+  `confirms_selected_action=true`, selected action `ACTION1:1` from
+  `world_model_internal_thinking`, and `0` actuator steps.
 
 ## Active Queue
 
@@ -228,12 +235,12 @@ iteration.
    detector stub that produces the palette-labeled image required by V031.
    Goal: separate image parsing accuracy from geometry/raycast correctness.
 
-4. ARC-AGI-3 live Nemo3 confirmation gate for `ls20`: rerun the V047 producer
-   with `--nemo-mode live-relay` against the configured Nemo3 relay and require
-   a valid external final confirmation before any actuator step.
-   Goal: replace the contract-local confirmation with real Nemo3 signoff, then
-   feed the resulting `arc_agi3.model_decision.v001` artifact to the standard
-   one-step actuator runner.
+4. ARC-AGI-3 one-step actuator gate for `ls20`: consume the V048 live-Nemo
+   `arc_agi3.model_decision.v001` artifact with
+   `scripts/run_arc_agi3_model_step.py`.
+   Goal: prove the actuator only consumes a live-confirmed ModelDecision and
+   records exactly one local offline step with no online submission or solve
+   claim.
 
 5. Fresh heldout family: build or select the next heldout family beyond
    V015/V016 after the action-candidate manifest is available.

@@ -62,7 +62,10 @@ simulation -> trust checks -> internal-thinking lock -> Nemo3 final
 confirmation -> ModelDecision artifact chain with `0` actuator steps. The
 recorded V047 run used explicit `contract-local` Nemo confirmation, so the next
 readiness gate is a `--nemo-mode live-relay` run before any challenge-step
-claim.
+claim. V048 passes that live-relay producer gate: local vLLM served
+`nemotron_3_nano_omni` at `http://127.0.0.1:8000/v1/responses`, Nemo3 returned
+final JSON confirming the internally selected `ACTION1:1`, and the producer
+still executed `0` actuator steps.
 
 ## Hard Boundaries
 

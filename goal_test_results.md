@@ -2,6 +2,69 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V048 ARC-AGI-3 Live Nemo3 ModelDecision Producer
+
+Artifacts:
+
+- `scripts/run_arc_agi3_model_decision_producer.py`
+- `experiments/2026-05-06_arc_agi3_model_decision_v048_ls20_live_nemo3_reset/`
+
+Status:
+
+- loaded real offline `ls20-9607627b` from `/home/frosty40/world_model_1`
+- produced `arc_agi3.model_decision.v001`
+- produced observation, 3D/world-state, chronometric game-knowledge,
+  branch-simulation, trust-check, internal-thinking-lock, live Nemo3
+  final-confirmation, and ModelDecision artifacts
+- invoked live external Nemo3 relay through local vLLM
+- Nemo model: `nemotron_3_nano_omni`
+- Nemo relay URL: `http://127.0.0.1:8000/v1/responses`
+- Nemo response JSON: `confirms_selected_action=true`,
+  `selected_action_value=1`, `nemo_supplied_action=false`,
+  `confidence=0.96`
+- selected action source is `world_model_internal_thinking`
+- executed `0` ARC actuator steps
+- no online submission, no score claim, no training data promotion
+
+Run metrics:
+
+- selected game: `ls20-9607627b`
+- model decision:
+  `experiments/2026-05-06_arc_agi3_model_decision_v048_ls20_live_nemo3_reset/model_decision.json`
+- valid standard ModelDecision: `True`
+- selected action: `ACTION1:1`
+- candidate action packets: `4`
+- object anchors: `4093`
+- rays: `32744`
+- Nemo3 confirmation mode: `live-relay`
+- external Nemo3 model invoked: `True`
+- interim Nemo confirmations: `0` because the internal lock recorded no
+  ambiguity or open questions
+- actuator steps executed: `0`
+- `nano-world-model` git dirty at run time: `False`
+- ARC toolkit source repo dirty at run time: `True`
+  (`/home/frosty40/world_model_1` had unrelated untracked experiment logs)
+
+Verification:
+
+- live relay process observed: `vllm serve /model --served-model-name=nemotron_3_nano_omni --port 8000`
+- `curl -sS -m 2 http://127.0.0.1:8000/v1/responses`
+- result: `{"detail":"Method Not Allowed"}` confirming the endpoint was
+  listening before POST use
+- `/home/frosty40/world_model_1/.venv/bin/python scripts/run_arc_agi3_model_decision_producer.py --run-label arc_agi3_model_decision_v048_ls20_live_nemo3_reset --out-dir experiments/2026-05-06_arc_agi3_model_decision_v048_ls20_live_nemo3_reset --arc-repo /home/frosty40/world_model_1 --environments-dir /home/frosty40/world_model_1/environment_files --source-condition-artifact /home/frosty40/world_model_1/docs/arc-agi-3-env.md --operation-mode OFFLINE --game ls20 --max-candidate-actions 8 --nemo-mode live-relay --nemo-relay-url http://127.0.0.1:8000/v1/responses --nemo-model nemotron_3_nano_omni --nemo-timeout 180`
+- result: valid ModelDecision artifact, `0` actuator steps, no online
+  submission, no ARC solve claim
+- `python -c "import json, sys; sys.path.insert(0, 'src'); from arc_agi3_model_flow import require_standard_model_decision; d=json.load(open('experiments/2026-05-06_arc_agi3_model_decision_v048_ls20_live_nemo3_reset/model_decision.json')); print(require_standard_model_decision(d, available_action_values=[1,2,3,4]))"`
+- result:
+  `{'action_data': None, 'action_name': 'ACTION1', 'action_value': 1, 'source': 'world_model_internal_thinking'}`
+
+Decision:
+
+V048 completes the producer-side readiness gate: the real `ls20` reset
+observation now flows through the full artifact chain with live external Nemo3
+confirmation and no actuator step. The next test is downstream consumption:
+feed the V048 ModelDecision into the one-step actuator runner.
+
 ## V047 ARC-AGI-3 Reset-Only ModelDecision Producer
 
 Artifacts:
