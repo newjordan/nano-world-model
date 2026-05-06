@@ -228,6 +228,20 @@ iteration.
   exactly one offline `ls20` step with `ACTION1:1`, carried Nemo3 and
   chronometric SHA provenance into the trace, and recorded no online submission
   or solve claim.
+- V050: Added pre-action MLP consultation as a required standard-flow artifact.
+  Result: the live-Nemo producer emitted `mlp_consultation.json` before branch
+  simulation, branch scores consumed MLP priors, the ModelDecision validated,
+  and the producer still executed `0` actuator steps.
+- V051: Added post-action MLP update-candidate capture to the one-step runner.
+  Result: the actuator consumed the V050 ModelDecision, executed exactly one
+  offline `ls20` step, wrote `post_action_mlp_update.json`, and kept
+  `mlp_weights_updated=False` with no training promotion.
+- V052/V053: Reran the MLP-connected producer/actuator pair with explicit
+  action/source evidence fields. Result: V052 produced a clean live-Nemo
+  ModelDecision selecting `ACTION3:3` with `mlp_consultation` in the standard
+  flow; V053 consumed that artifact, executed exactly one offline action, wrote
+  a candidate-only post-action MLP update, and recorded no online submission or
+  solve claim.
 
 ## Active Queue
 
@@ -242,12 +256,14 @@ iteration.
    detector stub that produces the palette-labeled image required by V031.
    Goal: separate image parsing accuracy from geometry/raycast correctness.
 
-4. ARC-AGI-3 multi-step mental loop for `ls20`: after the V049 one-step trace,
-   route the post-action observation back through the producer path and require
-   a fresh live-Nemo ModelDecision before the next action.
+4. ARC-AGI-3 multi-step mental loop for `ls20`: after the V053 one-step trace,
+   route the post-action observation and candidate-only MLP update back into
+   the next producer pass, then require a fresh live-Nemo ModelDecision before
+   action two.
    Goal: prove repeated observe -> 3D/world-state -> chronometric knowledge ->
-   branch simulation -> internal lock -> Nemo3 confirmation -> actuator cycles
-   work without direct action policy bypasses.
+   MLP consultation -> branch simulation -> internal lock -> Nemo3
+   confirmation -> actuator -> post-action MLP update-candidate cycles work
+   without direct action policy bypasses or silent weight updates.
 
 5. Fresh heldout family: build or select the next heldout family beyond
    V015/V016 after the action-candidate manifest is available.

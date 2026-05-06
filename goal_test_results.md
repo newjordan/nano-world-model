@@ -2,6 +2,96 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V052/V053 ARC-AGI-3 Live Nemo3 MLP-Connected Model Loop
+
+Artifacts:
+
+- `src/arc_agi3_model_flow.py`
+- `scripts/run_arc_agi3_model_decision_producer.py`
+- `scripts/run_arc_agi3_model_step.py`
+- `tests/test_arc_agi3_model_flow.py`
+- `tests/test_arc_agi3_model_decision_producer.py`
+- `tests/test_arc_agi3_model_step.py`
+- `experiments/2026-05-06_arc_agi3_model_decision_v052_ls20_live_nemo3_mlp_alias_reset/`
+- `experiments/2026-05-06_arc_agi3_model_step_v053_ls20_live_nemo3_mlp_alias_action/`
+
+Status:
+
+- MLP consultation is now a required standard-flow artifact before branch
+  simulation.
+- Branch simulation consumes the MLP candidate priors.
+- The actuator writes a post-action MLP update-candidate artifact after the
+  local step.
+- MLP weights are not silently updated; V053 records
+  `mlp_weights_updated=False`, `training_data_promoted=False`, and
+  `promotion_condition_satisfied=False`.
+- V052 invoked live external Nemo3 through local vLLM.
+- V053 consumed the V052 ModelDecision and executed exactly one offline local
+  `ls20` actuator step.
+- No online submission, no score claim, no training data promotion.
+
+V052 run metrics:
+
+- selected game: `ls20-9607627b`
+- model decision:
+  `experiments/2026-05-06_arc_agi3_model_decision_v052_ls20_live_nemo3_mlp_alias_reset/model_decision.json`
+- valid standard ModelDecision: `True`
+- selected action: `ACTION3:3`
+- candidate action packets: `4`
+- MLP consultation:
+  `experiments/2026-05-06_arc_agi3_model_decision_v052_ls20_live_nemo3_mlp_alias_reset/mlp_consultation.json`
+- MLP candidate priors: `4`
+- Nemo3 confirmation mode: `live-relay`
+- external Nemo3 model invoked: `True`
+- Nemo3 response text:
+  `{"confirms_selected_action": true, "selected_action_value": 3, "nemo_supplied_action": false, "confidence": 0.95}`
+- actuator steps executed: `0`
+- `nano-world-model` git dirty at run time: `False`
+
+V053 run metrics:
+
+- input ModelDecision:
+  `experiments/2026-05-06_arc_agi3_model_decision_v052_ls20_live_nemo3_mlp_alias_reset/model_decision.json`
+- valid standard model-flow step: `True`
+- source ModelDecision id:
+  `arc_agi3_model_decision_v052_ls20_live_nemo3_mlp_alias_reset:0fd8b348dd19be66`
+- chosen action: `ACTION3:3`
+- actuator steps executed: `1`
+- observation content match: `True`
+- observation GUID match: `False`
+- frame changed: `True`
+- level delta: `0`
+- post-action MLP update:
+  `experiments/2026-05-06_arc_agi3_model_step_v053_ls20_live_nemo3_mlp_alias_action/post_action_mlp_update.json`
+- post-action update mode: `candidate-only`
+- MLP weights updated: `False`
+- `nano-world-model` git dirty at run time: `False`
+
+Verification:
+
+- `python -m py_compile scripts/run_arc_agi3_model_decision_producer.py scripts/run_arc_agi3_model_step.py src/arc_agi3_model_flow.py`
+- `python -m pytest tests/test_arc_agi3_model_decision_producer.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_model_flow.py`
+- result: `17 passed`
+- `python -m py_compile scripts/run_arc_agi3_model_decision_producer.py scripts/run_arc_agi3_model_step.py scripts/run_arc_agi3_closed_loop_smoke.py scripts/run_arc_agi3_io_smoke.py scripts/run_dream_kernel_cem_rollout_smoke.py scripts/run_dream_kernel_branch_choice_smoke.py scripts/build_arc_dream_curriculum.py scripts/run_arc_dream_curriculum_eval.py scripts/build_dream_kernel_branch_rank_goal.py src/arc_agi3_model_flow.py src/planning/cem_planner.py src/experiments/planning_experiment.py`
+- `python -m pytest tests/test_arc_agi3_model_decision_producer.py tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_closed_loop_smoke.py tests/test_arc_agi3_io_smoke.py tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `44 passed`
+- `/home/frosty40/world_model_1/.venv/bin/python scripts/run_arc_agi3_model_decision_producer.py --run-label arc_agi3_model_decision_v052_ls20_live_nemo3_mlp_alias_reset --out-dir experiments/2026-05-06_arc_agi3_model_decision_v052_ls20_live_nemo3_mlp_alias_reset --arc-repo /home/frosty40/world_model_1 --environments-dir /home/frosty40/world_model_1/environment_files --source-condition-artifact /home/frosty40/world_model_1/docs/arc-agi-3-env.md --operation-mode OFFLINE --game ls20 --max-candidate-actions 8 --nemo-mode live-relay --nemo-relay-url http://127.0.0.1:8000/v1/responses --nemo-model nemotron_3_nano_omni --nemo-timeout 180`
+- result: valid ModelDecision, `0` actuator steps, no online submission, no
+  ARC solve claim
+- `/home/frosty40/world_model_1/.venv/bin/python scripts/run_arc_agi3_model_step.py --run-label arc_agi3_model_step_v053_ls20_live_nemo3_mlp_alias_action --out-dir experiments/2026-05-06_arc_agi3_model_step_v053_ls20_live_nemo3_mlp_alias_action --arc-repo /home/frosty40/world_model_1 --environments-dir /home/frosty40/world_model_1/environment_files --source-condition-artifact /home/frosty40/world_model_1/docs/arc-agi-3-env.md --model-decision-artifact experiments/2026-05-06_arc_agi3_model_decision_v052_ls20_live_nemo3_mlp_alias_reset/model_decision.json --operation-mode OFFLINE --game ls20 --max-candidate-actions 8 --post-action-mlp-update-mode candidate-only`
+- result: valid standard model-flow step, `1` actuator step, no online
+  submission, no ARC solve claim
+
+Decision:
+
+V052/V053 are the current connected standard for the `ls20` ARC-AGI-3 mental
+loop: internal world-model thinking consults MLP priors before action, Nemo3
+signs off before action, the actuator consumes the locked ModelDecision, and
+post-action evidence is captured as an MLP update candidate without mutating
+weights. The next gate is a two-action loop that feeds V053 post-action
+observation/update-candidate context back into a fresh producer pass before
+action two.
+
 ## V049 ARC-AGI-3 Live Nemo3 One-Step Actuator Connection
 
 Artifacts:

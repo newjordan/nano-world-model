@@ -70,7 +70,13 @@ to the actuator runner: before stepping, the runner now checks that the current
 actuator observation content matches the ModelDecision observation artifact;
 the guarded one-step run consumed V048, executed exactly one local offline
 `ACTION1:1` step, and carried the Nemo3/chronometric SHA provenance into the
-trace.
+trace. V052/V053 make the MLP loop explicit in the same standard path: the
+producer must consult a required `arc_agi3.mlp_consultation.v001` artifact
+before branch simulation, branch scores consume those priors, and the actuator
+must write a candidate-only `arc_agi3.post_action_mlp_update_candidate.v001`
+artifact after the step. V053 records `mlp_weights_updated=False` and
+`training_data_promoted=False`; update candidates are evidence for a later
+promotion gate, not silent online learning.
 
 ## Hard Boundaries
 
@@ -100,6 +106,10 @@ trace.
 - Do not execute an ARC actuator step unless branch simulation proves it used
   the linked NanoWM/action-embedding and chronometric calibration/library
   knowledge packet.
+- Do not execute an ARC actuator step unless branch simulation proves it used
+  the linked pre-action MLP consultation artifact; post-action MLP observations
+  may be written as candidate updates, but weights cannot update without an
+  explicit promotion condition.
 - Do not execute an ARC actuator step unless Nemo3 has signed off after the
   internal-thinking lock and before the actuator step. Nemo3 may confirm
   ambiguous internal navigation intermittently, but it is not the selected
@@ -126,9 +136,10 @@ trace.
 - Dream Kernel CEM rollout success rate and mean final safe path steps.
 - ARC-AGI-3 offline I/O validity and candidate action packet count.
 - ARC-AGI-3 standard model-flow validity: trusted 3D/world-state artifact,
-  linked chronometric game-knowledge artifact, branch simulation, locked
-  internal-thinking artifact, ModelDecision artifact, mandatory Nemo3 final
-  signoff, and at most one actuator step.
+  linked chronometric game-knowledge artifact, linked MLP consultation artifact,
+  branch simulation, locked internal-thinking artifact, ModelDecision artifact,
+  mandatory Nemo3 final signoff, post-action MLP update-candidate capture, and
+  at most one actuator step.
 
 ## Current Best Checkpoint
 
