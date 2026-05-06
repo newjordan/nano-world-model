@@ -20,6 +20,7 @@ INTERNAL_THINKING_LOCK_SCHEMA = "arc_agi3.internal_thinking_lock.v001"
 NEMO3_FINAL_CONFIRMATION_SCHEMA = "arc_agi3.nemo3_final_confirmation.v001"
 NEMO3_INTERIM_CONFIRMATION_SCHEMA = "arc_agi3.nemo3_interim_confirmation.v001"
 CHRONOMETRIC_GAME_KNOWLEDGE_SCHEMA = "chronometric.game_knowledge_link.v001"
+MLP_CONSULTATION_SCHEMA = "arc_agi3.mlp_consultation.v001"
 CHRONOMETRIC_GAME_KNOWLEDGE_BACKBONE = "nanowm_action_conditioned_transformer"
 CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION = "ChronometricCalibrationMLP+branch_library_fallback"
 CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE = "NanoWM.score_chronometric_branch"
@@ -28,6 +29,7 @@ STANDARD_MODEL_FLOW = (
     "observation",
     "world_state_3d",
     "chronometric_game_knowledge",
+    "mlp_consultation",
     "internal_branch_simulation",
     "trust_checks",
     "internal_thinking_lock",
@@ -39,6 +41,7 @@ REQUIRED_MODEL_FLOW_ARTIFACTS = (
     "observation_artifact",
     "world_state_3d_artifact",
     "chronometric_game_knowledge_artifact",
+    "mlp_consultation_artifact",
     "branch_simulation_artifact",
     "trust_checks_artifact",
     "internal_thinking_artifact",
@@ -96,6 +99,7 @@ def model_decision_failures(
 
     nemo3 = _dict(decision.get("nemo3"))
     game_knowledge = _dict(decision.get("chronometric_game_knowledge"))
+    mlp_consultation = _dict(decision.get("mlp_consultation"))
     trust = _dict(decision.get("trust"))
     for key in REQUIRED_TRUST_FLAGS:
         if trust.get(key) is not True:
@@ -114,6 +118,7 @@ def model_decision_failures(
         failures.append("selected_action.action_name is required")
 
     failures.extend(_chronometric_game_knowledge_failures(game_knowledge, flow=flow))
+    failures.extend(_mlp_consultation_failures(mlp_consultation, flow=flow))
     failures.extend(_internal_thinking_lock_failures(internal_lock, flow=flow, selected_action_value=action_value))
     failures.extend(_nemo3_confirmation_failures(nemo3, flow=flow, lock=internal_lock, selected_action_value=action_value))
 
@@ -140,6 +145,9 @@ def actuator_reasoning_from_model_decision(decision: dict[str, Any]) -> dict[str
         "chronometric_game_knowledge_score_surface": _dict(decision.get("chronometric_game_knowledge")).get(
             "score_surface"
         ),
+        "mlp_consultation": _dict(decision.get("mlp_consultation")).get("artifact"),
+        "mlp_consultation_sha256": _dict(decision.get("mlp_consultation")).get("sha256"),
+        "mlp_consultation_surface": _dict(decision.get("mlp_consultation")).get("calibration_surface"),
         "internal_thinking_lock": _dict(decision.get("internal_thinking_lock")).get("artifact"),
         "internal_thinking_sha256": _dict(decision.get("internal_thinking_lock")).get("sha256"),
         "model_decision_artifact": _dict(decision.get("standard_model_flow")).get("model_decision_artifact"),
@@ -188,6 +196,40 @@ def _chronometric_game_knowledge_failures(knowledge: dict[str, Any], *, flow: di
     for domain in ("basic_movement", "known_interactions", "branch_value_calibration"):
         if domain not in domains:
             failures.append(f"chronometric_game_knowledge.knowledge_domains must include {domain}")
+    return failures
+
+
+def _mlp_consultation_failures(consultation: dict[str, Any], *, flow: dict[str, Any]) -> list[str]:
+    failures: list[str] = []
+    if consultation.get("schema") != MLP_CONSULTATION_SCHEMA:
+        failures.append(f"mlp_consultation.schema must be {MLP_CONSULTATION_SCHEMA}")
+    if not _non_empty_string(consultation.get("artifact")):
+        failures.append("mlp_consultation.artifact is required")
+    elif consultation.get("artifact") != flow.get("mlp_consultation_artifact"):
+        failures.append("mlp_consultation.artifact must match standard_model_flow.mlp_consultation_artifact")
+    if not _sha256_string(consultation.get("sha256")):
+        failures.append("mlp_consultation.sha256 must be a 64-character lowercase hex digest")
+    if consultation.get("backbone_surface") != CHRONOMETRIC_GAME_KNOWLEDGE_BACKBONE:
+        failures.append(f"mlp_consultation.backbone_surface must be {CHRONOMETRIC_GAME_KNOWLEDGE_BACKBONE}")
+    if consultation.get("calibration_surface") != CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION:
+        failures.append(f"mlp_consultation.calibration_surface must be {CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION}")
+    if consultation.get("score_surface") != CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE:
+        failures.append(f"mlp_consultation.score_surface must be {CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE}")
+    for key in (
+        "consulted_before_branch_simulation",
+        "drives_branch_simulation",
+        "action_embedding_context_linked",
+        "calibration_mlp_linked",
+        "branch_library_context_linked",
+        "updates_from_post_action_only",
+        "online_update_requires_promotion_condition",
+    ):
+        if consultation.get(key) is not True:
+            failures.append(f"mlp_consultation.{key} must be true")
+    if consultation.get("heldout_labels_used") is not False:
+        failures.append("mlp_consultation.heldout_labels_used must be false")
+    if not _list(consultation.get("candidate_priors")):
+        failures.append("mlp_consultation.candidate_priors must be non-empty")
     return failures
 
 

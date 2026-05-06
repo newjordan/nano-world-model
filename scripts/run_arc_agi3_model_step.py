@@ -30,6 +30,7 @@ from arc_agi3_model_flow import (  # noqa: E402
     CHRONOMETRIC_GAME_KNOWLEDGE_SCHEMA,
     CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
     INTERNAL_THINKING_LOCK_SCHEMA,
+    MLP_CONSULTATION_SCHEMA,
     MODEL_DECISION_SCHEMA,
     NEMO3_FINAL_CONFIRMATION_SCHEMA,
     NEMO3_INTERIM_CONFIRMATION_SCHEMA,
@@ -67,6 +68,7 @@ DEFAULT_SOURCE_CONDITION = DEFAULT_ARC_REPO / "docs" / "arc-agi-3-env.md"
 DEFAULT_OUT_DIR = ROOT / "experiments" / "2026-05-06_arc_agi3_model_step_v043_standard_flow"
 SCHEMA = "arc_agi3.model_step.v001"
 TRACE_SCHEMA = "arc_agi3.model_step_trace_row.v001"
+POST_ACTION_MLP_UPDATE_SCHEMA = "arc_agi3.post_action_mlp_update_candidate.v001"
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
@@ -123,6 +125,25 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         raise RuntimeError(f"env.step returned None after {action_name(action)}")
 
     next_summary = summarize_frame_stack(getattr(next_obs, "frame", None))
+    post_action_mlp_update_path = out_dir / "post_action_mlp_update.json"
+    post_action_mlp_update = build_post_action_mlp_update_artifact(
+        args=args,
+        obs=obs,
+        next_obs=next_obs,
+        action=action,
+        action_data=action_data,
+        model_decision=model_decision,
+        before_summary=before_summary,
+        next_summary=next_summary,
+    )
+    post_action_mlp_update_path.write_text(
+        json.dumps(post_action_mlp_update, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    post_action_mlp_update_ref = {
+        "artifact": _repo_rel(post_action_mlp_update_path),
+        "sha256": _sha256(post_action_mlp_update_path),
+    }
     trace_rows = [
         trace_row(
             args=args,
@@ -136,6 +157,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             before_summary=before_summary,
             next_summary=next_summary,
             observation_match=observation_match,
+            post_action_mlp_update_ref=post_action_mlp_update_ref,
+            post_action_mlp_update=post_action_mlp_update,
         )
     ]
     condition = condition_payload(
@@ -180,6 +203,8 @@ def trace_row(
     before_summary: dict[str, Any],
     next_summary: dict[str, Any],
     observation_match: dict[str, Any],
+    post_action_mlp_update_ref: dict[str, str],
+    post_action_mlp_update: dict[str, Any],
 ) -> dict[str, Any]:
     levels_completed = int(getattr(obs, "levels_completed", 0))
     next_levels_completed = int(getattr(next_obs, "levels_completed", 0))
@@ -243,7 +268,100 @@ def trace_row(
         "nemo3_final_confirmation": final_confirmation.get("artifact"),
         "nemo3_final_confirmation_sha256": final_confirmation.get("sha256"),
         "nemo3_interim_confirmation_count": len(interim_confirmations),
+        "mlp_consultation": _dict(model_decision.get("mlp_consultation")).get("artifact"),
+        "mlp_consultation_sha256": _dict(model_decision.get("mlp_consultation")).get("sha256"),
+        "post_action_mlp_update_artifact": post_action_mlp_update_ref["artifact"],
+        "post_action_mlp_update_sha256": post_action_mlp_update_ref["sha256"],
+        "post_action_mlp_update_candidate_written": True,
+        "post_action_mlp_update_mode": post_action_mlp_update["update_mode"],
+        "mlp_weights_updated": post_action_mlp_update["mlp_weights_updated"],
         "training_data_promoted": False,
+        "arc_solve_claim": False,
+        "online_submission": False,
+        "scorecard_submission": False,
+    }
+
+
+def build_post_action_mlp_update_artifact(
+    *,
+    args: argparse.Namespace,
+    obs: Any,
+    next_obs: Any,
+    action: Any,
+    action_data: Any,
+    model_decision: dict[str, Any],
+    before_summary: dict[str, Any],
+    next_summary: dict[str, Any],
+) -> dict[str, Any]:
+    selected_action = _dict(model_decision.get("selected_action"))
+    mlp_consultation = _dict(model_decision.get("mlp_consultation"))
+    game_knowledge = _dict(model_decision.get("chronometric_game_knowledge"))
+    levels_completed = int(getattr(obs, "levels_completed", 0))
+    next_levels_completed = int(getattr(next_obs, "levels_completed", 0))
+    level_delta = next_levels_completed - levels_completed
+    frame_changed = before_summary["latest_frame_sha256"] != next_summary["latest_frame_sha256"]
+    return {
+        "schema": POST_ACTION_MLP_UPDATE_SCHEMA,
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "run_label": args.run_label,
+        "decision_id": model_decision.get("decision_id"),
+        "state_id": model_decision.get("state_id"),
+        "update_mode": args.post_action_mlp_update_mode,
+        "update_candidate_written": True,
+        "mlp_weights_updated": False,
+        "training_data_promoted": False,
+        "heldout_labels_used": False,
+        "online_update_requires_promotion_condition": True,
+        "promotion_condition_satisfied": False,
+        "target_surface": CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION,
+        "score_surface": CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
+        "mlp_consultation_artifact": mlp_consultation.get("artifact"),
+        "mlp_consultation_sha256": mlp_consultation.get("sha256"),
+        "chronometric_game_knowledge_artifact": game_knowledge.get("artifact"),
+        "chronometric_game_knowledge_sha256": game_knowledge.get("sha256"),
+        "selected_action": {
+            "action_name": selected_action.get("action_name", action_name(action)),
+            "action_value": int(selected_action.get("action_value", action_value(action))),
+            "action_data": action_data,
+            "source": selected_action.get("source"),
+        },
+        "pre_action_observation": {
+            "guid": str(getattr(obs, "guid", "")),
+            "state": state_name(getattr(obs, "state", None)),
+            "levels_completed": levels_completed,
+            "win_levels": int(getattr(obs, "win_levels", 0)),
+            "frame": before_summary,
+        },
+        "post_action_observation": {
+            "guid": str(getattr(next_obs, "guid", "")),
+            "state": state_name(getattr(next_obs, "state", None)),
+            "levels_completed": next_levels_completed,
+            "win_levels": int(getattr(next_obs, "win_levels", 0)),
+            "frame": next_summary,
+        },
+        "post_action_calibration_label": {
+            "source": "post_action_observation_only",
+            "frame_changed": frame_changed,
+            "level_delta": level_delta,
+            "next_state": state_name(getattr(next_obs, "state", None)),
+            "direct_outcome_fields_are_post_action_only": True,
+        },
+        "candidate_update": {
+            "kind": "chronometric_calibration_mlp_transition_candidate",
+            "apply_to_weights_now": False,
+            "append_to_branch_library_candidate_buffer": True,
+            "requires_review_or_promotion": True,
+            "features": {
+                "action_value": int(selected_action.get("action_value", action_value(action))),
+                "before_frame_sha256": before_summary["latest_frame_sha256"],
+                "after_frame_sha256": next_summary["latest_frame_sha256"],
+                "frame_changed": frame_changed,
+            },
+            "targets": {
+                "level_delta": level_delta,
+                "frame_changed": frame_changed,
+            },
+        },
         "arc_solve_claim": False,
         "online_submission": False,
         "scorecard_submission": False,
@@ -330,6 +448,10 @@ def resolve_model_artifact(artifact_ref: Any) -> Path:
     return path.resolve()
 
 
+def _dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
 def condition_payload(
     args: argparse.Namespace,
     *,
@@ -375,6 +497,7 @@ def condition_payload(
         "gpu_count": 0,
         "world_size": 1,
         "loader_mode": "arc_agi_offline_local_environment_wrapper_as_actuator",
+        "post_action_mlp_update_mode": args.post_action_mlp_update_mode,
         "metric_to_compare": "arc_agi3_standard_model_flow_validity_and_one_step_trace",
         "training_data_promoted": False,
         "arc_solve_claim": False,
@@ -419,6 +542,13 @@ def summarize_model_step(
         "observation_artifact_sha256": row.get("observation_artifact_sha256"),
         "observation_content_match": row.get("observation_content_match"),
         "observation_guid_match": row.get("observation_guid_match"),
+        "mlp_consultation": row.get("mlp_consultation"),
+        "mlp_consultation_sha256": row.get("mlp_consultation_sha256"),
+        "post_action_mlp_update_artifact": row.get("post_action_mlp_update_artifact"),
+        "post_action_mlp_update_sha256": row.get("post_action_mlp_update_sha256"),
+        "post_action_mlp_update_candidate_written": row.get("post_action_mlp_update_candidate_written"),
+        "post_action_mlp_update_mode": row.get("post_action_mlp_update_mode"),
+        "mlp_weights_updated": row.get("mlp_weights_updated"),
         "valid_standard_model_flow_step": bool(
             len(trace_rows) == 1
             and model_decision.get("schema") == MODEL_DECISION_SCHEMA
@@ -429,6 +559,9 @@ def summarize_model_step(
             and row.get("chronometric_game_knowledge_score_surface") == CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE
             and row.get("chronometric_game_knowledge_action_embedding_linked") is True
             and row.get("chronometric_game_knowledge_branch_library_linked") is True
+            and row.get("mlp_consultation")
+            and row.get("post_action_mlp_update_candidate_written") is True
+            and row.get("mlp_weights_updated") is False
             and row["nemo3_invoked"]
             and row.get("nemo3_role") == "confirmation_not_action_source"
             and row.get("nemo3_decision_delegated_to_nemo") is False
@@ -466,6 +599,9 @@ def format_results(metrics: dict[str, Any]) -> str:
         f"- decision id: `{metrics['decision_id']}`",
         f"- observation content match: `{metrics['observation_content_match']}`",
         f"- observation GUID match: `{metrics['observation_guid_match']}`",
+        f"- MLP consultation: `{metrics['mlp_consultation']}`",
+        f"- post-action MLP update: `{metrics['post_action_mlp_update_artifact']}`",
+        f"- MLP weights updated: `{metrics['mlp_weights_updated']}`",
         f"- Nemo3 invoked: `{metrics['nemo3_invoked']}`",
         f"- action: `{metrics['chosen_action_name']}:{metrics['chosen_action_value']}`",
         f"- candidate action packets: `{metrics['candidate_action_packets']}`",
@@ -488,6 +624,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--operation-mode", choices=("OFFLINE",), default="OFFLINE")
     parser.add_argument("--game", default="ls20")
     parser.add_argument("--max-candidate-actions", type=int, default=8)
+    parser.add_argument("--post-action-mlp-update-mode", choices=("candidate-only",), default="candidate-only")
     return parser.parse_args()
 
 

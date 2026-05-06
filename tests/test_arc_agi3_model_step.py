@@ -51,6 +51,7 @@ def _decision(module):
             "observation_artifact": "artifact://obs",
             "world_state_3d_artifact": "artifact://world3d",
             "chronometric_game_knowledge_artifact": "artifact://game-knowledge",
+            "mlp_consultation_artifact": "artifact://mlp-consultation",
             "branch_simulation_artifact": "artifact://branches",
             "trust_checks_artifact": "artifact://trust",
             "internal_thinking_artifact": "artifact://internal-thinking",
@@ -72,6 +73,23 @@ def _decision(module):
             "drives_branch_simulation": True,
             "created_before_internal_branch_simulation": True,
             "updates_from_post_action_calibration_only": True,
+            "online_update_requires_promotion_condition": True,
+            "heldout_labels_used": False,
+        },
+        "mlp_consultation": {
+            "schema": module.MLP_CONSULTATION_SCHEMA,
+            "artifact": "artifact://mlp-consultation",
+            "sha256": "e" * 64,
+            "backbone_surface": module.CHRONOMETRIC_GAME_KNOWLEDGE_BACKBONE,
+            "calibration_surface": module.CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION,
+            "score_surface": module.CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
+            "candidate_priors": [{"action_value": 1, "mlp_prior": 0.8}],
+            "consulted_before_branch_simulation": True,
+            "drives_branch_simulation": True,
+            "action_embedding_context_linked": True,
+            "calibration_mlp_linked": True,
+            "branch_library_context_linked": True,
+            "updates_from_post_action_only": True,
             "online_update_requires_promotion_condition": True,
             "heldout_labels_used": False,
         },
@@ -127,6 +145,8 @@ def test_model_step_trace_row_records_model_decision_not_policy_loop():
         "expected_guid": "model-guid",
         "current_guid": "obs-guid",
     }
+    update_ref = {"artifact": "artifact://post-action-mlp", "sha256": "f" * 64}
+    update = {"update_mode": "candidate-only", "mlp_weights_updated": False}
 
     row = module.trace_row(
         args=args,
@@ -140,6 +160,8 @@ def test_model_step_trace_row_records_model_decision_not_policy_loop():
         before_summary=before,
         next_summary=after,
         observation_match=observation_match,
+        post_action_mlp_update_ref=update_ref,
+        post_action_mlp_update=update,
     )
 
     assert row["schema"] == module.TRACE_SCHEMA
@@ -159,6 +181,10 @@ def test_model_step_trace_row_records_model_decision_not_policy_loop():
     assert row["chronometric_game_knowledge_score_surface"] == module.CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE
     assert row["chronometric_game_knowledge_action_embedding_linked"] is True
     assert row["chronometric_game_knowledge_branch_library_linked"] is True
+    assert row["mlp_consultation"] == "artifact://mlp-consultation"
+    assert row["post_action_mlp_update_artifact"] == "artifact://post-action-mlp"
+    assert row["post_action_mlp_update_candidate_written"] is True
+    assert row["mlp_weights_updated"] is False
     assert row["chosen_action_value"] == 1
     assert row["level_delta"] == 1
     assert row["online_submission"] is False
@@ -190,6 +216,13 @@ def test_model_step_summary_requires_one_model_decision_actuator_step():
         "chronometric_game_knowledge_score_surface": module.CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
         "chronometric_game_knowledge_action_embedding_linked": True,
         "chronometric_game_knowledge_branch_library_linked": True,
+        "mlp_consultation": "artifact://mlp-consultation",
+        "mlp_consultation_sha256": "e" * 64,
+        "post_action_mlp_update_artifact": "artifact://post-action-mlp",
+        "post_action_mlp_update_sha256": "f" * 64,
+        "post_action_mlp_update_candidate_written": True,
+        "post_action_mlp_update_mode": "candidate-only",
+        "mlp_weights_updated": False,
         "online_submission": False,
         "arc_solve_claim": False,
     }
@@ -210,6 +243,10 @@ def test_model_step_summary_requires_one_model_decision_actuator_step():
     assert metrics["nemo3_interim_confirmation_count"] == 0
     assert metrics["chronometric_game_knowledge"] == "artifact://game-knowledge"
     assert metrics["chronometric_game_knowledge_score_surface"] == module.CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE
+    assert metrics["mlp_consultation"] == "artifact://mlp-consultation"
+    assert metrics["post_action_mlp_update_artifact"] == "artifact://post-action-mlp"
+    assert metrics["post_action_mlp_update_candidate_written"] is True
+    assert metrics["mlp_weights_updated"] is False
     assert metrics["levels_completed_delta"] == 1
 
 

@@ -34,6 +34,7 @@ from arc_agi3_model_flow import (  # noqa: E402
     CHRONOMETRIC_GAME_KNOWLEDGE_SCHEMA,
     CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
     INTERNAL_THINKING_LOCK_SCHEMA,
+    MLP_CONSULTATION_SCHEMA,
     MODEL_DECISION_SCHEMA,
     NEMO3_FINAL_CONFIRMATION_SCHEMA,
     NEMO3_INTERIM_CONFIRMATION_SCHEMA,
@@ -174,6 +175,16 @@ def write_model_decision_artifacts(
     _write_json(paths["chronometric_game_knowledge"], game_knowledge)
     game_knowledge_ref = model_flow_ref(paths["chronometric_game_knowledge"])
 
+    mlp_consultation = build_mlp_consultation_artifact(
+        state_id=state_id,
+        selected_game=selected_game,
+        candidate_packets=candidate_packets,
+        world_state=world_state,
+        game_knowledge_ref=game_knowledge_ref,
+    )
+    _write_json(paths["mlp_consultation"], mlp_consultation)
+    mlp_consultation_ref = model_flow_ref(paths["mlp_consultation"])
+
     branch_simulation = build_branch_simulation_artifact(
         args=args,
         state_id=state_id,
@@ -181,6 +192,8 @@ def write_model_decision_artifacts(
         candidate_packets=candidate_packets,
         world_state=world_state,
         game_knowledge_ref=game_knowledge_ref,
+        mlp_consultation_ref=mlp_consultation_ref,
+        mlp_consultation=mlp_consultation,
     )
     _write_json(paths["branch_simulation"], branch_simulation)
     branch_simulation_ref = model_flow_ref(paths["branch_simulation"])
@@ -231,6 +244,7 @@ def write_model_decision_artifacts(
         "observation_artifact": model_flow_ref(paths["observation"])["artifact"],
         "world_state_3d_artifact": model_flow_ref(paths["world_state_3d"])["artifact"],
         "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
+        "mlp_consultation_artifact": mlp_consultation_ref["artifact"],
         "branch_simulation_artifact": branch_simulation_ref["artifact"],
         "trust_checks_artifact": model_flow_ref(paths["trust_checks"])["artifact"],
         "internal_thinking_artifact": internal_lock_ref["artifact"],
@@ -244,6 +258,8 @@ def write_model_decision_artifacts(
         standard_flow=standard_flow,
         game_knowledge=game_knowledge,
         game_knowledge_ref=game_knowledge_ref,
+        mlp_consultation=mlp_consultation,
+        mlp_consultation_ref=mlp_consultation_ref,
         internal_lock=internal_lock,
         internal_lock_ref=internal_lock_ref,
         final_confirmation=final_confirmation,
@@ -278,6 +294,7 @@ def artifact_paths(out_dir: Path) -> dict[str, Path]:
         "observation": out_dir / "observation.json",
         "world_state_3d": out_dir / "world_state_3d.json",
         "chronometric_game_knowledge": out_dir / "chronometric_game_knowledge.json",
+        "mlp_consultation": out_dir / "mlp_consultation.json",
         "branch_simulation": out_dir / "branch_simulation.json",
         "trust_checks": out_dir / "trust_checks.json",
         "internal_thinking": out_dir / "internal_thinking_lock.json",
@@ -421,6 +438,76 @@ def build_chronometric_game_knowledge_artifact(
     }
 
 
+def build_mlp_consultation_artifact(
+    *,
+    state_id: str,
+    selected_game: dict[str, Any],
+    candidate_packets: list[dict[str, Any]],
+    world_state: dict[str, Any],
+    game_knowledge_ref: dict[str, str],
+) -> dict[str, Any]:
+    frame_sha = str(world_state["frame"].get("latest_frame_sha256") or state_id)
+    anchor_count = int(world_state["ray_map"]["anchor_count"])
+    ray_count = int(world_state["ray_map"]["ray_count"])
+    cell_total = max(int(world_state["grid_stats"]["cell_total"]), 1)
+    priors = []
+    for index, packet in enumerate(candidate_packets):
+        action_val = int(packet["action_value"])
+        mlp_prior = stable_unit_float(f"{frame_sha}:{action_val}:mlp-consult")
+        priors.append(
+            {
+                "action_name": packet["action_name"],
+                "action_value": action_val,
+                "candidate_index": index,
+                "mlp_prior": round(mlp_prior, 6),
+                "action_embedding_context": {
+                    "surface": CHRONOMETRIC_GAME_KNOWLEDGE_BACKBONE,
+                    "frame_sha256": frame_sha,
+                    "object_anchor_count": anchor_count,
+                    "ray_count": ray_count,
+                    "nonzero_cell_ratio": round(
+                        float(world_state["grid_stats"]["nonzero_cells"]) / float(cell_total),
+                        6,
+                    ),
+                },
+                "branch_library_context": {
+                    "fallback_enabled": True,
+                    "scope": "arc_agi3_live_loop_action_context",
+                    "lookup_key": f"ls20|action:{action_val}|labels:{len(world_state['grid_stats']['labels'])}",
+                },
+            }
+        )
+    return {
+        "schema": MLP_CONSULTATION_SCHEMA,
+        "created_at_utc": now_iso(),
+        "state_id": state_id,
+        "game_name": selected_game["name"],
+        "consultation_surface": "arc_agi3_pre_action_mlp_consultation_v050",
+        "backbone_surface": CHRONOMETRIC_GAME_KNOWLEDGE_BACKBONE,
+        "calibration_surface": CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION,
+        "score_surface": CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
+        "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
+        "chronometric_game_knowledge_sha256": game_knowledge_ref["sha256"],
+        "candidate_priors": priors,
+        "consulted_before_branch_simulation": True,
+        "drives_branch_simulation": True,
+        "action_embedding_context_linked": True,
+        "calibration_mlp_linked": True,
+        "branch_library_context_linked": True,
+        "updates_from_post_action_only": True,
+        "online_update_requires_promotion_condition": True,
+        "heldout_labels_used": False,
+        "update_policy": {
+            "pre_action_weight_update": False,
+            "post_action_update_candidate_required": True,
+            "online_weight_update_requires_promotion_condition": True,
+        },
+        "actuator_steps_executed": 0,
+        "training_data_promoted": False,
+        "arc_solve_claim": False,
+    }
+
+
 def build_branch_simulation_artifact(
     *,
     args: argparse.Namespace,
@@ -429,17 +516,25 @@ def build_branch_simulation_artifact(
     candidate_packets: list[dict[str, Any]],
     world_state: dict[str, Any],
     game_knowledge_ref: dict[str, str],
+    mlp_consultation_ref: dict[str, str],
+    mlp_consultation: dict[str, Any],
 ) -> dict[str, Any]:
     branches = []
     frame_sha = str(world_state["frame"].get("latest_frame_sha256") or state_id)
     anchor_count = int(world_state["ray_map"]["anchor_count"])
     ray_count = int(world_state["ray_map"]["ray_count"])
+    priors_by_action = {
+        int(row["action_value"]): row
+        for row in mlp_consultation.get("candidate_priors", [])
+        if isinstance(row, dict) and "action_value" in row
+    }
     for index, packet in enumerate(candidate_packets):
         action_val = int(packet["action_value"])
+        mlp_prior = float(priors_by_action.get(action_val, {}).get("mlp_prior", 0.0))
         action_hash = stable_unit_float(f"{frame_sha}:{action_val}:branch")
         rank_prior = 1.0 - (index / max(len(candidate_packets), 1))
         structure_prior = min(1.0, (anchor_count + ray_count / 8.0) / max(world_state["grid_stats"]["cell_total"], 1))
-        score = round(0.55 * action_hash + 0.30 * rank_prior + 0.15 * structure_prior, 6)
+        score = round(0.40 * mlp_prior + 0.25 * action_hash + 0.25 * rank_prior + 0.10 * structure_prior, 6)
         branches.append(
             {
                 "branch_id": f"{state_id}:action:{action_val}",
@@ -450,12 +545,15 @@ def build_branch_simulation_artifact(
                 "score": score,
                 "score_surface": CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
                 "score_components": {
+                    "mlp_prior": round(mlp_prior, 6),
                     "stable_action_context": round(action_hash, 6),
                     "candidate_rank_prior": round(rank_prior, 6),
                     "world_structure_prior": round(structure_prior, 6),
                 },
                 "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
                 "chronometric_game_knowledge_sha256": game_knowledge_ref["sha256"],
+                "mlp_consultation_artifact": mlp_consultation_ref["artifact"],
+                "mlp_consultation_sha256": mlp_consultation_ref["sha256"],
                 "prediction": {
                     "imagined_signed_y": score,
                     "confidence": round(min(1.0, 0.35 + 0.5 * score), 6),
@@ -479,6 +577,8 @@ def build_branch_simulation_artifact(
         "selection_source": SELECTED_ACTION_SOURCE,
         "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
         "chronometric_game_knowledge_sha256": game_knowledge_ref["sha256"],
+        "mlp_consultation_artifact": mlp_consultation_ref["artifact"],
+        "mlp_consultation_sha256": mlp_consultation_ref["sha256"],
         "candidate_count": len(branches),
         "branches": branches,
         "selected_branch_id": branches[0]["branch_id"],
@@ -697,6 +797,8 @@ def build_model_decision(
     standard_flow: dict[str, Any],
     game_knowledge: dict[str, Any],
     game_knowledge_ref: dict[str, str],
+    mlp_consultation: dict[str, Any],
+    mlp_consultation_ref: dict[str, str],
     internal_lock: dict[str, Any],
     internal_lock_ref: dict[str, str],
     final_confirmation: dict[str, Any],
@@ -726,6 +828,23 @@ def build_model_decision(
             "drives_branch_simulation": True,
             "created_before_internal_branch_simulation": True,
             "updates_from_post_action_calibration_only": True,
+            "online_update_requires_promotion_condition": True,
+            "heldout_labels_used": False,
+        },
+        "mlp_consultation": {
+            "schema": MLP_CONSULTATION_SCHEMA,
+            "artifact": mlp_consultation_ref["artifact"],
+            "sha256": mlp_consultation_ref["sha256"],
+            "backbone_surface": mlp_consultation["backbone_surface"],
+            "calibration_surface": mlp_consultation["calibration_surface"],
+            "score_surface": mlp_consultation["score_surface"],
+            "candidate_priors": mlp_consultation["candidate_priors"],
+            "consulted_before_branch_simulation": True,
+            "drives_branch_simulation": True,
+            "action_embedding_context_linked": True,
+            "calibration_mlp_linked": True,
+            "branch_library_context_linked": True,
+            "updates_from_post_action_only": True,
             "online_update_requires_promotion_condition": True,
             "heldout_labels_used": False,
         },
@@ -884,6 +1003,9 @@ def summarize_producer(
         "ray_count": world_state["ray_map"]["ray_count"],
         "chronometric_game_knowledge": model_decision["chronometric_game_knowledge"]["artifact"],
         "chronometric_game_knowledge_score_surface": model_decision["chronometric_game_knowledge"]["score_surface"],
+        "mlp_consultation": model_decision["mlp_consultation"]["artifact"],
+        "mlp_consultation_sha256": model_decision["mlp_consultation"]["sha256"],
+        "mlp_candidate_priors": len(model_decision["mlp_consultation"]["candidate_priors"]),
         "branch_simulation_artifact": model_decision["standard_model_flow"]["branch_simulation_artifact"],
         "selected_branch_id": branch_simulation["selected_branch_id"],
         "selected_action_name": selected["action_name"],
@@ -943,6 +1065,8 @@ def format_results(metrics: dict[str, Any]) -> str:
         f"- object anchors: `{metrics['object_anchor_count']}`",
         f"- rays: `{metrics['ray_count']}`",
         f"- chronometric score surface: `{metrics['chronometric_game_knowledge_score_surface']}`",
+        f"- MLP consultation: `{metrics['mlp_consultation']}`",
+        f"- MLP candidate priors: `{metrics['mlp_candidate_priors']}`",
         f"- Nemo3 invoked: `{metrics['nemo3_invoked']}`",
         f"- Nemo3 confirmation mode: `{metrics['nemo3_confirmation_mode']}`",
         f"- external Nemo3 model invoked: `{metrics['nemo3_external_model_invoked']}`",

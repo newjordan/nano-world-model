@@ -14,6 +14,7 @@ from arc_agi3_model_flow import (  # noqa: E402
     CHRONOMETRIC_GAME_KNOWLEDGE_SCHEMA,
     CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
     INTERNAL_THINKING_LOCK_SCHEMA,
+    MLP_CONSULTATION_SCHEMA,
     MODEL_DECISION_SCHEMA,
     NEMO3_FINAL_CONFIRMATION_SCHEMA,
     NEMO3_INTERIM_CONFIRMATION_SCHEMA,
@@ -35,6 +36,7 @@ def _valid_decision(action_value=1):
             "observation_artifact": "artifact://obs",
             "world_state_3d_artifact": "artifact://world3d",
             "chronometric_game_knowledge_artifact": "artifact://game-knowledge",
+            "mlp_consultation_artifact": "artifact://mlp-consultation",
             "branch_simulation_artifact": "artifact://branches",
             "trust_checks_artifact": "artifact://trust",
             "internal_thinking_artifact": "artifact://internal-thinking",
@@ -56,6 +58,23 @@ def _valid_decision(action_value=1):
             "drives_branch_simulation": True,
             "created_before_internal_branch_simulation": True,
             "updates_from_post_action_calibration_only": True,
+            "online_update_requires_promotion_condition": True,
+            "heldout_labels_used": False,
+        },
+        "mlp_consultation": {
+            "schema": MLP_CONSULTATION_SCHEMA,
+            "artifact": "artifact://mlp-consultation",
+            "sha256": "e" * 64,
+            "backbone_surface": CHRONOMETRIC_GAME_KNOWLEDGE_BACKBONE,
+            "calibration_surface": CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION,
+            "score_surface": CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
+            "candidate_priors": [{"action_value": action_value, "mlp_prior": 0.8}],
+            "consulted_before_branch_simulation": True,
+            "drives_branch_simulation": True,
+            "action_embedding_context_linked": True,
+            "calibration_mlp_linked": True,
+            "branch_library_context_linked": True,
+            "updates_from_post_action_only": True,
             "online_update_requires_promotion_condition": True,
             "heldout_labels_used": False,
         },
@@ -141,6 +160,25 @@ def test_standard_model_decision_rejects_unlinked_chronometric_game_knowledge():
     assert "chronometric_game_knowledge.heldout_labels_used must be false" in message
     assert "chronometric_game_knowledge.knowledge_domains must include known_interactions" in message
     assert "chronometric_game_knowledge.knowledge_domains must include branch_value_calibration" in message
+
+
+def test_standard_model_decision_rejects_missing_mlp_consultation():
+    decision = _valid_decision()
+    decision["standard_model_flow"]["mlp_consultation_artifact"] = ""
+    decision["mlp_consultation"]["artifact"] = ""
+    decision["mlp_consultation"]["consulted_before_branch_simulation"] = False
+    decision["mlp_consultation"]["candidate_priors"] = []
+    decision["mlp_consultation"]["heldout_labels_used"] = True
+
+    with pytest.raises(ModelDecisionError) as error:
+        require_standard_model_decision(decision, available_action_values=[1, 2, 3, 4])
+
+    message = str(error.value)
+    assert "standard_model_flow.mlp_consultation_artifact is required" in message
+    assert "mlp_consultation.artifact is required" in message
+    assert "mlp_consultation.consulted_before_branch_simulation must be true" in message
+    assert "mlp_consultation.candidate_priors must be non-empty" in message
+    assert "mlp_consultation.heldout_labels_used must be false" in message
 
 
 def test_standard_model_decision_rejects_nemo_as_action_source_or_missing_final_signoff():
@@ -242,6 +280,9 @@ def test_actuator_reasoning_keeps_model_provenance_and_non_submission_flags():
     assert reasoning["chronometric_game_knowledge"] == "artifact://game-knowledge"
     assert reasoning["chronometric_game_knowledge_sha256"] == "d" * 64
     assert reasoning["chronometric_game_knowledge_score_surface"] == CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE
+    assert reasoning["mlp_consultation"] == "artifact://mlp-consultation"
+    assert reasoning["mlp_consultation_sha256"] == "e" * 64
+    assert reasoning["mlp_consultation_surface"] == CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION
     assert reasoning["internal_thinking_lock"] == "artifact://internal-thinking"
     assert reasoning["internal_thinking_sha256"] == "a" * 64
     assert reasoning["submit_online"] is False

@@ -140,6 +140,7 @@ def test_model_decision_producer_writes_valid_artifact_chain_without_actuator_st
     assert (tmp_path / "observation.json").exists()
     assert (tmp_path / "world_state_3d.json").exists()
     assert (tmp_path / "chronometric_game_knowledge.json").exists()
+    assert (tmp_path / "mlp_consultation.json").exists()
     assert (tmp_path / "branch_simulation.json").exists()
     assert (tmp_path / "trust_checks.json").exists()
     assert (tmp_path / "internal_thinking_lock.json").exists()
