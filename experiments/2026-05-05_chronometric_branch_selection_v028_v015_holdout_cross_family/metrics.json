@@ -1,0 +1,62 @@
+{
+  "by_split": {
+    "heldout": {
+      "mean_selection_score": null,
+      "mean_target_signed_y": null,
+      "oracle_signed_best_match_rate": null,
+      "progress_positive_selected": 0,
+      "selected_records": 0
+    },
+    "train": {
+      "branch_library_applied_selected": 680,
+      "fallback_selected": 0,
+      "mean_selection_score": -0.191195979751093,
+      "mean_target_signed_y": -0.1912128931484173,
+      "oracle_signed_best_match_rate": 1.0,
+      "progress_positive_selected": 1,
+      "selected_records": 774
+    }
+  },
+  "candidate_records": 7732,
+  "candidate_records_by_split": {
+    "heldout": 400,
+    "train": 7332
+  },
+  "condition": {
+    "created_at_utc": "2026-05-06T03:04:38.256463+00:00",
+    "git_commit": "37d666695e9273c41f8e0e9bf19a71034d9acc95",
+    "git_dirty": false,
+    "group_fields": [
+      "split",
+      "task_id",
+      "frame_hash",
+      "t"
+    ],
+    "input_planner_scores": "experiments/2026-05-05_chronometric_planner_branch_score_v027_v015_holdout_cross_family/planner_scores.jsonl",
+    "input_planner_scores_sha256": "665f830004799f2443b3113f68f304c7ee7912509f2db8dcec4b06372855205f",
+    "metrics_use_target_labels": true,
+    "min_group_size": 2,
+    "run_kind": "branch_selection_smoke",
+    "run_label": "chronometric_branch_selection_v028_v015_holdout_cross_family",
+    "score_policy": "library_or_calibration",
+    "script": "scripts/select_chronometric_branches.py",
+    "selection_uses_target_labels": false,
+    "training_data_promoted": false
+  },
+  "groups": 2138,
+  "overall": {
+    "branch_library_applied_selected": 680,
+    "fallback_selected": 0,
+    "mean_selection_score": -0.191195979751093,
+    "mean_target_signed_y": -0.1912128931484173,
+    "oracle_signed_best_match_rate": 1.0,
+    "progress_positive_selected": 1,
+    "selected_records": 774
+  },
+  "selectable_groups": 774,
+  "selectable_groups_by_split": {
+    "train": 774
+  },
+  "selected_records": 774,
+  "skipped_groups": 1364
+}
