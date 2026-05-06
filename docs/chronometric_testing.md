@@ -562,6 +562,66 @@ Promotion rule: V011 supports second-family progress/nonlocal transfer. It does
 not close the ACTION6 residual; use an ACTION6-bearing ten-task heldout for the
 next gate.
 
+## V012/V013 ACTION6 Residual Gates
+
+V012 holds out V016 controllability movement as an ACTION6-bearing ten-task
+family. V013 then adds V016 to train and holds out V015 object-relative
+movement to test whether that support transfers.
+
+V012:
+
+```bash
+python scripts/build_arc_bridge_manifest.py \
+  --run-label arc_bridge_manifest_v012_v016_action6_holdout_family \
+  --source-condition-artifact experiments/2026-05-04_v016_controllability_movement_scout/CONDITION.md \
+  --source-transition-glob 'experiments/2026-05-04_v016_controllability_movement_scout/grid/transition_events/*.jsonl' \
+  --split arc_sprint0_v016_controllability_family_v012_heldout \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v012_v016_action6_holdout_family
+
+python scripts/merge_chronometric_bridge_manifests.py \
+  --run-label arc_bridge_manifest_v012_action6_ten_task_holdout \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v011_nonlocal_second_family/arc_bridge_manifest.jsonl \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v012_v016_action6_holdout_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v012_action6_ten_task_holdout
+
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v012_action6_ten_task_v016_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v012_action6_ten_task_holdout/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v012_action6_ten_task_v016_holdout_cpu \
+  --holdout-key source_condition_artifact \
+  --heldout-group-value experiments/2026-05-04_v016_controllability_movement_scout/CONDITION.md \
+  --device cpu
+```
+
+V013:
+
+```bash
+python scripts/build_arc_bridge_manifest.py \
+  --run-label arc_bridge_manifest_v013_v015_action6_holdout_family \
+  --source-condition-artifact experiments/2026-05-04_v015_object_relative_movement_scout/CONDITION.md \
+  --source-transition-glob 'experiments/2026-05-04_v015_object_relative_movement_scout/grid/transition_events/*.jsonl' \
+  --split arc_sprint0_v015_object_relative_family_v013_heldout \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v013_v015_action6_holdout_family
+
+python scripts/merge_chronometric_bridge_manifests.py \
+  --run-label arc_bridge_manifest_v013_action6_support_v015_holdout \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v012_action6_ten_task_holdout/arc_bridge_manifest.jsonl \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v013_v015_action6_holdout_family/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_arc_bridge_manifest_v013_action6_support_v015_holdout
+
+python scripts/train_chronometric_calibrator.py \
+  --run-label chronometric_calibration_v013_action6_support_v015_holdout_cpu \
+  --manifest experiments/2026-05-05_arc_bridge_manifest_v013_action6_support_v015_holdout/arc_bridge_manifest.jsonl \
+  --out-dir experiments/2026-05-05_chronometric_calibration_v013_action6_support_v015_holdout_cpu \
+  --holdout-key source_condition_artifact \
+  --heldout-group-value experiments/2026-05-04_v015_object_relative_movement_scout/CONDITION.md \
+  --device cpu
+```
+
+Run bucket and feature diagnostics with the matching prediction and metrics
+paths for each calibration. V012 confirmed the ACTION6 residual. V013 improved
+ACTION6 aggregate transfer, but did not fix time-phase polarity.
+
 ## What This Test Does Not Prove
 
 - no learned world-model quality

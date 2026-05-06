@@ -96,3 +96,16 @@ V011 validates progress/nonlocal transfer on a second heldout family:
 
 V011 did not contain ACTION6, so it does not close the V010 ACTION6 time-phase
 residual. The next target is an ACTION6-bearing ten-task heldout family.
+
+V012/V013 isolate the ACTION6 residual:
+
+- V012 held out V016 controllability movement: ACTION6 signed-Y MAE `0.110621`,
+  time-phase signed-Y MAE `0.124584`, top false-progress probability
+  `0.00150808`.
+- V013 added V016 as support and held out V015 object-relative movement:
+  ACTION6 signed-Y MAE improved to `0.0513169`, but time-phase signed-Y MAE
+  remained high at `0.159137`.
+
+The current blocker is now precise: coordinate-bearing ACTION6 time-phase
+polarity. More generic support data improves ACTION6 overall, but does not
+teach the rare time-phase sign correctly.

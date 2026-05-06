@@ -38,18 +38,21 @@ iteration.
   Result: heldout signed-Y MAE `0.0105739`, progress accuracy `1.0`, positive
   best rank `1`, and top false-progress probability `0.000195519`; this gates
   progress/nonlocal transfer but does not test ACTION6.
+- V012: Held out V016 controllability movement as an ACTION6-bearing ten-task
+  family. Result: progress stayed safe, stasis stayed safe, but ACTION6 signed-Y
+  MAE regressed to `0.110621` and ACTION6 time-phase remained the top residual.
+- V013: Added V016 as support and held out V015 object-relative movement.
+  Result: ACTION6 aggregate improved to `0.0513169`, but time-phase remained
+  high at `0.159137`; generic support data is not enough.
 
 ## Active Queue
 
-1. V012: hold out an ACTION6-bearing ten-task family.
-   Goal: test whether the V010 ACTION6 time-phase residual repeats outside
-   V019B/V023 while keeping progress and stasis transfer intact.
+1. V014: add an explicit coordinate-bearing ACTION6 time-phase polarity feature
+   or support-check runner, then rerun V012/V013 comparable holdouts.
+   Goal: fix rare time-phase signed-Y polarity without weakening stasis or
+   progress separation.
 
-2. V013: add a small time-phase support batch or feature check if V012 repeats
-   the V010 one-row ACTION6 time-phase residual.
-   Goal: handle rare signed-Y polarity edges without weakening stasis transfer.
-
-3. C-model integration: route the calibration head output back into NanoWM
+2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.
    Goal: move from posthoc calibration to world-model-planner scoring.
 

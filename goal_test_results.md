@@ -2,6 +2,93 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V013 ACTION6 Support With V015 Heldout
+
+Artifacts:
+
+- `experiments/2026-05-05_arc_bridge_manifest_v013_v015_action6_holdout_family/`
+- `experiments/2026-05-05_arc_bridge_manifest_v013_action6_support_v015_holdout/`
+- `experiments/2026-05-05_chronometric_calibration_v013_action6_support_v015_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v013_action6_support_v015_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v013_action6_support_v015_holdout_cpu/`
+
+Condition:
+
+- base manifest: V012 ACTION6 ten-task holdout manifest
+- added heldout family:
+  `experiments/2026-05-04_v015_object_relative_movement_scout/CONDITION.md`
+- V016 is in train as ACTION6/time-phase support
+- merged manifest rows: `7732`
+- train rows: `7332`
+- heldout rows: `400`
+- heldout ACTION6 rows: `99`
+- heldout progress-positive rows: `0`
+- requested device: `cpu`
+- seed: `20260505`
+- steps: `800`
+- training data promoted: `False`
+
+Metrics:
+
+- heldout total: `0.012371068820357323`
+- heldout signed-Y MAE: `0.027918638661503792`
+- heldout progress accuracy: `1.0`
+- heldout top false-progress probability: `0.0008116625249385834`
+- heldout ACTION6 signed-Y MAE: `0.051316857916500536`
+- heldout stasis/no-change signed-Y MAE: `0.00007406903094932681`
+- heldout stasis-loop signed-Y MAE: `0.025686474615021757`
+- heldout time-phase signed-Y MAE: `0.15913675703546581`
+- heldout translation signed-Y MAE: `0.026444879888625043`
+
+Decision:
+
+V013 improves ACTION6 aggregate transfer versus V012, but does not fix the
+time-phase polarity residual. Next work should be feature-level or targeted
+time-phase support, not generic data expansion.
+
+## V012 ACTION6 Ten-Task Holdout
+
+Artifacts:
+
+- `experiments/2026-05-05_arc_bridge_manifest_v012_v016_action6_holdout_family/`
+- `experiments/2026-05-05_arc_bridge_manifest_v012_action6_ten_task_holdout/`
+- `experiments/2026-05-05_chronometric_calibration_v012_action6_ten_task_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v012_action6_ten_task_v016_holdout_cpu/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v012_action6_ten_task_v016_holdout_cpu/`
+
+Condition:
+
+- base manifest: V011 nonlocal second-family manifest
+- added heldout family:
+  `experiments/2026-05-04_v016_controllability_movement_scout/CONDITION.md`
+- merged manifest rows: `7332`
+- train rows: `6932`
+- heldout rows: `400`
+- heldout ACTION6 rows: `103`
+- heldout progress-positive rows: `0`
+- requested device: `cpu`
+- seed: `20260505`
+- steps: `800`
+- training data promoted: `False`
+
+Metrics:
+
+- heldout total: `0.03148259222507477`
+- heldout signed-Y MAE: `0.04510998725891113`
+- heldout progress accuracy: `1.0`
+- heldout top false-progress probability: `0.0015080823795869946`
+- heldout ACTION6 signed-Y MAE: `0.11062070680330101`
+- heldout stasis/no-change signed-Y MAE: `0.00016286648236788235`
+- heldout stasis-loop signed-Y MAE: `0.017676929894246553`
+- heldout time-phase signed-Y MAE: `0.12458408767865463`
+- heldout translation signed-Y MAE: `0.058857012541698416`
+
+Decision:
+
+V012 confirms the V010 ACTION6 time-phase residual repeats on a separate
+ACTION6-bearing ten-task family. Progress and stasis remain safe; the error is
+signed-Y polarity for coordinate-bearing ACTION6 time/translation rows.
+
 ## V011 Nonlocal Second-Family Holdout
 
 Artifacts:
