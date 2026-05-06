@@ -29,6 +29,7 @@ from arc_agi3_model_flow import (  # noqa: E402
     CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION,
     CHRONOMETRIC_GAME_KNOWLEDGE_SCHEMA,
     CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
+    INTERNAL_FORWARD_ROLLOUT_SCHEMA,
     INTERNAL_THINKING_LOCK_SCHEMA,
     MLP_CONSULTATION_SCHEMA,
     MODEL_DECISION_SCHEMA,
@@ -104,7 +105,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     )
     available_values = action_values(getattr(env, "action_space", []))
     model_decision = load_model_decision(decision_path)
-    selected_action = require_standard_model_decision(model_decision, available_action_values=available_values)
+    selected_action = require_standard_model_decision(
+        model_decision,
+        available_action_values=available_values,
+        require_internal_solve=not args.allow_unsolved_internal_rollout_for_contract_test,
+    )
     action = action_by_value(env.action_space, int(selected_action["action_value"]))
     action_data = selected_action.get("action_data")
     before_summary = summarize_frame_stack(getattr(obs, "frame", None))
@@ -217,6 +222,11 @@ def trace_row(
         if isinstance(model_decision.get("chronometric_game_knowledge"), dict)
         else {}
     )
+    internal_forward_rollout = (
+        model_decision.get("internal_forward_rollout", {})
+        if isinstance(model_decision.get("internal_forward_rollout"), dict)
+        else {}
+    )
     interim_confirmations = nemo3.get("interim_confirmations", [])
     if not isinstance(interim_confirmations, list):
         interim_confirmations = []
@@ -272,6 +282,12 @@ def trace_row(
         "nemo3_interim_confirmation_count": len(interim_confirmations),
         "mlp_consultation": _dict(model_decision.get("mlp_consultation")).get("artifact"),
         "mlp_consultation_sha256": _dict(model_decision.get("mlp_consultation")).get("sha256"),
+        "internal_forward_rollout": internal_forward_rollout.get("artifact"),
+        "internal_forward_rollout_sha256": internal_forward_rollout.get("sha256"),
+        "internal_forward_rollout_kernel_supported": internal_forward_rollout.get("kernel_supported"),
+        "internal_forward_rollout_solves_before_first_step": internal_forward_rollout.get(
+            "solves_before_first_step"
+        ),
         "post_action_mlp_update_artifact": post_action_mlp_update_ref["artifact"],
         "post_action_mlp_update_sha256": post_action_mlp_update_ref["sha256"],
         "post_action_mlp_update_candidate_written": True,
@@ -501,6 +517,7 @@ def condition_payload(
         "world_size": 1,
         "loader_mode": "arc_agi_offline_local_environment_wrapper_as_actuator",
         "post_action_mlp_update_mode": args.post_action_mlp_update_mode,
+        "allow_unsolved_internal_rollout_for_contract_test": args.allow_unsolved_internal_rollout_for_contract_test,
         "metric_to_compare": "arc_agi3_standard_model_flow_validity_and_one_step_trace",
         "training_data_promoted": False,
         "arc_solve_claim": False,
@@ -549,6 +566,12 @@ def summarize_model_step(
         "observation_guid_match": row.get("observation_guid_match"),
         "mlp_consultation": row.get("mlp_consultation"),
         "mlp_consultation_sha256": row.get("mlp_consultation_sha256"),
+        "internal_forward_rollout": row.get("internal_forward_rollout"),
+        "internal_forward_rollout_sha256": row.get("internal_forward_rollout_sha256"),
+        "internal_forward_rollout_kernel_supported": row.get("internal_forward_rollout_kernel_supported"),
+        "internal_forward_rollout_solves_before_first_step": row.get(
+            "internal_forward_rollout_solves_before_first_step"
+        ),
         "post_action_mlp_update_artifact": row.get("post_action_mlp_update_artifact"),
         "post_action_mlp_update_sha256": row.get("post_action_mlp_update_sha256"),
         "post_action_mlp_update_candidate_written": row.get("post_action_mlp_update_candidate_written"),
@@ -565,6 +588,11 @@ def summarize_model_step(
             and row.get("chronometric_game_knowledge_action_embedding_linked") is True
             and row.get("chronometric_game_knowledge_branch_library_linked") is True
             and row.get("mlp_consultation")
+            and row.get("internal_forward_rollout")
+            and (
+                condition.get("allow_unsolved_internal_rollout_for_contract_test") is True
+                or row.get("internal_forward_rollout_solves_before_first_step") is True
+            )
             and row.get("post_action_mlp_update_candidate_written") is True
             and row.get("mlp_weights_updated") is False
             and row["nemo3_invoked"]
@@ -605,6 +633,8 @@ def format_results(metrics: dict[str, Any]) -> str:
         f"- observation content match: `{metrics['observation_content_match']}`",
         f"- observation GUID match: `{metrics['observation_guid_match']}`",
         f"- MLP consultation: `{metrics['mlp_consultation']}`",
+        f"- internal forward rollout: `{metrics['internal_forward_rollout']}`",
+        f"- solved before first step: `{metrics['internal_forward_rollout_solves_before_first_step']}`",
         f"- post-action MLP update: `{metrics['post_action_mlp_update_artifact']}`",
         f"- MLP weights updated: `{metrics['mlp_weights_updated']}`",
         f"- Nemo3 invoked: `{metrics['nemo3_invoked']}`",
@@ -630,6 +660,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--game", default="ls20")
     parser.add_argument("--max-candidate-actions", type=int, default=8)
     parser.add_argument("--post-action-mlp-update-mode", choices=("candidate-only",), default="candidate-only")
+    parser.add_argument("--allow-unsolved-internal-rollout-for-contract-test", action="store_true")
     return parser.parse_args()
 
 

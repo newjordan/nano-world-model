@@ -13,6 +13,7 @@ from arc_agi3_model_flow import (  # noqa: E402
     CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION,
     CHRONOMETRIC_GAME_KNOWLEDGE_SCHEMA,
     CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
+    INTERNAL_FORWARD_ROLLOUT_SCHEMA,
     INTERNAL_THINKING_LOCK_SCHEMA,
     MLP_CONSULTATION_SCHEMA,
     MODEL_DECISION_SCHEMA,
@@ -37,6 +38,7 @@ def _valid_decision(action_value=1):
             "world_state_3d_artifact": "artifact://world3d",
             "chronometric_game_knowledge_artifact": "artifact://game-knowledge",
             "mlp_consultation_artifact": "artifact://mlp-consultation",
+            "internal_forward_rollout_artifact": "artifact://forward-rollout",
             "branch_simulation_artifact": "artifact://branches",
             "trust_checks_artifact": "artifact://trust",
             "internal_thinking_artifact": "artifact://internal-thinking",
@@ -86,6 +88,41 @@ def _valid_decision(action_value=1):
             "drives_selected_action": True,
             "created_before_actuator_step": True,
             "selected_action_value": action_value,
+        },
+        "internal_forward_rollout": {
+            "schema": INTERNAL_FORWARD_ROLLOUT_SCHEMA,
+            "artifact": "artifact://forward-rollout",
+            "sha256": "f" * 64,
+            "created_before_actuator_step": True,
+            "kernel_surface": "dream_kernel.arc_grid_scout.v001",
+            "kernel_supported": True,
+            "solves_before_first_step": True,
+            "planned_action_values": [action_value],
+            "candidate_count": 1,
+            "candidate_rollout_refs": [
+                {
+                    "action_value": action_value,
+                    "prediction_supported": True,
+                    "kernel_supported": True,
+                    "predicted_next_state": "WIN",
+                    "predicted_level_delta": 1,
+                    "predicted_solved": True,
+                    "predicted_solved_by_plan": True,
+                    "predicted_next_frame_sha256": "c" * 64,
+                    "rollout_steps": 1,
+                }
+            ],
+            "selected_candidate_prediction": {
+                "action_value": action_value,
+                "prediction_supported": True,
+                "kernel_supported": True,
+                "predicted_next_state": "WIN",
+                "predicted_level_delta": 1,
+                "predicted_solved": True,
+                "predicted_solved_by_plan": True,
+                "predicted_next_frame_sha256": "c" * 64,
+                "rollout_steps": 1,
+            },
         },
         "nemo3": {
             "invoked": True,
@@ -179,6 +216,41 @@ def test_standard_model_decision_rejects_missing_mlp_consultation():
     assert "mlp_consultation.consulted_before_branch_simulation must be true" in message
     assert "mlp_consultation.candidate_priors must be non-empty" in message
     assert "mlp_consultation.heldout_labels_used must be false" in message
+
+
+def test_standard_model_decision_rejects_missing_internal_forward_rollout():
+    decision = _valid_decision()
+    decision["standard_model_flow"]["internal_forward_rollout_artifact"] = ""
+    decision["internal_forward_rollout"]["artifact"] = ""
+    decision["internal_forward_rollout"]["selected_candidate_prediction"] = {}
+
+    with pytest.raises(ModelDecisionError) as error:
+        require_standard_model_decision(decision, available_action_values=[1, 2, 3, 4])
+
+    message = str(error.value)
+    assert "standard_model_flow.internal_forward_rollout_artifact is required" in message
+    assert "internal_forward_rollout.artifact is required" in message
+    assert "internal_forward_rollout.selected_candidate_prediction is required" in message
+
+
+def test_standard_model_decision_can_require_internal_solve_before_actuator():
+    decision = _valid_decision()
+    decision["internal_forward_rollout"]["kernel_supported"] = False
+    decision["internal_forward_rollout"]["solves_before_first_step"] = False
+    decision["internal_forward_rollout"]["selected_candidate_prediction"]["prediction_supported"] = False
+    decision["internal_forward_rollout"]["selected_candidate_prediction"]["predicted_solved_by_plan"] = False
+
+    with pytest.raises(ModelDecisionError) as error:
+        require_standard_model_decision(
+            decision,
+            available_action_values=[1, 2, 3, 4],
+            require_internal_solve=True,
+        )
+
+    message = str(error.value)
+    assert "internal_forward_rollout.kernel_supported must be true before actuator step" in message
+    assert "internal_forward_rollout.solves_before_first_step must be true before actuator step" in message
+    assert "predicted_solved_by_plan must be true before actuator step" in message
 
 
 def test_standard_model_decision_rejects_nemo_as_action_source_or_missing_final_signoff():
@@ -283,6 +355,9 @@ def test_actuator_reasoning_keeps_model_provenance_and_non_submission_flags():
     assert reasoning["mlp_consultation"] == "artifact://mlp-consultation"
     assert reasoning["mlp_consultation_sha256"] == "e" * 64
     assert reasoning["mlp_consultation_surface"] == CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION
+    assert reasoning["internal_forward_rollout"] == "artifact://forward-rollout"
+    assert reasoning["internal_forward_rollout_sha256"] == "f" * 64
+    assert reasoning["internal_forward_rollout_solves_before_first_step"] is True
     assert reasoning["internal_thinking_lock"] == "artifact://internal-thinking"
     assert reasoning["internal_thinking_sha256"] == "a" * 64
     assert reasoning["submit_online"] is False

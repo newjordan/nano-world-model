@@ -50,10 +50,25 @@ fn main() {
                 std::process::exit(1);
             }
         }
+        "arc-grid-scout" => {
+            let parsed = match arc_grid_scout_args(&args[2..]) {
+                Ok(parsed) => parsed,
+                Err(error) => {
+                    eprintln!("{error}");
+                    eprintln!("{}", arc_grid_scout_usage());
+                    std::process::exit(2);
+                }
+            };
+            if let Err(error) = arc_grid_scout(parsed) {
+                eprintln!("dream-kernel arc-grid-scout failed: {error}");
+                std::process::exit(1);
+            }
+        }
         _ => {
             eprintln!(
-                "usage: dream-kernel demo [--out PATH] | solve-suite --out-dir PATH | {}",
-                solve_map_usage()
+                "usage: dream-kernel demo [--out PATH] | solve-suite --out-dir PATH | {} | {}",
+                solve_map_usage(),
+                arc_grid_scout_usage()
             );
             std::process::exit(2);
         }
@@ -80,6 +95,10 @@ fn output_dir(args: &[String]) -> Option<PathBuf> {
 
 fn solve_map_usage() -> &'static str {
     "solve-map --map PATH --sequence-out PATH --summary-out PATH [--name NAME] [--max-steps N] [--expected-reward VALUE]"
+}
+
+fn arc_grid_scout_usage() -> &'static str {
+    "arc-grid-scout --grid PATH --summary-out PATH --state-id ID --game NAME --grid-sha256 SHA --actions 1,2,3,4 [--agent-label N --goal-label N --wall-labels N,N --hazard-labels N,N --max-steps N]"
 }
 
 fn solve_map_args(args: &[String]) -> Result<SolveMapArgs, String> {
@@ -186,6 +205,86 @@ struct SolveMapArgs {
     expected_reward: f32,
 }
 
+#[derive(Clone, Debug)]
+struct ArcGridScoutArgs {
+    grid_path: PathBuf,
+    summary_out: PathBuf,
+    state_id: String,
+    game: String,
+    grid_sha256: String,
+    actions: Vec<i32>,
+    agent_label: Option<i32>,
+    goal_label: Option<i32>,
+    wall_labels: HashSet<i32>,
+    hazard_labels: HashSet<i32>,
+    max_steps: usize,
+}
+
+fn arc_grid_scout_args(args: &[String]) -> Result<ArcGridScoutArgs, String> {
+    let mut grid_path = None;
+    let mut summary_out = None;
+    let mut state_id = None;
+    let mut game = None;
+    let mut grid_sha256 = None;
+    let mut actions = None;
+    let mut agent_label = None;
+    let mut goal_label = None;
+    let mut wall_labels = HashSet::new();
+    let mut hazard_labels = HashSet::new();
+    let mut max_steps = 32usize;
+    let mut index = 0usize;
+    while index < args.len() {
+        let flag = args[index].as_str();
+        let Some(value) = args.get(index + 1) else {
+            return Err(format!("missing value for {flag}"));
+        };
+        match flag {
+            "--grid" => grid_path = Some(PathBuf::from(value)),
+            "--summary-out" => summary_out = Some(PathBuf::from(value)),
+            "--state-id" => state_id = Some(value.clone()),
+            "--game" => game = Some(value.clone()),
+            "--grid-sha256" => grid_sha256 = Some(value.clone()),
+            "--actions" => actions = Some(parse_i32_list(value)?),
+            "--agent-label" => {
+                agent_label = Some(
+                    value
+                        .parse::<i32>()
+                        .map_err(|error| format!("invalid --agent-label {value:?}: {error}"))?,
+                );
+            }
+            "--goal-label" => {
+                goal_label = Some(
+                    value
+                        .parse::<i32>()
+                        .map_err(|error| format!("invalid --goal-label {value:?}: {error}"))?,
+                );
+            }
+            "--wall-labels" => wall_labels = parse_i32_list(value)?.into_iter().collect(),
+            "--hazard-labels" => hazard_labels = parse_i32_list(value)?.into_iter().collect(),
+            "--max-steps" => {
+                max_steps = value
+                    .parse::<usize>()
+                    .map_err(|error| format!("invalid --max-steps {value:?}: {error}"))?;
+            }
+            other => return Err(format!("unknown arc-grid-scout flag: {other}")),
+        }
+        index += 2;
+    }
+    Ok(ArcGridScoutArgs {
+        grid_path: grid_path.ok_or_else(|| "missing --grid".to_string())?,
+        summary_out: summary_out.ok_or_else(|| "missing --summary-out".to_string())?,
+        state_id: state_id.ok_or_else(|| "missing --state-id".to_string())?,
+        game: game.ok_or_else(|| "missing --game".to_string())?,
+        grid_sha256: grid_sha256.ok_or_else(|| "missing --grid-sha256".to_string())?,
+        actions: actions.ok_or_else(|| "missing --actions".to_string())?,
+        agent_label,
+        goal_label,
+        wall_labels,
+        hazard_labels,
+        max_steps,
+    })
+}
+
 fn solve_suite(out_dir: &PathBuf) -> Result<(), String> {
     std::fs::create_dir_all(out_dir)
         .map_err(|error| format!("create {}: {error}", out_dir.display()))?;
@@ -287,6 +386,282 @@ fn solve_map(args: SolveMapArgs) -> Result<(), String> {
     std::fs::write(&args.summary_out, summary)
         .map_err(|error| format!("write {}: {error}", args.summary_out.display()))?;
     Ok(())
+}
+
+fn arc_grid_scout(args: ArcGridScoutArgs) -> Result<(), String> {
+    if let Some(parent) = args.summary_out.parent() {
+        std::fs::create_dir_all(parent)
+            .map_err(|error| format!("create {}: {error}", parent.display()))?;
+    }
+    let grid = read_label_grid(&args.grid_path)?;
+    let unsupported_reason = arc_grid_support_reason(&args, &grid);
+    let summary = if let Some(reason) = unsupported_reason {
+        arc_grid_unsupported_json(&args, &reason)
+    } else {
+        arc_grid_supported_json(&args, &grid)?
+    };
+    std::fs::write(&args.summary_out, format!("{summary}\n"))
+        .map_err(|error| format!("write {}: {error}", args.summary_out.display()))?;
+    Ok(())
+}
+
+fn arc_grid_support_reason(args: &ArcGridScoutArgs, grid: &[Vec<i32>]) -> Option<String> {
+    if args.actions.is_empty() {
+        return Some("missing_candidate_actions".to_string());
+    }
+    let Some(agent_label) = args.agent_label else {
+        return Some("missing_agent_label_mapping".to_string());
+    };
+    let Some(goal_label) = args.goal_label else {
+        return Some("missing_goal_label_mapping".to_string());
+    };
+    if args.wall_labels.contains(&agent_label)
+        || args.wall_labels.contains(&goal_label)
+        || args.hazard_labels.contains(&agent_label)
+        || args.hazard_labels.contains(&goal_label)
+        || agent_label == goal_label
+    {
+        return Some("overlapping_label_roles".to_string());
+    }
+    let agent_count = grid
+        .iter()
+        .flatten()
+        .filter(|value| **value == agent_label)
+        .count();
+    if agent_count != 1 {
+        return Some(format!("expected_one_agent_cell_found_{agent_count}"));
+    }
+    let goal_count = grid
+        .iter()
+        .flatten()
+        .filter(|value| **value == goal_label)
+        .count();
+    if goal_count == 0 {
+        return Some("missing_goal_cells".to_string());
+    }
+    None
+}
+
+fn arc_grid_unsupported_json(args: &ArcGridScoutArgs, reason: &str) -> String {
+    let candidate_rows = args
+        .actions
+        .iter()
+        .map(|action_value| {
+            format!(
+                "{{\"action_value\":{},\"action_name\":\"ACTION{}\",\"action_id\":{},\"kernel_supported\":false,\"prediction_supported\":false,\"predicted_next_frame_sha256\":null,\"predicted_next_state\":\"UNKNOWN\",\"predicted_level_delta\":null,\"predicted_solved\":false,\"predicted_solved_by_plan\":false,\"rollout_steps\":0,\"rollout_reason\":\"{}\",\"one_step_accepted\":null,\"one_step_reward\":null,\"on_planned_solution_prefix\":false}}",
+                action_value,
+                action_value,
+                string_option_to_json(action_id_for_arc_action(*action_value).as_deref()),
+                json_escape(reason)
+            )
+        })
+        .collect::<Vec<_>>()
+        .join(",");
+    format!(
+        "{{\"schema\":\"dream_kernel.arc_grid_scout.v001\",\"state_id\":\"{}\",\"game\":\"{}\",\"grid_sha256\":\"{}\",\"supported\":false,\"support_reason\":\"{}\",\"solved\":false,\"selected_action_value\":null,\"planned_action_values\":[],\"planned_action_ids\":[],\"planned_rollout_steps\":0,\"planned_sequence_hash\":null,\"candidate_rollouts\":[{}]}}",
+        json_escape(&args.state_id),
+        json_escape(&args.game),
+        json_escape(&args.grid_sha256),
+        json_escape(reason),
+        candidate_rows
+    )
+}
+
+fn arc_grid_supported_json(args: &ArcGridScoutArgs, grid: &[Vec<i32>]) -> Result<String, String> {
+    let lines = grid_to_ascii_lines(args, grid)?;
+    let line_refs = lines.iter().map(String::as_str).collect::<Vec<_>>();
+    let (sequence, row) = solve_lines(
+        &args.game,
+        &line_refs,
+        args.max_steps,
+        1.0,
+        "arc_grid_internal_rollout.dream_sequence.json".to_string(),
+    )?;
+    let planned_action_values = row
+        .planned_actions
+        .iter()
+        .filter_map(|action_id| arc_action_for_action_id(action_id))
+        .collect::<Vec<_>>();
+    let first_planned_action = planned_action_values.first().copied();
+    let candidate_rows = args
+        .actions
+        .iter()
+        .map(|action_value| {
+            candidate_rollout_json(
+                *action_value,
+                first_planned_action,
+                row.solved,
+                &line_refs,
+            )
+        })
+        .collect::<Result<Vec<_>, _>>()?
+        .join(",");
+    Ok(format!(
+        "{{\"schema\":\"dream_kernel.arc_grid_scout.v001\",\"state_id\":\"{}\",\"game\":\"{}\",\"grid_sha256\":\"{}\",\"supported\":true,\"support_reason\":\"label_roles_supported\",\"solved\":{},\"selected_action_value\":{},\"planned_action_values\":{},\"planned_action_ids\":{},\"planned_rollout_steps\":{},\"planned_sequence_hash\":\"{}\",\"candidate_rollouts\":[{}]}}",
+        json_escape(&args.state_id),
+        json_escape(&args.game),
+        json_escape(&args.grid_sha256),
+        row.solved,
+        first_planned_action
+            .map(|value| value.to_string())
+            .unwrap_or_else(|| "null".to_string()),
+        i32_vec_to_json(&planned_action_values),
+        string_vec_to_json(&row.planned_actions),
+        row.steps,
+        json_escape(&sequence.integrity.sequence_hash),
+        candidate_rows
+    ))
+}
+
+fn candidate_rollout_json(
+    action_value: i32,
+    first_planned_action: Option<i32>,
+    solved: bool,
+    line_refs: &[&str],
+) -> Result<String, String> {
+    let action_id = action_id_for_arc_action(action_value);
+    let Some(action) = action_for_arc_action(action_value) else {
+        return Ok(format!(
+            "{{\"action_value\":{},\"action_name\":\"ACTION{}\",\"action_id\":null,\"kernel_supported\":true,\"prediction_supported\":false,\"predicted_next_frame_sha256\":null,\"predicted_next_state\":\"UNKNOWN\",\"predicted_level_delta\":null,\"predicted_solved\":false,\"predicted_solved_by_plan\":false,\"rollout_steps\":0,\"rollout_reason\":\"unknown_action_mapping\",\"one_step_accepted\":null,\"one_step_reward\":null,\"on_planned_solution_prefix\":false}}",
+            action_value, action_value
+        ));
+    };
+    let state = SimState::from_ascii_layer(line_refs)?;
+    let directions = compass_directions();
+    let mut kernel = DreamKernel::new(state);
+    let sequence = kernel.rollout(&[action], &directions, 16, "agent")?;
+    let next_frame_hash = sequence
+        .frames
+        .get(1)
+        .and_then(|frame| frame.integrity.as_ref().map(|integrity| integrity.frame_hash.clone()));
+    let outcome = sequence.frames.get(1).and_then(|frame| frame.outcome.as_ref());
+    let one_step_accepted = outcome.map(|row| row.accepted).unwrap_or(false);
+    let one_step_reward = outcome.map(|row| row.reward).unwrap_or(0.0);
+    let one_step_terminal = outcome.map(|row| row.terminal).unwrap_or(false);
+    let predicted_next_state = if one_step_terminal && one_step_reward > 0.0 {
+        "WIN"
+    } else if one_step_terminal && one_step_reward < 0.0 {
+        "LOSS"
+    } else {
+        "NOT_FINISHED"
+    };
+    let predicted_level_delta = if one_step_terminal && one_step_reward > 0.0 {
+        1
+    } else {
+        0
+    };
+    let on_plan = first_planned_action == Some(action_value);
+    Ok(format!(
+        "{{\"action_value\":{},\"action_name\":\"ACTION{}\",\"action_id\":{},\"kernel_supported\":true,\"prediction_supported\":true,\"predicted_next_frame_sha256\":{},\"predicted_next_state\":\"{}\",\"predicted_level_delta\":{},\"predicted_solved\":{},\"predicted_solved_by_plan\":{},\"rollout_steps\":1,\"rollout_reason\":\"one_step_transition_predicted_by_dream_kernel\",\"one_step_accepted\":{},\"one_step_reward\":{},\"on_planned_solution_prefix\":{}}}",
+        action_value,
+        action_value,
+        string_option_to_json(action_id.as_deref()),
+        string_option_to_json(next_frame_hash.as_deref()),
+        predicted_next_state,
+        predicted_level_delta,
+        one_step_terminal && one_step_reward > 0.0,
+        solved && on_plan,
+        one_step_accepted,
+        number_to_json(one_step_reward),
+        on_plan
+    ))
+}
+
+fn read_label_grid(path: &PathBuf) -> Result<Vec<Vec<i32>>, String> {
+    let text = std::fs::read_to_string(path)
+        .map_err(|error| format!("read {}: {error}", path.display()))?;
+    let rows = text
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .map(|line| {
+            line.split_whitespace()
+                .map(|token| {
+                    token
+                        .parse::<i32>()
+                        .map_err(|error| format!("invalid grid token {token:?}: {error}"))
+                })
+                .collect::<Result<Vec<_>, _>>()
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    if rows.is_empty() {
+        return Err(format!("{} did not contain grid rows", path.display()));
+    }
+    let width = rows[0].len();
+    if width == 0 || rows.iter().any(|row| row.len() != width) {
+        return Err("label grid rows must be non-empty and rectangular".to_string());
+    }
+    Ok(rows)
+}
+
+fn grid_to_ascii_lines(args: &ArcGridScoutArgs, grid: &[Vec<i32>]) -> Result<Vec<String>, String> {
+    let agent_label = args
+        .agent_label
+        .ok_or_else(|| "agent label missing after support check".to_string())?;
+    let goal_label = args
+        .goal_label
+        .ok_or_else(|| "goal label missing after support check".to_string())?;
+    Ok(grid
+        .iter()
+        .map(|row| {
+            row.iter()
+                .map(|value| {
+                    if *value == agent_label {
+                        'A'
+                    } else if *value == goal_label {
+                        'G'
+                    } else if args.wall_labels.contains(value) {
+                        '#'
+                    } else if args.hazard_labels.contains(value) {
+                        'H'
+                    } else {
+                        '.'
+                    }
+                })
+                .collect::<String>()
+        })
+        .collect())
+}
+
+fn parse_i32_list(value: &str) -> Result<Vec<i32>, String> {
+    if value.trim().is_empty() {
+        return Ok(Vec::new());
+    }
+    value
+        .split(',')
+        .map(str::trim)
+        .filter(|item| !item.is_empty())
+        .map(|item| {
+            item.parse::<i32>()
+                .map_err(|error| format!("invalid integer list value {item:?}: {error}"))
+        })
+        .collect()
+}
+
+fn action_for_arc_action(action_value: i32) -> Option<Action> {
+    match action_value {
+        0 => Some(Action::Wait),
+        1 => Some(Action::move_agent(Coord::new(1, 0, 0))),
+        2 => Some(Action::move_agent(Coord::new(0, 1, 0))),
+        3 => Some(Action::move_agent(Coord::new(0, -1, 0))),
+        4 => Some(Action::move_agent(Coord::new(-1, 0, 0))),
+        _ => None,
+    }
+}
+
+fn action_id_for_arc_action(action_value: i32) -> Option<String> {
+    action_for_arc_action(action_value).map(Action::action_id)
+}
+
+fn arc_action_for_action_id(action_id: &str) -> Option<i32> {
+    match action_id {
+        "wait" => Some(0),
+        "move_entity_0_dx1_dy0_dz0" => Some(1),
+        "move_entity_0_dx0_dy1_dz0" => Some(2),
+        "move_entity_0_dx0_dy-1_dz0" => Some(3),
+        "move_entity_0_dx-1_dy0_dz0" => Some(4),
+        _ => None,
+    }
 }
 
 fn run_scenario(scenario: Scenario, out_dir: &PathBuf) -> Result<ScenarioResult, String> {
@@ -675,6 +1050,23 @@ fn coord_to_json(coord: Coord) -> String {
 fn optional_i32_to_json(value: Option<i32>) -> String {
     value
         .map(|value| value.to_string())
+        .unwrap_or_else(|| "null".to_string())
+}
+
+fn i32_vec_to_json(values: &[i32]) -> String {
+    format!(
+        "[{}]",
+        values
+            .iter()
+            .map(i32::to_string)
+            .collect::<Vec<_>>()
+            .join(",")
+    )
+}
+
+fn string_option_to_json(value: Option<&str>) -> String {
+    value
+        .map(|text| format!("\"{}\"", json_escape(text)))
         .unwrap_or_else(|| "null".to_string())
 }
 

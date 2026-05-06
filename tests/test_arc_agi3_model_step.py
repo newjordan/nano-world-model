@@ -52,6 +52,7 @@ def _decision(module):
             "world_state_3d_artifact": "artifact://world3d",
             "chronometric_game_knowledge_artifact": "artifact://game-knowledge",
             "mlp_consultation_artifact": "artifact://mlp-consultation",
+            "internal_forward_rollout_artifact": "artifact://forward-rollout",
             "branch_simulation_artifact": "artifact://branches",
             "trust_checks_artifact": "artifact://trust",
             "internal_thinking_artifact": "artifact://internal-thinking",
@@ -101,6 +102,41 @@ def _decision(module):
             "drives_selected_action": True,
             "created_before_actuator_step": True,
             "selected_action_value": 1,
+        },
+        "internal_forward_rollout": {
+            "schema": module.INTERNAL_FORWARD_ROLLOUT_SCHEMA,
+            "artifact": "artifact://forward-rollout",
+            "sha256": "c" * 64,
+            "created_before_actuator_step": True,
+            "kernel_surface": "dream_kernel.arc_grid_scout.v001",
+            "kernel_supported": True,
+            "solves_before_first_step": True,
+            "planned_action_values": [1],
+            "candidate_count": 1,
+            "candidate_rollout_refs": [
+                {
+                    "action_value": 1,
+                    "prediction_supported": True,
+                    "kernel_supported": True,
+                    "predicted_next_state": "WIN",
+                    "predicted_level_delta": 1,
+                    "predicted_solved": True,
+                    "predicted_solved_by_plan": True,
+                    "predicted_next_frame_sha256": "c" * 64,
+                    "rollout_steps": 1,
+                }
+            ],
+            "selected_candidate_prediction": {
+                "action_value": 1,
+                "prediction_supported": True,
+                "kernel_supported": True,
+                "predicted_next_state": "WIN",
+                "predicted_level_delta": 1,
+                "predicted_solved": True,
+                "predicted_solved_by_plan": True,
+                "predicted_next_frame_sha256": "c" * 64,
+                "rollout_steps": 1,
+            },
         },
         "nemo3": {
             "invoked": True,
@@ -183,6 +219,8 @@ def test_model_step_trace_row_records_model_decision_not_policy_loop():
     assert row["chronometric_game_knowledge_action_embedding_linked"] is True
     assert row["chronometric_game_knowledge_branch_library_linked"] is True
     assert row["mlp_consultation"] == "artifact://mlp-consultation"
+    assert row["internal_forward_rollout"] == "artifact://forward-rollout"
+    assert row["internal_forward_rollout_solves_before_first_step"] is True
     assert row["post_action_mlp_update_artifact"] == "artifact://post-action-mlp"
     assert row["post_action_mlp_update_candidate_written"] is True
     assert row["mlp_weights_updated"] is False
@@ -194,7 +232,10 @@ def test_model_step_trace_row_records_model_decision_not_policy_loop():
 
 def test_model_step_summary_requires_one_model_decision_actuator_step():
     module = _load_module()
-    condition = {"selected_game": {"game_id": "ls20-9607627b", "name": "ls20"}}
+    condition = {
+        "selected_game": {"game_id": "ls20-9607627b", "name": "ls20"},
+        "allow_unsolved_internal_rollout_for_contract_test": False,
+    }
     row = {
         "chosen_action_name": "ACTION1",
         "chosen_action": "ACTION1:1",
@@ -222,6 +263,10 @@ def test_model_step_summary_requires_one_model_decision_actuator_step():
         "chronometric_game_knowledge_branch_library_linked": True,
         "mlp_consultation": "artifact://mlp-consultation",
         "mlp_consultation_sha256": "e" * 64,
+        "internal_forward_rollout": "artifact://forward-rollout",
+        "internal_forward_rollout_sha256": "c" * 64,
+        "internal_forward_rollout_kernel_supported": True,
+        "internal_forward_rollout_solves_before_first_step": True,
         "post_action_mlp_update_artifact": "artifact://post-action-mlp",
         "post_action_mlp_update_sha256": "f" * 64,
         "post_action_mlp_update_candidate_written": True,
@@ -250,6 +295,8 @@ def test_model_step_summary_requires_one_model_decision_actuator_step():
     assert metrics["chronometric_game_knowledge"] == "artifact://game-knowledge"
     assert metrics["chronometric_game_knowledge_score_surface"] == module.CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE
     assert metrics["mlp_consultation"] == "artifact://mlp-consultation"
+    assert metrics["internal_forward_rollout"] == "artifact://forward-rollout"
+    assert metrics["internal_forward_rollout_solves_before_first_step"] is True
     assert metrics["post_action_mlp_update_artifact"] == "artifact://post-action-mlp"
     assert metrics["post_action_mlp_update_candidate_written"] is True
     assert metrics["mlp_weights_updated"] is False

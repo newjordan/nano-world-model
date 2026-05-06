@@ -1,0 +1,12 @@
+{
+  "actuator_steps_executed": 0,
+  "arc_solve_claim": false,
+  "created_at_utc": "2026-05-06T23:25:06.825224+00:00",
+  "decision_id": "arc_agi3_model_solve_scout_v056_ls20_internal_forward_rollout_gate_probe_step_000_decision:051262800fb37e18",
+  "model_decision_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v056_ls20_internal_forward_rollout_gate_probe/steps/000_model_decision/model_decision.json",
+  "online_submission": false,
+  "reason": "internal_forward_rollout.kernel_supported must be true before actuator step; internal_forward_rollout.solves_before_first_step must be true before actuator step; internal_forward_rollout.selected_candidate_prediction.prediction_supported must be true before actuator step; internal_forward_rollout.selected_candidate_prediction.predicted_solved_by_plan must be true before actuator step",
+  "require_internal_solve": true,
+  "schema": "arc_agi3.actuator_gate_block.v001",
+  "state_id": "ls20:full_reset:not_finished:c1efdf6a-a67d-4334-8d1f-4a30605ba884"
+}

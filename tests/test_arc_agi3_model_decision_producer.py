@@ -32,7 +32,12 @@ class FakeEnv:
     info = FakeInfo()
 
     def __init__(self):
-        self.action_space = [FakeAction("ACTION1", 1), FakeAction("ACTION2", 2), FakeAction("ACTION3", 3)]
+        self.action_space = [
+            FakeAction("ACTION1", 1),
+            FakeAction("ACTION2", 2),
+            FakeAction("ACTION3", 3),
+            FakeAction("ACTION4", 4),
+        ]
         self.step_called = False
 
     def step(self, *_args, **_kwargs):
@@ -84,6 +89,12 @@ def _args(module, *, threshold=0.0):
         nemo_model="test-nemo",
         nemo_relay_url="http://127.0.0.1:8000/v1/responses",
         nemo_timeout=1,
+        internal_rollout_max_steps=8,
+        internal_rollout_kernel_timeout=30,
+        arc_grid_agent_label=1,
+        arc_grid_goal_label=3,
+        arc_grid_wall_labels="2,4",
+        arc_grid_hazard_labels="",
     )
 
 
@@ -133,7 +144,11 @@ def test_model_decision_producer_writes_valid_artifact_chain_without_actuator_st
 
     env, metrics, decision = _produce(module, tmp_path)
 
-    selected = module.require_standard_model_decision(decision, available_action_values=[1, 2, 3])
+    selected = module.require_standard_model_decision(
+        decision,
+        available_action_values=[1, 2, 3, 4],
+        require_internal_solve=True,
+    )
     assert selected["source"] == module.SELECTED_ACTION_SOURCE
     assert metrics["valid_standard_model_decision"] is True
     assert metrics["actuator_steps_executed"] == 0
@@ -143,6 +158,8 @@ def test_model_decision_producer_writes_valid_artifact_chain_without_actuator_st
     assert (tmp_path / "world_state_3d.json").exists()
     assert (tmp_path / "chronometric_game_knowledge.json").exists()
     assert (tmp_path / "mlp_consultation.json").exists()
+    assert (tmp_path / "internal_forward_rollout.json").exists()
+    assert (tmp_path / "dream_kernel_arc_grid_scout.json").exists()
     assert (tmp_path / "branch_simulation.json").exists()
     assert (tmp_path / "trust_checks.json").exists()
     assert (tmp_path / "internal_thinking_lock.json").exists()
@@ -172,7 +189,7 @@ def test_ambiguous_branch_selection_creates_interim_nemo_confirmation(tmp_path):
     assert decision["internal_thinking_lock"]["ambiguity_detected"] is True
     assert decision["internal_thinking_lock"]["open_question_ids"] == ["branch_selection_gap"]
     assert decision["nemo3"]["interim_confirmations"][0]["question_id"] == "branch_selection_gap"
-    module.require_standard_model_decision(decision, available_action_values=[1, 2, 3])
+    module.require_standard_model_decision(decision, available_action_values=[1, 2, 3, 4])
 
 
 def test_mlp_consultation_can_consume_prior_post_action_update_candidate(tmp_path):

@@ -35,6 +35,7 @@ for path in (ROOT, SRC):
 from arc_agi3_model_flow import (  # noqa: E402
     MODEL_DECISION_SCHEMA,
     STANDARD_MODEL_FLOW,
+    ModelDecisionError,
     actuator_reasoning_from_model_decision,
     load_model_decision,
     require_standard_model_decision,
@@ -167,10 +168,37 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         )
         decision_path = decision_dir / "model_decision.json"
         model_decision = load_model_decision(decision_path)
-        selected_action = require_standard_model_decision(
-            model_decision,
-            available_action_values=action_values(getattr(env, "action_space", [])),
-        )
+        try:
+            selected_action = require_standard_model_decision(
+                model_decision,
+                available_action_values=action_values(getattr(env, "action_space", [])),
+                require_internal_solve=not args.allow_unsolved_internal_rollout_for_contract_test,
+            )
+        except ModelDecisionError as exc:
+            stop_reason = "internal_solve_gate_blocked_before_actuator"
+            (decision_dir / "actuator_gate_block.json").write_text(
+                json.dumps(
+                    {
+                        "schema": "arc_agi3.actuator_gate_block.v001",
+                        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+                        "state_id": model_decision.get("state_id"),
+                        "decision_id": model_decision.get("decision_id"),
+                        "require_internal_solve": (
+                            not args.allow_unsolved_internal_rollout_for_contract_test
+                        ),
+                        "reason": str(exc),
+                        "model_decision_artifact": _repo_rel(decision_path),
+                        "actuator_steps_executed": len(trace_rows),
+                        "arc_solve_claim": False,
+                        "online_submission": False,
+                    },
+                    indent=2,
+                    sort_keys=True,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            break
         action = action_by_value(env.action_space, int(selected_action["action_value"]))
         action_data = selected_action.get("action_data")
         before_summary = summarize_frame_stack(getattr(obs, "frame", None))
@@ -489,6 +517,7 @@ def condition_payload(
         "nemo_model": args.nemo_model,
         "max_steps": args.max_steps,
         "post_action_mlp_update_mode": args.post_action_mlp_update_mode,
+        "allow_unsolved_internal_rollout_for_contract_test": args.allow_unsolved_internal_rollout_for_contract_test,
         "tokenizer_path": "not_applicable",
         "vocab_size": "not_applicable",
         "seed": "deterministic_from_observation_frame_sha_action_values_and_candidate_update_context",
@@ -502,6 +531,14 @@ def condition_payload(
             "max_candidate_actions": args.max_candidate_actions,
             "max_steps": args.max_steps,
             "branch_ambiguity_gap_threshold": args.branch_ambiguity_gap_threshold,
+            "internal_rollout_max_steps": args.internal_rollout_max_steps,
+            "arc_grid_agent_label": args.arc_grid_agent_label,
+            "arc_grid_goal_label": args.arc_grid_goal_label,
+            "arc_grid_wall_labels": args.arc_grid_wall_labels,
+            "arc_grid_hazard_labels": args.arc_grid_hazard_labels,
+            "allow_unsolved_internal_rollout_for_contract_test": (
+                args.allow_unsolved_internal_rollout_for_contract_test
+            ),
             "post_action_mlp_update_mode": args.post_action_mlp_update_mode,
             "online_submission": False,
             "scorecard_submission": False,
@@ -512,7 +549,7 @@ def condition_payload(
             None if args.historical_comparator_artifact is None else _repo_rel(args.historical_comparator_artifact)
         ),
         "quantization_policy": "none",
-        "compile_kernel_policy": "not_applicable_python_sdk_offline_loop",
+        "compile_kernel_policy": "mandatory_dream_kernel_arc_grid_scout_before_actuator",
         "arc_data_used": True,
         "training_data_promoted": False,
         "arc_solve_claim": False,
@@ -583,6 +620,11 @@ def decision_condition_payload(
             "game": args.game,
             "max_candidate_actions": args.max_candidate_actions,
             "branch_ambiguity_gap_threshold": args.branch_ambiguity_gap_threshold,
+            "internal_rollout_max_steps": args.internal_rollout_max_steps,
+            "arc_grid_agent_label": args.arc_grid_agent_label,
+            "arc_grid_goal_label": args.arc_grid_goal_label,
+            "arc_grid_wall_labels": args.arc_grid_wall_labels,
+            "arc_grid_hazard_labels": args.arc_grid_hazard_labels,
             "online_submission": False,
             "scorecard_submission": False,
         },
@@ -592,7 +634,7 @@ def decision_condition_payload(
             None if args.historical_comparator_artifact is None else _repo_rel(args.historical_comparator_artifact)
         ),
         "quantization_policy": "none",
-        "compile_kernel_policy": "not_applicable_python_sdk_decision_step",
+        "compile_kernel_policy": "mandatory_dream_kernel_arc_grid_scout_before_actuator",
         "arc_data_used": True,
         "training_data_promoted": False,
         "arc_solve_claim": False,
@@ -670,6 +712,12 @@ def decision_args_for(args: argparse.Namespace, *, run_label: str) -> argparse.N
         nemo_model=args.nemo_model,
         nemo_relay_url=args.nemo_relay_url,
         nemo_timeout=args.nemo_timeout,
+        internal_rollout_max_steps=args.internal_rollout_max_steps,
+        internal_rollout_kernel_timeout=args.internal_rollout_kernel_timeout,
+        arc_grid_agent_label=args.arc_grid_agent_label,
+        arc_grid_goal_label=args.arc_grid_goal_label,
+        arc_grid_wall_labels=args.arc_grid_wall_labels,
+        arc_grid_hazard_labels=args.arc_grid_hazard_labels,
     )
 
 
@@ -733,6 +781,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-candidate-actions", type=int, default=8)
     parser.add_argument("--max-steps", type=int, default=12)
     parser.add_argument("--branch-ambiguity-gap-threshold", type=float, default=0.0)
+    parser.add_argument("--internal-rollout-max-steps", type=int, default=32)
+    parser.add_argument("--internal-rollout-kernel-timeout", type=int, default=30)
+    parser.add_argument("--arc-grid-agent-label", type=int, default=None)
+    parser.add_argument("--arc-grid-goal-label", type=int, default=None)
+    parser.add_argument("--arc-grid-wall-labels", default="")
+    parser.add_argument("--arc-grid-hazard-labels", default="")
+    parser.add_argument("--allow-unsolved-internal-rollout-for-contract-test", action="store_true")
     parser.add_argument("--nemo-mode", choices=(producer.LOCAL_NEMO_MODE, producer.LIVE_NEMO_MODE), default=producer.LIVE_NEMO_MODE)
     parser.add_argument("--nemo-relay-url", default="http://127.0.0.1:8000/v1/responses")
     parser.add_argument("--nemo-model", default="nemotron_3_nano_omni")

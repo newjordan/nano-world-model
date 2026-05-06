@@ -5,8 +5,8 @@ non-I/O ARC step must be driven by a ModelDecision emitted by the Nemo3/world
 model flow:
 
 observation -> 3D/world state -> chronometric game knowledge -> MLP
-consultation -> internal branch simulation -> trust checks -> ModelDecision
-artifact -> actuator step
+consultation -> internal forward rollout -> internal branch simulation ->
+trust checks -> ModelDecision artifact -> actuator step
 """
 
 from __future__ import annotations
@@ -22,6 +22,7 @@ NEMO3_FINAL_CONFIRMATION_SCHEMA = "arc_agi3.nemo3_final_confirmation.v001"
 NEMO3_INTERIM_CONFIRMATION_SCHEMA = "arc_agi3.nemo3_interim_confirmation.v001"
 CHRONOMETRIC_GAME_KNOWLEDGE_SCHEMA = "chronometric.game_knowledge_link.v001"
 MLP_CONSULTATION_SCHEMA = "arc_agi3.mlp_consultation.v001"
+INTERNAL_FORWARD_ROLLOUT_SCHEMA = "arc_agi3.internal_forward_rollout.v001"
 CHRONOMETRIC_GAME_KNOWLEDGE_BACKBONE = "nanowm_action_conditioned_transformer"
 CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION = "ChronometricCalibrationMLP+branch_library_fallback"
 CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE = "NanoWM.score_chronometric_branch"
@@ -31,6 +32,7 @@ STANDARD_MODEL_FLOW = (
     "world_state_3d",
     "chronometric_game_knowledge",
     "mlp_consultation",
+    "internal_forward_rollout",
     "internal_branch_simulation",
     "trust_checks",
     "internal_thinking_lock",
@@ -43,6 +45,7 @@ REQUIRED_MODEL_FLOW_ARTIFACTS = (
     "world_state_3d_artifact",
     "chronometric_game_knowledge_artifact",
     "mlp_consultation_artifact",
+    "internal_forward_rollout_artifact",
     "branch_simulation_artifact",
     "trust_checks_artifact",
     "internal_thinking_artifact",
@@ -70,13 +73,18 @@ def require_standard_model_decision(
     decision: dict[str, Any],
     *,
     available_action_values: Sequence[int],
+    require_internal_solve: bool = False,
 ) -> dict[str, Any]:
     """Validate and return the selected actuator action.
 
     This is deliberately fail-closed. Missing Nemo3/world-model evidence is not
     a warning or optional preflight; it means there is no action.
     """
-    failures = model_decision_failures(decision, available_action_values=available_action_values)
+    failures = model_decision_failures(
+        decision,
+        available_action_values=available_action_values,
+        require_internal_solve=require_internal_solve,
+    )
     if failures:
         raise ModelDecisionError("; ".join(failures))
     return dict(decision["selected_action"])
@@ -86,6 +94,7 @@ def model_decision_failures(
     decision: dict[str, Any],
     *,
     available_action_values: Sequence[int],
+    require_internal_solve: bool = False,
 ) -> list[str]:
     failures: list[str] = []
     if decision.get("schema") != MODEL_DECISION_SCHEMA:
@@ -101,6 +110,7 @@ def model_decision_failures(
     nemo3 = _dict(decision.get("nemo3"))
     game_knowledge = _dict(decision.get("chronometric_game_knowledge"))
     mlp_consultation = _dict(decision.get("mlp_consultation"))
+    forward_rollout = _dict(decision.get("internal_forward_rollout"))
     trust = _dict(decision.get("trust"))
     for key in REQUIRED_TRUST_FLAGS:
         if trust.get(key) is not True:
@@ -120,6 +130,14 @@ def model_decision_failures(
 
     failures.extend(_chronometric_game_knowledge_failures(game_knowledge, flow=flow))
     failures.extend(_mlp_consultation_failures(mlp_consultation, flow=flow))
+    failures.extend(
+        _internal_forward_rollout_failures(
+            forward_rollout,
+            flow=flow,
+            selected_action_value=action_value,
+            require_internal_solve=require_internal_solve,
+        )
+    )
     failures.extend(_internal_thinking_lock_failures(internal_lock, flow=flow, selected_action_value=action_value))
     failures.extend(_nemo3_confirmation_failures(nemo3, flow=flow, lock=internal_lock, selected_action_value=action_value))
 
@@ -155,6 +173,17 @@ def actuator_reasoning_from_model_decision(decision: dict[str, Any]) -> dict[str
         ),
         "mlp_post_action_update_context_sha256": _dict(decision.get("mlp_consultation")).get(
             "post_action_update_candidate_context_sha256"
+        ),
+        "internal_forward_rollout": _dict(decision.get("internal_forward_rollout")).get("artifact"),
+        "internal_forward_rollout_sha256": _dict(decision.get("internal_forward_rollout")).get("sha256"),
+        "internal_forward_rollout_kernel_supported": _dict(decision.get("internal_forward_rollout")).get(
+            "kernel_supported"
+        ),
+        "internal_forward_rollout_solves_before_first_step": _dict(decision.get("internal_forward_rollout")).get(
+            "solves_before_first_step"
+        ),
+        "internal_forward_rollout_selected_prediction": _dict(decision.get("internal_forward_rollout")).get(
+            "selected_candidate_prediction"
         ),
         "internal_thinking_lock": _dict(decision.get("internal_thinking_lock")).get("artifact"),
         "internal_thinking_sha256": _dict(decision.get("internal_thinking_lock")).get("sha256"),
@@ -238,6 +267,84 @@ def _mlp_consultation_failures(consultation: dict[str, Any], *, flow: dict[str, 
         failures.append("mlp_consultation.heldout_labels_used must be false")
     if not _list(consultation.get("candidate_priors")):
         failures.append("mlp_consultation.candidate_priors must be non-empty")
+    return failures
+
+
+def _internal_forward_rollout_failures(
+    rollout: dict[str, Any],
+    *,
+    flow: dict[str, Any],
+    selected_action_value: Any,
+    require_internal_solve: bool,
+) -> list[str]:
+    failures: list[str] = []
+    if rollout.get("schema") != INTERNAL_FORWARD_ROLLOUT_SCHEMA:
+        failures.append(f"internal_forward_rollout.schema must be {INTERNAL_FORWARD_ROLLOUT_SCHEMA}")
+    if not _non_empty_string(rollout.get("artifact")):
+        failures.append("internal_forward_rollout.artifact is required")
+    elif rollout.get("artifact") != flow.get("internal_forward_rollout_artifact"):
+        failures.append(
+            "internal_forward_rollout.artifact must match "
+            "standard_model_flow.internal_forward_rollout_artifact"
+        )
+    if not _sha256_string(rollout.get("sha256")):
+        failures.append("internal_forward_rollout.sha256 must be a 64-character lowercase hex digest")
+    if rollout.get("created_before_actuator_step") is not True:
+        failures.append("internal_forward_rollout.created_before_actuator_step must be true")
+    if not _non_empty_string(rollout.get("kernel_surface")):
+        failures.append("internal_forward_rollout.kernel_surface is required")
+    candidate_count = rollout.get("candidate_count")
+    if not isinstance(candidate_count, int) or isinstance(candidate_count, bool) or candidate_count <= 0:
+        failures.append("internal_forward_rollout.candidate_count must be a positive integer")
+    if not _list(rollout.get("candidate_rollout_refs")):
+        failures.append("internal_forward_rollout.candidate_rollout_refs must be non-empty")
+
+    selected_prediction = _dict(rollout.get("selected_candidate_prediction"))
+    if not selected_prediction:
+        failures.append("internal_forward_rollout.selected_candidate_prediction is required")
+    else:
+        if selected_prediction.get("action_value") != selected_action_value:
+            failures.append(
+                "internal_forward_rollout.selected_candidate_prediction.action_value must match "
+                "selected_action.action_value"
+            )
+        for field in (
+            "prediction_supported",
+            "kernel_supported",
+            "predicted_next_state",
+            "predicted_level_delta",
+            "predicted_solved",
+            "predicted_solved_by_plan",
+            "predicted_next_frame_sha256",
+            "rollout_steps",
+        ):
+            if field not in selected_prediction:
+                failures.append(f"internal_forward_rollout.selected_candidate_prediction.{field} is required")
+
+    planned_values = _list(rollout.get("planned_action_values"))
+    if rollout.get("solves_before_first_step") is True:
+        if not planned_values:
+            failures.append("internal_forward_rollout.planned_action_values must be non-empty when solved")
+        elif isinstance(selected_action_value, int) and planned_values[0] != selected_action_value:
+            failures.append(
+                "internal_forward_rollout.planned_action_values[0] must match selected_action.action_value"
+            )
+
+    if require_internal_solve:
+        if rollout.get("kernel_supported") is not True:
+            failures.append("internal_forward_rollout.kernel_supported must be true before actuator step")
+        if rollout.get("solves_before_first_step") is not True:
+            failures.append("internal_forward_rollout.solves_before_first_step must be true before actuator step")
+        if selected_prediction.get("prediction_supported") is not True:
+            failures.append(
+                "internal_forward_rollout.selected_candidate_prediction.prediction_supported must be true "
+                "before actuator step"
+            )
+        if selected_prediction.get("predicted_solved_by_plan") is not True:
+            failures.append(
+                "internal_forward_rollout.selected_candidate_prediction.predicted_solved_by_plan must be true "
+                "before actuator step"
+            )
     return failures
 
 

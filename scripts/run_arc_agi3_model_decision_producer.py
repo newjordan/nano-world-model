@@ -13,6 +13,7 @@ import argparse
 import hashlib
 import json
 import os
+import subprocess
 import sys
 from collections import Counter
 from datetime import datetime, timezone
@@ -33,6 +34,7 @@ from arc_agi3_model_flow import (  # noqa: E402
     CHRONOMETRIC_GAME_KNOWLEDGE_CALIBRATION,
     CHRONOMETRIC_GAME_KNOWLEDGE_SCHEMA,
     CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
+    INTERNAL_FORWARD_ROLLOUT_SCHEMA,
     INTERNAL_THINKING_LOCK_SCHEMA,
     MLP_CONSULTATION_SCHEMA,
     MODEL_DECISION_SCHEMA,
@@ -75,6 +77,7 @@ OBSERVATION_SCHEMA = "arc_agi3.reset_observation_artifact.v001"
 WORLD_STATE_SCHEMA = "arc_agi3.world_state_3d.v001"
 BRANCH_SIMULATION_SCHEMA = "arc_agi3.branch_simulation.v001"
 TRUST_CHECKS_SCHEMA = "arc_agi3.trust_checks.v001"
+DREAM_KERNEL_ARC_GRID_SCOUT_SCHEMA = "dream_kernel.arc_grid_scout.v001"
 LOCAL_NEMO_MODE = "contract-local"
 LIVE_NEMO_MODE = "live-relay"
 
@@ -187,6 +190,19 @@ def write_model_decision_artifacts(
     _write_json(paths["mlp_consultation"], mlp_consultation)
     mlp_consultation_ref = model_flow_ref(paths["mlp_consultation"])
 
+    internal_forward_rollout = build_internal_forward_rollout_artifact(
+        args=args,
+        out_dir=out_dir,
+        state_id=state_id,
+        selected_game=selected_game,
+        candidate_packets=candidate_packets,
+        world_state=world_state,
+        game_knowledge_ref=game_knowledge_ref,
+        mlp_consultation_ref=mlp_consultation_ref,
+    )
+    _write_json(paths["internal_forward_rollout"], internal_forward_rollout)
+    internal_forward_rollout_ref = model_flow_ref(paths["internal_forward_rollout"])
+
     branch_simulation = build_branch_simulation_artifact(
         args=args,
         state_id=state_id,
@@ -196,6 +212,8 @@ def write_model_decision_artifacts(
         game_knowledge_ref=game_knowledge_ref,
         mlp_consultation_ref=mlp_consultation_ref,
         mlp_consultation=mlp_consultation,
+        internal_forward_rollout_ref=internal_forward_rollout_ref,
+        internal_forward_rollout=internal_forward_rollout,
     )
     _write_json(paths["branch_simulation"], branch_simulation)
     branch_simulation_ref = model_flow_ref(paths["branch_simulation"])
@@ -205,6 +223,7 @@ def write_model_decision_artifacts(
         selected_game=selected_game,
         world_state=world_state,
         branch_simulation=branch_simulation,
+        internal_forward_rollout=internal_forward_rollout,
     )
     _write_json(paths["trust_checks"], trust_checks)
 
@@ -224,6 +243,8 @@ def write_model_decision_artifacts(
         selected_branch=selected_branch,
         branch_simulation=branch_simulation,
         branch_simulation_ref=branch_simulation_ref,
+        internal_forward_rollout=internal_forward_rollout,
+        internal_forward_rollout_ref=internal_forward_rollout_ref,
         ambiguity=ambiguity,
         interim_confirmations=interim_confirmations,
     )
@@ -235,6 +256,7 @@ def write_model_decision_artifacts(
         state_id=state_id,
         selected_branch=selected_branch,
         branch_simulation=branch_simulation,
+        internal_forward_rollout=internal_forward_rollout,
         trust_checks=trust_checks,
         internal_lock_ref=internal_lock_ref,
     )
@@ -247,6 +269,7 @@ def write_model_decision_artifacts(
         "world_state_3d_artifact": model_flow_ref(paths["world_state_3d"])["artifact"],
         "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
         "mlp_consultation_artifact": mlp_consultation_ref["artifact"],
+        "internal_forward_rollout_artifact": internal_forward_rollout_ref["artifact"],
         "branch_simulation_artifact": branch_simulation_ref["artifact"],
         "trust_checks_artifact": model_flow_ref(paths["trust_checks"])["artifact"],
         "internal_thinking_artifact": internal_lock_ref["artifact"],
@@ -262,6 +285,8 @@ def write_model_decision_artifacts(
         game_knowledge_ref=game_knowledge_ref,
         mlp_consultation=mlp_consultation,
         mlp_consultation_ref=mlp_consultation_ref,
+        internal_forward_rollout=internal_forward_rollout,
+        internal_forward_rollout_ref=internal_forward_rollout_ref,
         internal_lock=internal_lock,
         internal_lock_ref=internal_lock_ref,
         final_confirmation=final_confirmation,
@@ -281,6 +306,7 @@ def write_model_decision_artifacts(
         candidate_packets=candidate_packets,
         model_decision=model_decision,
         world_state=world_state,
+        internal_forward_rollout=internal_forward_rollout,
         branch_simulation=branch_simulation,
         trust_checks=trust_checks,
         interim_confirmations=interim_confirmations,
@@ -297,6 +323,9 @@ def artifact_paths(out_dir: Path) -> dict[str, Path]:
         "world_state_3d": out_dir / "world_state_3d.json",
         "chronometric_game_knowledge": out_dir / "chronometric_game_knowledge.json",
         "mlp_consultation": out_dir / "mlp_consultation.json",
+        "internal_forward_rollout": out_dir / "internal_forward_rollout.json",
+        "internal_forward_rollout_grid": out_dir / "internal_forward_rollout_grid.txt",
+        "dream_kernel_arc_grid_scout": out_dir / "dream_kernel_arc_grid_scout.json",
         "branch_simulation": out_dir / "branch_simulation.json",
         "trust_checks": out_dir / "trust_checks.json",
         "internal_thinking": out_dir / "internal_thinking_lock.json",
@@ -528,6 +557,203 @@ def build_mlp_consultation_artifact(
     }
 
 
+def build_internal_forward_rollout_artifact(
+    *,
+    args: argparse.Namespace,
+    out_dir: Path,
+    state_id: str,
+    selected_game: dict[str, Any],
+    candidate_packets: list[dict[str, Any]],
+    world_state: dict[str, Any],
+    game_knowledge_ref: dict[str, str],
+    mlp_consultation_ref: dict[str, str],
+) -> dict[str, Any]:
+    paths = artifact_paths(out_dir)
+    grid_path = paths["internal_forward_rollout_grid"]
+    kernel_summary_path = paths["dream_kernel_arc_grid_scout"]
+    write_kernel_grid_text(grid_path, world_state["grid"])
+    kernel_summary = run_dream_kernel_arc_grid_scout(
+        args=args,
+        state_id=state_id,
+        selected_game=selected_game,
+        candidate_packets=candidate_packets,
+        world_state=world_state,
+        grid_path=grid_path,
+        summary_path=kernel_summary_path,
+    )
+    candidate_rollouts = normalize_kernel_candidate_rollouts(
+        kernel_summary=kernel_summary,
+        candidate_packets=candidate_packets,
+    )
+    preferred_action_value = kernel_summary.get("selected_action_value")
+    selected_prediction = next(
+        (row for row in candidate_rollouts if row["action_value"] == preferred_action_value),
+        candidate_rollouts[0] if candidate_rollouts else {},
+    )
+    planned_action_values = [
+        int(value)
+        for value in kernel_summary.get("planned_action_values", [])
+        if isinstance(value, int) and not isinstance(value, bool)
+    ]
+    solves_before_first_step = bool(kernel_summary.get("supported") is True and kernel_summary.get("solved") is True)
+    return {
+        "schema": INTERNAL_FORWARD_ROLLOUT_SCHEMA,
+        "created_at_utc": now_iso(),
+        "state_id": state_id,
+        "game_name": selected_game["name"],
+        "created_before_actuator_step": True,
+        "rollout_surface": "arc_agi3_pre_action_internal_forward_rollout_v056",
+        "kernel_surface": DREAM_KERNEL_ARC_GRID_SCOUT_SCHEMA,
+        "kernel_artifact": _repo_rel(kernel_summary_path),
+        "kernel_sha256": _sha256(kernel_summary_path),
+        "kernel_supported": kernel_summary.get("supported") is True,
+        "kernel_support_reason": kernel_summary.get("support_reason"),
+        "kernel_support_required_for_actuator": True,
+        "solves_before_first_step": solves_before_first_step,
+        "preferred_action_value": preferred_action_value,
+        "planned_action_values": planned_action_values,
+        "planned_action_ids": kernel_summary.get("planned_action_ids", []),
+        "planned_rollout_steps": int(kernel_summary.get("planned_rollout_steps", 0) or 0),
+        "planned_sequence_hash": kernel_summary.get("planned_sequence_hash"),
+        "grid_artifact": _repo_rel(grid_path),
+        "grid_sha256": world_state["grid_stats"]["grid_sha256"],
+        "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
+        "chronometric_game_knowledge_sha256": game_knowledge_ref["sha256"],
+        "mlp_consultation_artifact": mlp_consultation_ref["artifact"],
+        "mlp_consultation_sha256": mlp_consultation_ref["sha256"],
+        "candidate_count": len(candidate_rollouts),
+        "candidate_rollouts": candidate_rollouts,
+        "candidate_rollout_refs": [
+            {
+                "action_name": row["action_name"],
+                "action_value": row["action_value"],
+                "prediction_supported": row["prediction_supported"],
+                "kernel_supported": row["kernel_supported"],
+                "predicted_next_state": row["predicted_next_state"],
+                "predicted_level_delta": row["predicted_level_delta"],
+                "predicted_solved": row["predicted_solved"],
+                "predicted_solved_by_plan": row["predicted_solved_by_plan"],
+                "predicted_next_frame_sha256": row["predicted_next_frame_sha256"],
+                "rollout_steps": row["rollout_steps"],
+            }
+            for row in candidate_rollouts
+        ],
+        "selected_candidate_prediction": selected_prediction,
+        "actuator_gate": {
+            "require_kernel_supported": True,
+            "require_solves_before_first_step": True,
+            "gate_passed": solves_before_first_step,
+        },
+        "actuator_steps_executed": 0,
+        "training_data_promoted": False,
+        "arc_solve_claim": False,
+    }
+
+
+def write_kernel_grid_text(path: Path, grid: list[list[int]] | tuple[tuple[int, ...], ...]) -> None:
+    rows = []
+    for row in grid:
+        rows.append(" ".join(str(int(value)) for value in row))
+    path.write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+
+def run_dream_kernel_arc_grid_scout(
+    *,
+    args: argparse.Namespace,
+    state_id: str,
+    selected_game: dict[str, Any],
+    candidate_packets: list[dict[str, Any]],
+    world_state: dict[str, Any],
+    grid_path: Path,
+    summary_path: Path,
+) -> dict[str, Any]:
+    actions = ",".join(str(int(packet["action_value"])) for packet in candidate_packets)
+    cmd = [
+        "cargo",
+        "run",
+        "--quiet",
+        "--manifest-path",
+        str(ROOT / "dream_kernel" / "Cargo.toml"),
+        "--",
+        "arc-grid-scout",
+        "--grid",
+        str(grid_path),
+        "--summary-out",
+        str(summary_path),
+        "--state-id",
+        state_id,
+        "--game",
+        selected_game["name"],
+        "--grid-sha256",
+        str(world_state["grid_stats"]["grid_sha256"]),
+        "--actions",
+        actions,
+        "--max-steps",
+        str(int(getattr(args, "internal_rollout_max_steps", 32))),
+    ]
+    if getattr(args, "arc_grid_agent_label", None) is not None:
+        cmd.extend(["--agent-label", str(int(args.arc_grid_agent_label))])
+    if getattr(args, "arc_grid_goal_label", None) is not None:
+        cmd.extend(["--goal-label", str(int(args.arc_grid_goal_label))])
+    if getattr(args, "arc_grid_wall_labels", None):
+        cmd.extend(["--wall-labels", str(args.arc_grid_wall_labels)])
+    if getattr(args, "arc_grid_hazard_labels", None):
+        cmd.extend(["--hazard-labels", str(args.arc_grid_hazard_labels)])
+
+    completed = subprocess.run(
+        cmd,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=int(getattr(args, "internal_rollout_kernel_timeout", 30)),
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "dream-kernel arc-grid-scout failed "
+            f"with code {completed.returncode}: {completed.stderr.strip() or completed.stdout.strip()}"
+        )
+    return json.loads(summary_path.read_text(encoding="utf-8"))
+
+
+def normalize_kernel_candidate_rollouts(
+    *,
+    kernel_summary: dict[str, Any],
+    candidate_packets: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    by_value = {
+        int(row["action_value"]): row
+        for row in kernel_summary.get("candidate_rollouts", [])
+        if isinstance(row, dict) and isinstance(row.get("action_value"), int)
+    }
+    normalized = []
+    for packet in candidate_packets:
+        action_value = int(packet["action_value"])
+        row = dict(by_value.get(action_value, {}))
+        prediction_supported = row.get("prediction_supported") is True
+        normalized.append(
+            {
+                "action_name": packet["action_name"],
+                "action_value": action_value,
+                "action_data": None,
+                "action_id": row.get("action_id"),
+                "kernel_supported": row.get("kernel_supported") is True,
+                "prediction_supported": prediction_supported,
+                "predicted_next_frame_sha256": row.get("predicted_next_frame_sha256"),
+                "predicted_next_state": row.get("predicted_next_state", "UNKNOWN"),
+                "predicted_level_delta": row.get("predicted_level_delta"),
+                "predicted_solved": row.get("predicted_solved") is True,
+                "predicted_solved_by_plan": row.get("predicted_solved_by_plan") is True,
+                "rollout_steps": int(row.get("rollout_steps", 0) or 0),
+                "rollout_reason": row.get("rollout_reason", kernel_summary.get("support_reason")),
+                "one_step_accepted": row.get("one_step_accepted"),
+                "one_step_reward": row.get("one_step_reward"),
+                "on_planned_solution_prefix": row.get("on_planned_solution_prefix") is True,
+            }
+        )
+    return normalized
+
+
 def build_branch_simulation_artifact(
     *,
     args: argparse.Namespace,
@@ -538,6 +764,8 @@ def build_branch_simulation_artifact(
     game_knowledge_ref: dict[str, str],
     mlp_consultation_ref: dict[str, str],
     mlp_consultation: dict[str, Any],
+    internal_forward_rollout_ref: dict[str, str],
+    internal_forward_rollout: dict[str, Any],
 ) -> dict[str, Any]:
     branches = []
     frame_sha = str(world_state["frame"].get("latest_frame_sha256") or state_id)
@@ -548,13 +776,31 @@ def build_branch_simulation_artifact(
         for row in mlp_consultation.get("candidate_priors", [])
         if isinstance(row, dict) and "action_value" in row
     }
+    rollouts_by_action = {
+        int(row["action_value"]): row
+        for row in internal_forward_rollout.get("candidate_rollouts", [])
+        if isinstance(row, dict) and "action_value" in row
+    }
+    preferred_action_value = internal_forward_rollout.get("preferred_action_value")
+    solves_before_first_step = internal_forward_rollout.get("solves_before_first_step") is True
     for index, packet in enumerate(candidate_packets):
         action_val = int(packet["action_value"])
         mlp_prior = float(priors_by_action.get(action_val, {}).get("mlp_prior", 0.0))
+        rollout = rollouts_by_action.get(action_val, {})
         action_hash = stable_unit_float(f"{frame_sha}:{action_val}:branch")
         rank_prior = 1.0 - (index / max(len(candidate_packets), 1))
         structure_prior = min(1.0, (anchor_count + ray_count / 8.0) / max(world_state["grid_stats"]["cell_total"], 1))
-        score = round(0.40 * mlp_prior + 0.25 * action_hash + 0.25 * rank_prior + 0.10 * structure_prior, 6)
+        solve_plan_prior = 1.0 if solves_before_first_step and action_val == preferred_action_value else 0.0
+        transition_prior = 1.0 if rollout.get("prediction_supported") is True else 0.0
+        score = round(
+            0.34 * mlp_prior
+            + 0.20 * action_hash
+            + 0.18 * rank_prior
+            + 0.08 * structure_prior
+            + 0.10 * transition_prior
+            + 1.50 * solve_plan_prior,
+            6,
+        )
         branches.append(
             {
                 "branch_id": f"{state_id}:action:{action_val}",
@@ -569,14 +815,27 @@ def build_branch_simulation_artifact(
                     "stable_action_context": round(action_hash, 6),
                     "candidate_rank_prior": round(rank_prior, 6),
                     "world_structure_prior": round(structure_prior, 6),
+                    "internal_forward_transition_prior": round(transition_prior, 6),
+                    "internal_solve_plan_prior": round(solve_plan_prior, 6),
                 },
                 "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
                 "chronometric_game_knowledge_sha256": game_knowledge_ref["sha256"],
                 "mlp_consultation_artifact": mlp_consultation_ref["artifact"],
                 "mlp_consultation_sha256": mlp_consultation_ref["sha256"],
+                "internal_forward_rollout_artifact": internal_forward_rollout_ref["artifact"],
+                "internal_forward_rollout_sha256": internal_forward_rollout_ref["sha256"],
                 "prediction": {
                     "imagined_signed_y": score,
                     "confidence": round(min(1.0, 0.35 + 0.5 * score), 6),
+                    "kernel_supported": rollout.get("kernel_supported") is True,
+                    "prediction_supported": rollout.get("prediction_supported") is True,
+                    "predicted_next_frame_sha256": rollout.get("predicted_next_frame_sha256"),
+                    "predicted_next_state": rollout.get("predicted_next_state", "UNKNOWN"),
+                    "predicted_level_delta": rollout.get("predicted_level_delta"),
+                    "predicted_solved": rollout.get("predicted_solved") is True,
+                    "predicted_solved_by_plan": rollout.get("predicted_solved_by_plan") is True,
+                    "rollout_steps": int(rollout.get("rollout_steps", 0) or 0),
+                    "rollout_reason": rollout.get("rollout_reason"),
                     "observed_after_action": None,
                     "post_action_calibration": False,
                 },
@@ -599,6 +858,11 @@ def build_branch_simulation_artifact(
         "chronometric_game_knowledge_sha256": game_knowledge_ref["sha256"],
         "mlp_consultation_artifact": mlp_consultation_ref["artifact"],
         "mlp_consultation_sha256": mlp_consultation_ref["sha256"],
+        "internal_forward_rollout_artifact": internal_forward_rollout_ref["artifact"],
+        "internal_forward_rollout_sha256": internal_forward_rollout_ref["sha256"],
+        "internal_forward_rollout_kernel_supported": internal_forward_rollout.get("kernel_supported") is True,
+        "solves_before_first_step": solves_before_first_step,
+        "planned_action_values": internal_forward_rollout.get("planned_action_values", []),
         "candidate_count": len(branches),
         "branches": branches,
         "selected_branch_id": branches[0]["branch_id"],
@@ -618,16 +882,29 @@ def build_trust_checks_artifact(
     selected_game: dict[str, Any],
     world_state: dict[str, Any],
     branch_simulation: dict[str, Any],
+    internal_forward_rollout: dict[str, Any],
 ) -> dict[str, Any]:
     perception = world_state["trust_gates"]["map_perception"]
     projection = world_state["trust_gates"]["geometry_projection"]
     branch_count = int(branch_simulation["candidate_count"])
     selected = selected_branch_from(branch_simulation)
+    selected_prediction = selected.get("prediction", {}) if isinstance(selected.get("prediction"), dict) else {}
+    forward_rollout_count = int(internal_forward_rollout.get("candidate_count", 0) or 0)
+    temporal_fields_present = all(
+        key in selected_prediction
+        for key in (
+            "predicted_next_frame_sha256",
+            "predicted_next_state",
+            "predicted_level_delta",
+            "predicted_solved",
+            "rollout_steps",
+        )
+    )
     flags = {
         "map_trusted": perception.get("trusted") is True,
         "geometry_trusted": projection.get("trusted") is True,
         "ray_trusted": perception.get("trusted") is True and int(world_state["ray_map"]["ray_count"]) >= 0,
-        "temporal_trusted": branch_count > 0 and selected.get("prediction", {}).get("observed_after_action") is None,
+        "temporal_trusted": branch_count > 0 and forward_rollout_count == branch_count and temporal_fields_present,
         "branch_selection_trusted": branch_count > 0 and selected.get("selected") is True,
     }
     return {
@@ -641,6 +918,12 @@ def build_trust_checks_artifact(
             "geometry_projection_trusted": projection.get("trusted") is True,
             "ray_map_available": int(world_state["ray_map"]["ray_count"]) >= 0,
             "temporal_branch_simulation_pre_action_only": True,
+            "internal_forward_rollout_available": forward_rollout_count == branch_count,
+            "internal_forward_rollout_kernel_supported": internal_forward_rollout.get("kernel_supported") is True,
+            "internal_forward_rollout_solves_before_first_step": (
+                internal_forward_rollout.get("solves_before_first_step") is True
+            ),
+            "selected_prediction_has_next_state_fields": temporal_fields_present,
             "branch_selection_from_internal_score": selected.get("selected") is True,
         },
         "actuator_steps_executed": 0,
@@ -713,10 +996,13 @@ def build_internal_thinking_lock_artifact(
     selected_branch: dict[str, Any],
     branch_simulation: dict[str, Any],
     branch_simulation_ref: dict[str, str],
+    internal_forward_rollout: dict[str, Any],
+    internal_forward_rollout_ref: dict[str, str],
     ambiguity: dict[str, Any],
     interim_confirmations: list[dict[str, Any]],
 ) -> dict[str, Any]:
     open_questions = ["branch_selection_gap"] if ambiguity["ambiguity_detected"] else []
+    solves_before_first_step = internal_forward_rollout.get("solves_before_first_step") is True
     return {
         "schema": INTERNAL_THINKING_LOCK_SCHEMA,
         "created_at_utc": now_iso(),
@@ -728,12 +1014,21 @@ def build_internal_thinking_lock_artifact(
         "selected_action_name": selected_branch["action_name"],
         "selected_branch_id": selected_branch["branch_id"],
         "selected_action_source": SELECTED_ACTION_SOURCE,
+        "internal_forward_rollout_artifact": internal_forward_rollout_ref["artifact"],
+        "internal_forward_rollout_sha256": internal_forward_rollout_ref["sha256"],
+        "kernel_supported": internal_forward_rollout.get("kernel_supported") is True,
+        "solves_before_first_step": solves_before_first_step,
+        "planned_action_values": internal_forward_rollout.get("planned_action_values", []),
         "branch_simulation_artifact": branch_simulation_ref["artifact"],
         "branch_simulation_sha256": branch_simulation_ref["sha256"],
         "ambiguity_detected": ambiguity["ambiguity_detected"],
         "open_question_ids": open_questions,
         "nemo3_interim_confirmations": interim_confirmations,
-        "lock_reason": "internal chronometric branch simulation selected the action before actuator use",
+        "lock_reason": (
+            "internal forward rollout solved before actuator use"
+            if solves_before_first_step
+            else "internal branch simulation selected action, but actuator solve gate remains closed"
+        ),
         "actuator_steps_executed": 0,
         "training_data_promoted": False,
         "arc_solve_claim": False,
@@ -746,6 +1041,7 @@ def build_final_confirmation_artifact(
     state_id: str,
     selected_branch: dict[str, Any],
     branch_simulation: dict[str, Any],
+    internal_forward_rollout: dict[str, Any],
     trust_checks: dict[str, Any],
     internal_lock_ref: dict[str, str],
 ) -> dict[str, Any]:
@@ -761,6 +1057,14 @@ def build_final_confirmation_artifact(
             "candidate_count": branch_simulation["candidate_count"],
             "score_surface": branch_simulation["score_surface"],
         },
+        "internal_forward_rollout": {
+            "schema": internal_forward_rollout["schema"],
+            "kernel_surface": internal_forward_rollout["kernel_surface"],
+            "kernel_supported": internal_forward_rollout["kernel_supported"],
+            "solves_before_first_step": internal_forward_rollout["solves_before_first_step"],
+            "preferred_action_value": internal_forward_rollout.get("preferred_action_value"),
+            "planned_action_values": internal_forward_rollout.get("planned_action_values", []),
+        },
         "trust_flags": {
             "map_trusted": trust_checks["map_trusted"],
             "geometry_trusted": trust_checks["geometry_trusted"],
@@ -770,7 +1074,8 @@ def build_final_confirmation_artifact(
         },
         "internal_thinking_lock": internal_lock_ref,
         "instruction": (
-            "Confirm or reject this internally selected action. Do not provide a replacement action. "
+            "Confirm or reject this internally selected action and its internal rollout evidence. "
+            "Do not provide a replacement action. "
             "Return compact JSON with confirms_selected_action, selected_action_value, "
             "nemo_supplied_action=false, and confidence."
         ),
@@ -819,6 +1124,8 @@ def build_model_decision(
     game_knowledge_ref: dict[str, str],
     mlp_consultation: dict[str, Any],
     mlp_consultation_ref: dict[str, str],
+    internal_forward_rollout: dict[str, Any],
+    internal_forward_rollout_ref: dict[str, str],
     internal_lock: dict[str, Any],
     internal_lock_ref: dict[str, str],
     final_confirmation: dict[str, Any],
@@ -875,6 +1182,32 @@ def build_model_decision(
             "online_update_requires_promotion_condition": True,
             "heldout_labels_used": False,
         },
+        "internal_forward_rollout": {
+            "schema": INTERNAL_FORWARD_ROLLOUT_SCHEMA,
+            "artifact": internal_forward_rollout_ref["artifact"],
+            "sha256": internal_forward_rollout_ref["sha256"],
+            "created_before_actuator_step": True,
+            "rollout_surface": internal_forward_rollout["rollout_surface"],
+            "kernel_surface": internal_forward_rollout["kernel_surface"],
+            "kernel_artifact": internal_forward_rollout["kernel_artifact"],
+            "kernel_sha256": internal_forward_rollout["kernel_sha256"],
+            "kernel_supported": internal_forward_rollout["kernel_supported"],
+            "kernel_support_reason": internal_forward_rollout["kernel_support_reason"],
+            "kernel_support_required_for_actuator": True,
+            "solves_before_first_step": internal_forward_rollout["solves_before_first_step"],
+            "preferred_action_value": internal_forward_rollout.get("preferred_action_value"),
+            "planned_action_values": internal_forward_rollout.get("planned_action_values", []),
+            "planned_action_ids": internal_forward_rollout.get("planned_action_ids", []),
+            "planned_rollout_steps": internal_forward_rollout.get("planned_rollout_steps", 0),
+            "planned_sequence_hash": internal_forward_rollout.get("planned_sequence_hash"),
+            "candidate_count": internal_forward_rollout["candidate_count"],
+            "candidate_rollout_refs": internal_forward_rollout["candidate_rollout_refs"],
+            "selected_candidate_prediction": {
+                "action_name": selected_branch["action_name"],
+                "action_value": int(selected_branch["action_value"]),
+                **selected_branch["prediction"],
+            },
+        },
         "internal_thinking_lock": {
             "schema": INTERNAL_THINKING_LOCK_SCHEMA,
             "artifact": internal_lock_ref["artifact"],
@@ -883,6 +1216,9 @@ def build_model_decision(
             "drives_selected_action": True,
             "created_before_actuator_step": True,
             "selected_action_value": int(selected_branch["action_value"]),
+            "kernel_supported": internal_lock["kernel_supported"],
+            "solves_before_first_step": internal_lock["solves_before_first_step"],
+            "planned_action_values": internal_lock["planned_action_values"],
             "ambiguity_detected": internal_lock["ambiguity_detected"],
             "open_question_ids": internal_lock["open_question_ids"],
         },
@@ -981,6 +1317,11 @@ def condition_payload(
             "game": args.game,
             "max_candidate_actions": args.max_candidate_actions,
             "branch_ambiguity_gap_threshold": args.branch_ambiguity_gap_threshold,
+            "internal_rollout_max_steps": args.internal_rollout_max_steps,
+            "arc_grid_agent_label": args.arc_grid_agent_label,
+            "arc_grid_goal_label": args.arc_grid_goal_label,
+            "arc_grid_wall_labels": args.arc_grid_wall_labels,
+            "arc_grid_hazard_labels": args.arc_grid_hazard_labels,
             "online_submission": False,
             "scorecard_submission": False,
         },
@@ -990,7 +1331,7 @@ def condition_payload(
             None if args.historical_comparator_artifact is None else _repo_rel(args.historical_comparator_artifact)
         ),
         "quantization_policy": "none",
-        "compile_kernel_policy": "not_applicable_python_sdk_reset_only",
+        "compile_kernel_policy": "mandatory_dream_kernel_arc_grid_scout_before_actuator",
         "arc_data_used": True,
         "training_data_promoted": False,
         "arc_solve_claim": False,
@@ -1008,6 +1349,7 @@ def summarize_producer(
     candidate_packets: list[dict[str, Any]],
     model_decision: dict[str, Any],
     world_state: dict[str, Any],
+    internal_forward_rollout: dict[str, Any],
     branch_simulation: dict[str, Any],
     trust_checks: dict[str, Any],
     interim_confirmations: list[dict[str, Any]],
@@ -1036,6 +1378,11 @@ def summarize_producer(
         "mlp_post_action_update_context_count": model_decision["mlp_consultation"][
             "post_action_update_candidate_context_count"
         ],
+        "internal_forward_rollout": model_decision["internal_forward_rollout"]["artifact"],
+        "internal_forward_rollout_sha256": model_decision["internal_forward_rollout"]["sha256"],
+        "internal_forward_rollout_kernel_supported": internal_forward_rollout["kernel_supported"],
+        "internal_forward_rollout_solves_before_first_step": internal_forward_rollout["solves_before_first_step"],
+        "internal_forward_rollout_planned_action_values": internal_forward_rollout["planned_action_values"],
         "branch_simulation_artifact": model_decision["standard_model_flow"]["branch_simulation_artifact"],
         "selected_branch_id": branch_simulation["selected_branch_id"],
         "selected_action": f"{selected['action_name']}:{selected['action_value']}",
@@ -1099,6 +1446,9 @@ def format_results(metrics: dict[str, Any]) -> str:
         f"- MLP consultation: `{metrics['mlp_consultation']}`",
         f"- MLP candidate priors: `{metrics['mlp_candidate_priors']}`",
         f"- MLP post-action update context count: `{metrics['mlp_post_action_update_context_count']}`",
+        f"- internal forward rollout: `{metrics['internal_forward_rollout']}`",
+        f"- dream kernel supported: `{metrics['internal_forward_rollout_kernel_supported']}`",
+        f"- solved before first step: `{metrics['internal_forward_rollout_solves_before_first_step']}`",
         f"- Nemo3 invoked: `{metrics['nemo3_invoked']}`",
         f"- Nemo3 confirmation mode: `{metrics['nemo3_confirmation_mode']}`",
         f"- external Nemo3 model invoked: `{metrics['nemo3_external_model_invoked']}`",
@@ -1186,7 +1536,9 @@ def state_identifier(selected_game: dict[str, Any], reset_obs: Any, frame_summar
     guid = str(getattr(reset_obs, "guid", "") or "")
     frame_sha = str(frame_summary.get("latest_frame_sha256") or "no-frame")
     suffix = guid or frame_sha[:16]
-    return f"{selected_game['name']}:reset:{suffix}"
+    phase = "full_reset" if bool(getattr(reset_obs, "full_reset", False)) else "observation"
+    state = state_name(getattr(reset_obs, "state", None)).lower()
+    return f"{selected_game['name']}:{phase}:{state}:{suffix}"
 
 
 def decision_identifier(run_label: str, state_id: str, action_value: int) -> str:
@@ -1355,6 +1707,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--game", default="ls20")
     parser.add_argument("--max-candidate-actions", type=int, default=8)
     parser.add_argument("--branch-ambiguity-gap-threshold", type=float, default=0.03)
+    parser.add_argument("--internal-rollout-max-steps", type=int, default=32)
+    parser.add_argument("--internal-rollout-kernel-timeout", type=int, default=30)
+    parser.add_argument("--arc-grid-agent-label", type=int, default=None)
+    parser.add_argument("--arc-grid-goal-label", type=int, default=None)
+    parser.add_argument("--arc-grid-wall-labels", default="")
+    parser.add_argument("--arc-grid-hazard-labels", default="")
     parser.add_argument("--nemo-mode", choices=(LOCAL_NEMO_MODE, LIVE_NEMO_MODE), default=LOCAL_NEMO_MODE)
     parser.add_argument("--nemo-relay-url", default=os.environ.get("NEMO_RELAY_URL", "http://127.0.0.1:8000/v1/responses"))
     parser.add_argument("--nemo-model", default=os.environ.get("NEMO_RELAY_MODEL", "nemotron_3_nano_omni"))
@@ -1374,6 +1732,10 @@ def main() -> int:
                 "valid_standard_model_decision": metrics["valid_standard_model_decision"],
                 "model_decision_artifact": metrics["model_decision_artifact"],
                 "selected_action": f"{metrics['selected_action_name']}:{metrics['selected_action_value']}",
+                "internal_forward_rollout_kernel_supported": metrics["internal_forward_rollout_kernel_supported"],
+                "internal_forward_rollout_solves_before_first_step": metrics[
+                    "internal_forward_rollout_solves_before_first_step"
+                ],
                 "nemo3_confirmation_mode": metrics["nemo3_confirmation_mode"],
                 "nemo3_external_model_invoked": metrics["nemo3_external_model_invoked"],
                 "actuator_steps_executed": metrics["actuator_steps_executed"],
