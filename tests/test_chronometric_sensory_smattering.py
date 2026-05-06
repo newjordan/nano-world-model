@@ -45,6 +45,10 @@ def test_sensory_smattering_script_writes_human_eval_artifacts(tmp_path):
     assert metrics["failed_by_reason"]["visual.map"] == 1
     assert metrics["failed_by_reason"]["outcome.outcome_polarity_match"] == 3
     assert len(rows) == 5
+    assert rows[0]["review_assets"]["predicted_grid"][1][1] == 2
+    assert rows[0]["review_assets"]["truth_grid"][1][3] == 3
+    assert rows[0]["review_assets"]["predicted_after_grid"][1][2] == 2
+    assert rows[0]["review_assets"]["actual_after_grid"][1][2] == 2
     assert "v034_case_001_direct_positive" in human_eval
     assert "- human_label:" in human_eval
     assert (out_dir / "RESULTS.md").exists()

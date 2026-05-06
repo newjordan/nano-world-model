@@ -1,0 +1,14 @@
+[package]
+name = "dream_kernel"
+version = "0.1.0"
+edition = "2024"
+description = "Deterministic known-map imagination kernel for internal world-model rollouts."
+license = "MIT"
+
+[lib]
+name = "dream_kernel"
+path = "src/lib.rs"
+
+[[bin]]
+name = "dream-kernel"
+path = "src/main.rs"

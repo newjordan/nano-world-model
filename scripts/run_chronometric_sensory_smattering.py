@@ -74,6 +74,7 @@ def main() -> int:
             "human_notes": None,
         }
         record["case_description"] = case.description
+        record["review_assets"] = _review_assets(case)
         records.append(record)
 
     metrics = _summarize(records)
@@ -232,6 +233,20 @@ def _summarize(records: list[dict[str, Any]]) -> dict[str, Any]:
         "failed_by_reason": failed_by_reason,
         "human_eval_required": True,
     }
+
+
+def _review_assets(case: SmatteringCase) -> dict[str, Any]:
+    return {
+        "schema": "chronometric.grid_review.v001",
+        "predicted_grid": _grid_to_lists(case.predicted_grid),
+        "truth_grid": _grid_to_lists(case.truth_grid),
+        "predicted_after_grid": _grid_to_lists(case.predicted_after_grid),
+        "actual_after_grid": _grid_to_lists(case.actual_after_grid),
+    }
+
+
+def _grid_to_lists(grid: Grid) -> list[list[int]]:
+    return [list(row) for row in grid]
 
 
 def _write_json(path: Path, payload: Any) -> None:

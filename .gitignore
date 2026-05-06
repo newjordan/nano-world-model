@@ -20,6 +20,10 @@ __pycache__/
 *.eggs/
 dist/
 build/
+
+# Rust build artifacts
+target/
+dream_kernel/target/
 .eggs/
 
 # Python testing

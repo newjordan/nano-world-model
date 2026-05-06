@@ -1,0 +1,96 @@
+{
+  "confirmations": {
+    "tick0.move_entity_0_dx0_dy1_dz0": {
+      "branch_id": "tick0.move_entity_0_dx0_dy1_dz0",
+      "created_at": "2026-05-06T16:18:24.008131+00:00",
+      "model": "nemotron_3_nano_omni",
+      "relay_error": null,
+      "relay_ok": true,
+      "relay_url": "http://127.0.0.1:8000/v1/responses",
+      "request_counts": {
+        "branch_potentials": 12,
+        "object_link_hypotheses": 16,
+        "open_questions": 7
+      },
+      "response_text": "{\n  \"branch_id\":\"tick0.move_entity_0_dx0_dy1_dz0\",\n  \"category_revisions\":[\n    {\"object_id\":\"hazard:3:1:0\",\"category_id\":\"map.terminal.negative\",\"revision\":\"keep\"},\n    {\"object_id\":\"goal:4:1:0\",\"category_id\":\"map.terminal.positive\",\"revision\":\"keep\"},\n    {\"object_id\":\"agent\",\"category_id\":\"entity.agent.self\",\"revision\":\"keep\"}\n  ],\n  \"relation_candidates\":[\n    {\"source\":\"goal:4:1:0\",\"target\":\"hazard:3:1:0\",\"relation\":\"coactivation\",\"correlation\":\"negative\",\"confidence\":1.0},\n    {\"source\":\"agent\",\"target\":\"hazard:3:1:0\",\"relation\":\"coactivation\",\"correlation\":\"negative\",\"confidence\":0.94},\n    {\"source\":\"agent\",\"target\":\"goal:4:1:0\",\"relation\":\"coactivation\",\"correlation\":\"positive\",\"confidence\":0.94}\n  ],\n  \"confidence\":0.95,\n  \"evidence_needed\":[\n    \"chronometric Y measurement at (3,1,0)\",\n    \"agent\u2011hazard interaction observation\",\n    \"goal progress tracking\"\n  ],\n  \"action_recommendation\":\"Proceed with move, watch for hazard and goal proximity\"\n}",
+      "schema": "dream_kernel.nemo_branch_confirmation.v001"
+    },
+    "tick1.move_entity_0_dx1_dy0_dz0": {
+      "branch_id": "tick1.move_entity_0_dx1_dy0_dz0",
+      "created_at": "2026-05-06T16:47:00.148391+00:00",
+      "model": "nemotron_3_nano_omni",
+      "relay_error": null,
+      "relay_ok": true,
+      "relay_url": "http://127.0.0.1:8000/v1/responses",
+      "request_counts": {
+        "branch_potentials": 12,
+        "object_link_hypotheses": 16,
+        "open_questions": 5
+      },
+      "response_text": "{\n  \"branch_id\": \"tick1.move_entity_0_dx1_dy0_dz0\",\n  \"category_revisions\": [\n    {\"object_id\":\"hazard:3:1:0\",\"category\":\"map.terminal.negative\",\"revision\":\"keep\"},\n    {\"object_id\":\"goal:4:1:0\",\"category\":\"map.terminal.positive\",\"revision\":\"keep\"},\n    {\"object_id\":\"agent\",\"category\":\"entity.agent.self\",\"revision\":\"keep\"},\n    {\"object_id\":\"wall:2:0:0\",\"category\":\"map.structural.wall\",\"revision\":\"split\"}\n  ],\n  \"relation_candidates\": [\n    {\"source\":\"agent\",\"target\":\"goal:4:1:0\",\"prob\":1.0,\"direction\":\"positive\"},\n    {\"source\":\"agent\",\"target\":\"hazard:3:1:0\",\"prob\":0.68,\"direction\":\"negative\"},\n    {\"source\":\"hazard:3:1:0\",\"target\":\"wall:5:2:0\",\"prob\":0.625,\"direction\":\"negative\"},\n    {\"source\":\"hazard:3:1:0\",\"target\":\"wall:0:2:0\",\"prob\":0.625,\"direction\":\"negative\"},\n    {\"source\":\"goal:4:1:0\",\"target\":\"wall:0:2:0\",\"prob\":0.625,\"direction\":\"negative\"},\n    {\"source\":\"goal:4:1:0\",\"target\":\"wall:2:3:0\",\"prob\":0.625,\"direction\":\"negative\"}\n  ],\n  \"confidence\": 0.68,\n  \"evidence_needed\": [\n    \"chronometer log confirming agent position at (2,2,0) during tick1\",\n    \"environmental hazard activation flag for hazard:3:1:0\",\n    \"wall collision detection for wall:2:0:0\",\n    \"goal level delta measurement for goal:4:1:0\",\n    \"terminal cell status verification for hazard:3:1:0\",\n    \"mirror progress blocker status for walls\"\n  ],\n  \"action_recommendation\": \"Proceed with move, verify hazard clearance and goal proximity, avoid walls\"\n}",
+      "schema": "dream_kernel.nemo_branch_confirmation.v001"
+    },
+    "tick2.move_entity_0_dx1_dy0_dz0": {
+      "branch_id": "tick2.move_entity_0_dx1_dy0_dz0",
+      "created_at": "2026-05-06T16:47:56.323383+00:00",
+      "model": "nemotron_3_nano_omni",
+      "relay_error": null,
+      "relay_ok": true,
+      "relay_url": "http://127.0.0.1:8000/v1/responses",
+      "request_counts": {
+        "branch_potentials": 12,
+        "object_link_hypotheses": 16,
+        "open_questions": 9
+      },
+      "response_text": "{\n  \"branch_id\": \"tick2.move_entity_0_dx1_dy0_dz0\",\n  \"category_revisions\": [\n    \"hazard:3:1:0 \u2013 keep\",\n    \"goal:4:1:0 \u2013 keep\",\n    \"agent \u2013 keep\",\n    \"wall:5:2:0 \u2013 revise\"\n  ],\n  \"relation_candidates\": [\n    \"goal_4_1_0 influences hazard_3_1_0 (negative, 1.0)\",\n    \"agent influences hazard_3_1_0 (negative, 0.92)\",\n    \"agent influences goal_4_1_0 (positive, 0.92)\",\n    \"hazard_3_1_0 influences wall_5_2_0 (negative, 0.63)\",\n    \"hazard_3_1_0 influences wall_0_2_0 (negative, 0.63)\",\n    \"goal_4_1_0 influences wall_5_2_0 (negative, 0.63)\"\n  ],\n  \"confidence\": 0.85,\n  \"evidence_needed\": [\n    \"Observe hazard:3:1:0 activation during movement\",\n    \"Monitor agent position relative to goal:4:1:0\",\n    \"Check agent avoidance of hazard:3:1:0\",\n    \"Verify wall:5:2:0 status\",\n    \"Inspect wall:0:2:0 for changes\",\n    \"Track goal progress level delta\"\n  ],\n  \"action_recommendation\": \"Execute move_entity_0_dx1_dy0_dz0 while monitoring hazard and goal interactions; prioritize avoiding hazard and confirming goal progress.\"\n}",
+      "schema": "dream_kernel.nemo_branch_confirmation.v001"
+    },
+    "tick3.move_entity_0_dx1_dy0_dz0": {
+      "branch_id": "tick3.move_entity_0_dx1_dy0_dz0",
+      "created_at": "2026-05-06T16:48:48.971441+00:00",
+      "model": "nemotron_3_nano_omni",
+      "relay_error": null,
+      "relay_ok": true,
+      "relay_url": "http://127.0.0.1:8000/v1/responses",
+      "request_counts": {
+        "branch_potentials": 12,
+        "object_link_hypotheses": 16,
+        "open_questions": 6
+      },
+      "response_text": "{\n  \"branch_id\": \"tick3.move_entity_0_dx1_dy0_dz0\",\n  \"category_revisions\": [\n    {\"object_id\":\"hazard:3:1:0\",\"action\":\"keep\"},\n    {\"object_id\":\"goal:4:1:0\",\"action\":\"revise\"},\n    {\"object_id\":\"agent\",\"action\":\"split\"}\n  ],\n  \"relation_candidates\": [\n    \"link:tick3.move_entity_0_dx1_dy0_dz0:goal_4_1_0:hazard_3_1_0\",\n    \"link:tick3.move_entity_0_dx1_dy0_dz0:agent:hazard_3_1_0\",\n    \"link:tick3.move_entity_0_dx1_dy0_dz0:agent:goal_4_1_0\",\n    \"link:tick3.move_entity_0_dx1_dy0_dz0:hazard_3_1_0:wall_5_2_0\",\n    \"link:tick3.move_entity_0_dx1_dy0_dz0:hazard_3_1_0:wall_0_2_0\",\n    \"link:tick3.move_entity_0_dx1_dy0_dz0:goal_4_1_0:wall_5_2_0\"\n  ],\n  \"confidence\": 0.7,\n  \"evidence_needed\": [\n    \"chronometric Y at (3,1,0) to confirm hazard.env_failure\",\n    \"goal progress level delta at (4,1,0) to confirm positive influence\",\n    \"agent motion acceptance at (4,2,0) to confirm transition\",\n    \"wall contact detection at (5,2,0) to verify structural blocker\",\n    \"hazard environment failure detection\",\n    \"mirror progress blocker confirmation\"\n  ],\n  \"action_recommendation\": \"Execute move_entity_0_dx1_dy0_dz0 while monitoring hazard and goal relations, and collect the evidence needed to validate the identified links.\"\n}",
+      "schema": "dream_kernel.nemo_branch_confirmation.v001"
+    },
+    "tick4.move_entity_0_dx0_dy-1_dz0": {
+      "branch_id": "tick4.move_entity_0_dx0_dy-1_dz0",
+      "created_at": "2026-05-06T16:49:15.349513+00:00",
+      "model": "nemotron_3_nano_omni",
+      "relay_error": null,
+      "relay_ok": true,
+      "relay_url": "http://127.0.0.1:8000/v1/responses",
+      "request_counts": {
+        "branch_potentials": 13,
+        "object_link_hypotheses": 16,
+        "open_questions": 6
+      },
+      "response_text": "{\n  \"branch_id\": \"tick4.move_entity_0_dx0_dy-1_dz0\",\n  \"category_revisions\": [\n    \"keep hazard:3:1:0\",\n    \"revise goal:4:1:0\",\n    \"split agent branch\",\n    \"retain wall:5:1:0\"\n  ],\n  \"relation_candidates\": [\n    \"coactivation\",\n    \"causal\",\n    \"spatial\",\n    \"temporal\",\n    \"functional\",\n    \"conditional\"\n  ],\n  \"confidence\": 0.83,\n  \"evidence_needed\": [\n    \"direct hazard activation observation\",\n    \"goal progress level change\",\n    \"agent movement confirmation\",\n    \"wall contact detection\",\n    \"chronometric Y measurement\",\n    \"environmental failure signal\"\n  ],\n  \"action_recommendation\": \"Proceed with move, monitor hazard and goal\"\n}",
+      "schema": "dream_kernel.nemo_branch_confirmation.v001"
+    },
+    "tick5.move_entity_0_dx1_dy0_dz0": {
+      "branch_id": "tick5.move_entity_0_dx1_dy0_dz0",
+      "created_at": "2026-05-06T16:50:19.221182+00:00",
+      "model": "nemotron_3_nano_omni",
+      "relay_error": null,
+      "relay_ok": true,
+      "relay_url": "http://127.0.0.1:8000/v1/responses",
+      "request_counts": {
+        "branch_potentials": 12,
+        "object_link_hypotheses": 16,
+        "open_questions": 5
+      },
+      "response_text": "{\n  \"branch_id\": \"tick5.move_entity_0_dx1_dy0_dz0\",\n  \"category_revisions\": [\n    {\"object_id\":\"hazard:3:1:0\",\"decision\":\"keep\"},\n    {\"object_id\":\"goal:4:1:0\",\"decision\":\"keep\"},\n    {\"object_id\":\"agent\",\"decision\":\"keep\"},\n    {\"object_id\":\"wall:5:1:0\",\"decision\":\"keep\"}\n  ],\n  \"relation_candidates\": [\n    {\"link_id\":\"link:tick5_move_entity_0_dx1_dy0_dz0:goal_4_1_0:hazard_3_1_0\",\"probability\":1.0},\n    {\"link_id\":\"link:tick5_move_entity_0_dx1_dy0_dz0:agent:hazard_3_1_0\",\"probability\":0.786184},\n    {\"link_id\":\"link:tick5_move_entity_0_dx1_dy0_dz0:agent:goal_4_1_0\",\"probability\":0.786184},\n    {\"link_id\":\"link:tick5_move_entity_0_dx1_dy0_dz0:hazard_3_1_0:wall_5_1_0\",\"probability\":0.625},\n    {\"link_id\":\"link:tick5_move_entity_0_dx1_dy0_dz0:hazard_3_1_0:wall_4_3_0\",\"probability\":0.625},\n    {\"link_id\":\"link:tick5_move_entity_0_dx1_dy0_dz0:goal_4_1_0:wall_5_1_0\",\"probability\":0.625}\n  ],\n  \"confidence\": 0.85,\n  \"evidence_needed\": [\n    \"Chronometric Y measurement at (3,1,0) for hazard:3:1:0\",\n    \"Level delta observation at goal:4:1:0\",\n    \"Time phase repeat effect at agent (4,1,0)\",\n    \"Ray contact detection at wall:5:1:0\",\n    \"Spatial relation evidence between goal and hazard\",\n    \"Temporal correlation evidence between agent and hazard\"\n  ],\n  \"action_recommendation\": \"Execute move; monitor hazard and goal; no split required.\"\n}",
+      "schema": "dream_kernel.nemo_branch_confirmation.v001"
+    }
+  },
+  "schema": "dream_kernel.nemo_relay_confirmations.v001",
+  "updated_at": "2026-05-06T16:50:19.221182+00:00"
+}
