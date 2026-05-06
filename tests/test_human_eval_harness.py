@@ -4,6 +4,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -54,7 +56,26 @@ def test_harness_loads_legacy_records_and_saves_review_labels(tmp_path):
         json.dumps(
             {
                 "schema": "dream_kernel.sequence.v003",
+                "integrity": {
+                    "sequence_hash": "testhash",
+                    "frame_count": 1,
+                    "invariant_passed": True,
+                    "invariant_errors": [],
+                },
                 "object_registry": [
+                    {
+                        "object_id": "agent",
+                        "kind": "agent",
+                        "category_id": "entity.agent.self",
+                        "category_confidence": 1.0,
+                        "open_tags": ["entity", "self_anchor"],
+                        "hypothesis_refs": ["link:tick0_wait:wall_2_1_0:agent"],
+                        "map_coord": {"x": 1, "y": 1, "z": 0},
+                        "extent": [{"x": 1, "y": 1, "z": 0}],
+                        "source": "sim_state.entity",
+                        "confidence": 1.0,
+                        "dynamic": True,
+                    },
                     {
                         "object_id": "wall:2:1:0",
                         "kind": "wall",
@@ -261,3 +282,58 @@ def test_harness_loads_legacy_records_and_saves_review_labels(tmp_path):
     assert first["state_id"] in markdown
     assert "Looks aligned." in markdown
     assert "start map reads cleanly" in markdown
+
+
+@pytest.mark.parametrize(
+    ("payload", "message"),
+    [
+        ({"schema": "dream_kernel.sequence.v003", "frames": []}, "object_registry"),
+        (
+            {
+                "schema": "dream_kernel.sequence.v003",
+                "integrity": {
+                    "sequence_hash": "testhash",
+                    "frame_count": 1,
+                    "invariant_passed": True,
+                    "invariant_errors": [],
+                },
+                "object_registry": [
+                    {
+                        "object_id": "agent",
+                        "kind": "agent",
+                        "category_id": "entity.agent.self",
+                        "category_confidence": 1.0,
+                        "open_tags": ["self_anchor"],
+                        "map_coord": {"x": 1, "y": 1, "z": 0},
+                        "source": "sim_state.entity",
+                        "confidence": 1.0,
+                        "dynamic": True,
+                    }
+                ],
+                "branch_matrix": [],
+                "branch_potentials": [
+                    {
+                        "potential_id": "bp:bad",
+                        "branch_id": "missing.branch",
+                        "object_id": "agent",
+                        "outcome_probability": 0.5,
+                        "positive_probability": 0.5,
+                        "negative_probability": 0.5,
+                        "uncertainty": 0.0,
+                        "chrono_y_correlation": 0.0,
+                    }
+                ],
+                "object_link_hypotheses": [],
+                "nemo_relay": {},
+                "frames": [{"tick": 1, "rays": [], "chronometric": {}, "outcome": None}],
+            },
+            "missing.branch",
+        ),
+    ],
+)
+def test_harness_rejects_malformed_dream_sequences(tmp_path, payload, message):
+    harness = _load_harness_module()
+    (tmp_path / "dream_sequence.json").write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match=message):
+        harness.load_dream_sequence(tmp_path)

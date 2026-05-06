@@ -1,0 +1,56 @@
+{
+  "applied_records": 0,
+  "by_split": {
+    "dream_kernel_sequence_v003": {
+      "applied_records": 0,
+      "applied_reference_mae": null,
+      "applied_reference_max_abs_diff": null,
+      "applied_target_signed_mae": null,
+      "fallback_records": 0,
+      "records": 6,
+      "unapplied_records": 6
+    }
+  },
+  "condition": {
+    "batch_size": 512,
+    "blend": 0.0,
+    "created_at_utc": "2026-05-06T17:51:02.899082+00:00",
+    "device": "cpu",
+    "fallback_scope": "none",
+    "frames": 4,
+    "git_commit": "f7c19b0041516fccdf54234b4e58fa3298c9aef9",
+    "git_dirty": true,
+    "heldout_labels_used": false,
+    "hidden_size": 32,
+    "input_predictions": null,
+    "input_predictions_sha256": null,
+    "library_scope": "time_phase_translation_stasis_loop",
+    "library_source_field": "target_signed_y",
+    "library_source_split": "not_applicable_dream_kernel_no_library",
+    "manifest": "experiments/2026-05-06_chronometric_planner_branch_score_v030_dream_kernel_bridge/dream_kernel_bridge_manifest.jsonl",
+    "manifest_sha256": "a44c5058c30e59e556216acebc45438de8a93d4e14e25e89ad3c2f3d5fde0572",
+    "min_records": 1,
+    "potential_families": 16,
+    "run_kind": "deterministic_dream_kernel_planner_branch_scoring_smoke",
+    "run_label": "chronometric_planner_branch_score_v030_dream_kernel_bridge",
+    "scorer_impl": "ChronometricContortionLayer.score_branch",
+    "scorer_surface": "score_chronometric_branch_or_score_branch",
+    "script": "scripts/score_chronometric_planner_branches.py",
+    "seed": 20260505,
+    "source_condition_artifact": "experiments/2026-05-06_chronometric_sensory_smattering_v034_human_eval/condition.json",
+    "source_mode": "dream_kernel_sequence_v003",
+    "training_data_promoted": false
+  },
+  "fallback_records": 0,
+  "library_entries": 0,
+  "overall": {
+    "applied_records": 0,
+    "applied_reference_mae": null,
+    "applied_reference_max_abs_diff": null,
+    "applied_target_signed_mae": null,
+    "fallback_records": 0,
+    "records": 6,
+    "unapplied_records": 6
+  },
+  "records": 6
+}

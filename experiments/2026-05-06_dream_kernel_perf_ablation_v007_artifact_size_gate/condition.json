@@ -1,0 +1,33 @@
+{
+  "compile_kernel_policy": "none",
+  "created_at_utc": "2026-05-06T17:52:14.062583+00:00",
+  "dataset_path": "not_applicable_local_dream_sequence_artifact",
+  "git_commit": "f7c19b0041516fccdf54234b4e58fa3298c9aef9",
+  "git_dirty": true,
+  "gpu_count": 0,
+  "historical_comparator": "none_first_dream_kernel_value_ablation",
+  "historical_comparator_artifact": null,
+  "loader_mode": "json_artifact_direct",
+  "loader_settings": {
+    "dream_sequence_schema_required_prefix": "dream_kernel.sequence."
+  },
+  "metric_to_compare": "proxy_rank_preservation_and_value_density",
+  "nemo_confirmations": "experiments/2026-05-06_chronometric_sensory_smattering_v034_human_eval/nemo_relay_confirmations.json",
+  "nemo_confirmations_sha256": "dc414bedbc5fb4552c4a7f1ee1d700b0d0dd96342cd8a17651684ab256399170",
+  "nemo_reviews": "experiments/2026-05-06_chronometric_sensory_smattering_v034_human_eval/nemo_relay_reviews.json",
+  "nemo_reviews_sha256": "6886897b8c6fbc77064d688f92940878f0128a425eb14c7d226726a200051b6b",
+  "quantization_policy": "none",
+  "run_kind": "deterministic_dream_kernel_value_ablation_no_training",
+  "run_label": "dream_kernel_perf_ablation_v007_artifact_size_gate",
+  "run_label_semantics": "new_experiment",
+  "script": "scripts/run_dream_kernel_ablations.py",
+  "script_sha256": "75e0005019da66e492be48178ae613ca95de90d1f59bd961a529d36634c5635d",
+  "seed": "not_applicable_deterministic_artifact_analysis",
+  "sequence": "experiments/2026-05-06_chronometric_sensory_smattering_v034_human_eval/dream_sequence.json",
+  "sequence_sha256": "3f312595416f493e86b56b114470b58ecec10832e7078917df72348c595c19e9",
+  "tokenizer_path": "not_applicable",
+  "training_data_promoted": false,
+  "vocab_size": "not_applicable",
+  "wallclock_budget": "not_applicable_posthoc_local_analysis",
+  "world_size": 1
+}

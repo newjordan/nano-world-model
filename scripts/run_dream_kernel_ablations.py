@@ -8,12 +8,19 @@ import hashlib
 import json
 import math
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from dream_kernel_sequence_validation import require_dream_sequence
+
 DEFAULT_EXPERIMENT = ROOT / "experiments" / "2026-05-06_chronometric_sensory_smattering_v034_human_eval"
 DEFAULT_SEQUENCE = DEFAULT_EXPERIMENT / "dream_sequence.json"
 DEFAULT_CONFIRMATIONS = DEFAULT_EXPERIMENT / "nemo_relay_confirmations.json"
@@ -98,16 +105,27 @@ def _canonical_size(value: Any) -> int:
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
     sequence_path = args.sequence.resolve()
-    confirmations_path = args.confirmations.resolve()
-    reviews_path = args.reviews.resolve()
+    confirmations_path = _resolve_sidecar(
+        args.confirmations,
+        sequence_path,
+        DEFAULT_CONFIRMATIONS,
+        "nemo_relay_confirmations.json",
+    )
+    reviews_path = _resolve_sidecar(
+        args.reviews,
+        sequence_path,
+        DEFAULT_REVIEWS,
+        "nemo_relay_reviews.json",
+    )
     out_dir = args.out_dir.resolve()
-    out_dir.mkdir(parents=True, exist_ok=True)
+    _prepare_out_dir(out_dir)
 
     sequence = _read_json(sequence_path)
     confirmations = _read_optional_json(confirmations_path)
     reviews = _read_optional_json(reviews_path)
     if not isinstance(sequence, dict):
         raise ValueError(f"{sequence_path} must contain a JSON object")
+    require_dream_sequence(sequence, source=_rel(sequence_path))
 
     condition = _condition(args, sequence_path, confirmations_path, reviews_path, out_dir)
     context = _context(sequence, confirmations, reviews)
@@ -131,6 +149,25 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     _write_jsonl(out_dir / "object_value_rows.jsonl", object_rows)
     (out_dir / "RESULTS.md").write_text(_format_results(metrics), encoding="utf-8")
     return metrics
+
+
+def _prepare_out_dir(out_dir: Path) -> None:
+    if out_dir.exists() and any(out_dir.iterdir()):
+        raise FileExistsError(f"refusing to overwrite non-empty experiment directory: {_rel(out_dir)}")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+
+def _resolve_sidecar(
+    requested: Path | None,
+    sequence_path: Path,
+    default_path: Path,
+    filename: str,
+) -> Path:
+    if requested is not None:
+        return requested.resolve()
+    if sequence_path == DEFAULT_SEQUENCE.resolve():
+        return default_path.resolve()
+    return sequence_path.parent / filename
 
 
 def _condition(
@@ -181,7 +218,8 @@ def _context(
     reviews: dict[str, Any] | None,
 ) -> dict[str, Any]:
     branches = list(sequence.get("branch_matrix") or [])
-    frames = {int(frame.get("tick")): frame for frame in sequence.get("frames") or [] if "tick" in frame}
+    frame_rows = list(sequence.get("frames") or [])
+    frames = {int(frame.get("tick")): frame for frame in frame_rows if "tick" in frame}
     registry = {
         str(row.get("object_id")): row
         for row in sequence.get("object_registry") or []
@@ -197,11 +235,23 @@ def _context(
     source_summary = {
         "schema": sequence.get("schema"),
         "sequence_hash": (sequence.get("integrity") or {}).get("sequence_hash"),
-        "frames": len(sequence.get("frames") or []),
+        "sequence_bytes": _canonical_size(sequence),
+        "frames": len(frame_rows),
+        "frame_count": len(frame_rows),
+        "ray_count": sum(len(frame.get("rays") or []) for frame in frame_rows if isinstance(frame, dict)),
+        "potential_datapoint_count": sum(
+            len((frame.get("chronometric") or {}).get("potential_datapoints") or [])
+            for frame in frame_rows
+            if isinstance(frame, dict)
+        ),
         "objects": len(registry),
         "branches": len(branches),
         "branch_potentials": len(sequence.get("branch_potentials") or []),
         "object_link_hypotheses": len(sequence.get("object_link_hypotheses") or []),
+        "object_link_count": len(sequence.get("object_link_hypotheses") or []),
+        "max_object_links_per_branch": _max_object_links_per_branch(sequence.get("object_link_hypotheses") or []),
+        "object_link_bound_per_branch": 24,
+        "object_link_bound_policy": "stable branch-local sort by absolute chrono_y_correlation, retain top 24",
         "nemo_open_questions": len((sequence.get("nemo_relay") or {}).get("open_questions") or []),
         "nemo_confirmations": len(((confirmations or {}).get("confirmations") or {})),
         "nemo_reviews": len(((reviews or {}).get("reviews") or {})),
@@ -218,6 +268,14 @@ def _context(
         "full_scores": full_scores,
         "source_summary": source_summary,
     }
+
+
+def _max_object_links_per_branch(rows: list[dict[str, Any]]) -> int:
+    counts: dict[str, int] = {}
+    for row in rows:
+        branch_id = str(row.get("branch_id") or "")
+        counts[branch_id] = counts.get(branch_id, 0) + 1
+    return max(counts.values(), default=0)
 
 
 def _is_critical_object(row: dict[str, Any]) -> bool:
@@ -521,10 +579,24 @@ def _compression_summary(layer_rows: list[dict[str, Any]], object_rows: list[dic
         for row in value_layers
         if float(row["proxy_value_score"]) >= 0.80
     ]
+    high_value_layer_evidence = [
+        {
+            "layer": row["layer"],
+            "proxy_value_score": row["proxy_value_score"],
+            "spearman_to_full": row.get("spearman_to_full"),
+            "sign_accuracy": row.get("sign_accuracy"),
+            "top_branch_match": row.get("top_branch_match"),
+            "critical_object_coverage": row.get("critical_object_coverage"),
+            "terminal_branch_coverage": row.get("terminal_branch_coverage"),
+        }
+        for row in value_layers
+        if row["layer"] in high_value_layers
+    ]
     candidate_objects = [row["object_id"] for row in object_rows if row["compression_candidate"]]
     return {
         "median_layer_value_density_per_kb": median_density,
         "high_value_layers": high_value_layers,
+        "high_value_layer_evidence": high_value_layer_evidence,
         "low_density_layers_for_sparse_or_gated_attention": low_density_layers,
         "object_compression_candidates": candidate_objects,
         "recommended_policy": (
@@ -812,6 +884,7 @@ def _format_results(metrics: dict[str, Any]) -> str:
         f"- run label semantics: `{condition['run_label_semantics']}`",
         f"- git commit: `{condition['git_commit']}`",
         f"- git dirty at run: `{condition['git_dirty']}`",
+        f"- training_data_promoted: `{condition['training_data_promoted']}`",
         f"- script: `{condition['script']}`",
         f"- sequence: `{condition['sequence']}`",
         f"- sequence sha256: `{condition['sequence_sha256']}`",
@@ -821,11 +894,16 @@ def _format_results(metrics: dict[str, Any]) -> str:
         "",
         f"- schema: `{source['schema']}`",
         f"- sequence hash: `{source['sequence_hash']}`",
+        f"- sequence bytes: `{source['sequence_bytes']}`",
         f"- frames: `{source['frames']}`",
+        f"- ray count: `{source['ray_count']}`",
+        f"- potential datapoints: `{source['potential_datapoint_count']}`",
         f"- objects: `{source['objects']}`",
         f"- branches: `{source['branches']}`",
         f"- branch potentials: `{source['branch_potentials']}`",
         f"- object links: `{source['object_link_hypotheses']}`",
+        f"- max object links per branch: `{source['max_object_links_per_branch']}` of bound `{source['object_link_bound_per_branch']}`",
+        f"- object-link bound policy: {source['object_link_bound_policy']}",
         f"- Nemo open questions: `{source['nemo_open_questions']}`",
         f"- Nemo confirmations: `{source['nemo_confirmations']}`",
         f"- Nemo reviews: `{source['nemo_reviews']}`",
@@ -882,6 +960,25 @@ def _format_results(metrics: dict[str, Any]) -> str:
             f"- object compression candidates: `{compression['object_compression_candidates']}`",
             f"- recommended policy: {compression['recommended_policy']}",
             "",
+            "### High-Value Evidence",
+            "",
+        ]
+    )
+    for row in compression["high_value_layer_evidence"]:
+        lines.append(
+            "- `{layer}`: value `{value}`, spearman `{spearman}`, sign `{sign}`, top match `{top}`, critical coverage `{critical}`, terminal coverage `{terminal}`".format(
+                layer=row["layer"],
+                value=_fmt(row.get("proxy_value_score")),
+                spearman=_fmt(row.get("spearman_to_full")),
+                sign=_fmt(row.get("sign_accuracy")),
+                top=row.get("top_branch_match"),
+                critical=_fmt(row.get("critical_object_coverage")),
+                terminal=_fmt(row.get("terminal_branch_coverage")),
+            )
+        )
+    lines.extend(
+        [
+            "",
             "## Interpretation",
             "",
             "- This is a proxy analysis against the deterministic full branch score, not ground-truth human preference.",
@@ -904,8 +1001,8 @@ def _fmt(value: Any) -> str:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sequence", type=Path, default=DEFAULT_SEQUENCE)
-    parser.add_argument("--confirmations", type=Path, default=DEFAULT_CONFIRMATIONS)
-    parser.add_argument("--reviews", type=Path, default=DEFAULT_REVIEWS)
+    parser.add_argument("--confirmations", type=Path, default=None)
+    parser.add_argument("--reviews", type=Path, default=None)
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     parser.add_argument("--run-label", default="dream_kernel_ablation_v001_value_layers")
     return parser.parse_args()

@@ -58,7 +58,7 @@ def _git_dirty(*, ignored_paths: list[Path] | None = None) -> bool:
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
     out_dir = args.out_dir.resolve()
-    out_dir.mkdir(parents=True, exist_ok=True)
+    _prepare_out_dir(out_dir)
     command = [
         "cargo",
         "run",
@@ -82,6 +82,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     (out_dir / "metrics.json").write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (out_dir / "RESULTS.md").write_text(_format_results(metrics), encoding="utf-8")
     return metrics
+
+
+def _prepare_out_dir(out_dir: Path) -> None:
+    if out_dir.exists() and any(out_dir.iterdir()):
+        raise FileExistsError(f"refusing to overwrite non-empty experiment directory: {_rel(out_dir)}")
+    out_dir.mkdir(parents=True, exist_ok=True)
 
 
 def _condition(args: argparse.Namespace, out_dir: Path, command: list[str]) -> dict[str, Any]:

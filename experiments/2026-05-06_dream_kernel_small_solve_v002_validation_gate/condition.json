@@ -1,0 +1,52 @@
+{
+  "command": [
+    "cargo",
+    "run",
+    "--manifest-path",
+    "/home/frosty40/nano-world-model/dream_kernel/Cargo.toml",
+    "--",
+    "solve-suite",
+    "--out-dir",
+    "/home/frosty40/nano-world-model/experiments/2026-05-06_dream_kernel_small_solve_v002_validation_gate"
+  ],
+  "compile_kernel_policy": "cargo_dev_profile",
+  "created_at_utc": "2026-05-06T17:46:53.997524+00:00",
+  "dataset_path": "not_applicable_hardcoded_dream_kernel_scenarios",
+  "git_commit": "f7c19b0041516fccdf54234b4e58fa3298c9aef9",
+  "git_dirty": true,
+  "gpu_count": 0,
+  "historical_comparator": "none_first_small_solve_suite",
+  "historical_comparator_artifact": null,
+  "kernel_lib": "dream_kernel/src/lib.rs",
+  "kernel_lib_sha256": "b03952c2045bbe5328ee99f5e61bae3a2370bf2a86cefe9d3c4aa3d247a8eba3",
+  "kernel_main": "dream_kernel/src/main.rs",
+  "kernel_main_sha256": "e476c8faeae74fe6ab6400e371e4abf67b3973f24f8b3ccf0a53db62bc408c57",
+  "kernel_manifest": "dream_kernel/Cargo.toml",
+  "kernel_manifest_sha256": "832318f5c5b0588e672d490acb5116f1d62bbd2648ece0d53e68d5aa1c33bba4",
+  "loader_mode": "rust_hardcoded_scenario_suite",
+  "loader_settings": {
+    "candidate_actions": [
+      "east",
+      "south",
+      "north",
+      "west",
+      "wait"
+    ],
+    "max_ray_range": 16,
+    "ray_directions": "compass_8",
+    "scenario_count": 4
+  },
+  "metric_to_compare": "terminal_goal_pass_rate",
+  "quantization_policy": "none",
+  "run_kind": "deterministic_dream_kernel_small_solve_no_training",
+  "run_label": "dream_kernel_small_solve_v002_validation_gate",
+  "run_label_semantics": "new_experiment",
+  "script": "scripts/run_dream_kernel_small_solve.py",
+  "script_sha256": "10ec126963e98ae7739f96cfb89d9d1fb7a0982b4c5a9919c3f75758878963e9",
+  "seed": "not_applicable_deterministic_greedy_planner",
+  "tokenizer_path": "not_applicable",
+  "training_data_promoted": false,
+  "vocab_size": "not_applicable",
+  "wallclock_budget": "not_applicable_local_deterministic_suite",
+  "world_size": 1
+}

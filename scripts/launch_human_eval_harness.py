@@ -19,6 +19,12 @@ from urllib.request import Request, urlopen
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from dream_kernel_sequence_validation import require_dream_sequence
+
 DEFAULT_EXPERIMENT = ROOT / "experiments" / "2026-05-06_chronometric_sensory_smattering_v034_human_eval"
 LABEL_SCHEMA = "chronometric.human_eval_labels.v001"
 LABEL_FILE = "human_labels.json"
@@ -142,6 +148,7 @@ def load_dream_sequence(experiment_dir: Path) -> dict[str, Any] | None:
     frames = payload.get("frames")
     if not isinstance(frames, list):
         raise ValueError(f"{path} must contain a frames list")
+    require_dream_sequence(payload, source=str(path))
     return payload
 
 

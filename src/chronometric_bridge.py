@@ -302,6 +302,120 @@ def bridge_record_from_arc_transition(
     return record
 
 
+def bridge_records_from_dream_sequence(
+    sequence: dict[str, Any],
+    *,
+    source_repo: str,
+    source_commit: str,
+    source_artifact_path: str,
+    source_condition_artifact: str,
+    quarantine_status: str = "quarantine: dream_kernel_deterministic_no_training",
+    split: str = "dream_kernel_sequence_v003",
+    transform_version: str = "dream_kernel_sequence_to_chronometric_bridge_v001",
+) -> list[dict[str, Any]]:
+    """Convert Dream Kernel branch rows into chronometric bridge records.
+
+    The output is a deterministic bridge diagnostic, not ARC solve evidence and
+    not training data promotion. Branch IDs and Dream Kernel source hashes are
+    preserved so downstream consumers can keep this split separate.
+    """
+    frames = {
+        int(frame.get("tick")): frame
+        for frame in sequence.get("frames") or []
+        if isinstance(frame, dict) and isinstance(frame.get("tick"), int)
+    }
+    first_render = next(
+        (frame.get("render_top_down") for frame in sequence.get("frames") or [] if isinstance(frame, dict)),
+        [],
+    )
+    height = len(first_render) if isinstance(first_render, list) else 0
+    width = max((len(str(row)) for row in first_render), default=0) if isinstance(first_render, list) else 0
+    sequence_hash = (sequence.get("integrity") or {}).get("sequence_hash")
+    records: list[dict[str, Any]] = []
+    for branch in sequence.get("branch_matrix") or []:
+        if not isinstance(branch, dict):
+            continue
+        end_tick = int(branch.get("end_tick") or 0)
+        frame = frames.get(end_tick, {})
+        chronometric = frame.get("chronometric") if isinstance(frame, dict) else {}
+        if not isinstance(chronometric, dict):
+            chronometric = {}
+        outcome = frame.get("outcome") if isinstance(frame, dict) else {}
+        if not isinstance(outcome, dict):
+            outcome = {}
+        branch_id = str(branch.get("branch_id") or f"dream_branch_{len(records)}")
+        signed_outcome_y = _number_or_default(chronometric.get("signed_outcome_y"), branch.get("chrono_y_net", 0.0))
+        support_count = len(branch.get("supporting_objects") or [])
+        risk_count = len(branch.get("risk_objects") or [])
+        record = {
+            "source_repo": source_repo,
+            "source_commit": source_commit,
+            "source_artifact_path": source_artifact_path,
+            "source_condition_artifact": source_condition_artifact,
+            "quarantine_status": quarantine_status,
+            "split": split,
+            "task_id": f"dream_kernel:{sequence_hash or 'unknown_sequence'}",
+            "attempt_id": branch_id,
+            "branch_id": branch_id,
+            "t": end_tick,
+            "observation_shape": [height, width, 1],
+            "action_id": str(branch.get("action_id") or ""),
+            "action_context": [
+                clamp(float(branch.get("chrono_y_net") or 0.0)),
+                clamp(float(branch.get("chrono_y_min") or 0.0)),
+                clamp(float(branch.get("positive_mass") or 0.0)),
+                clamp(float(branch.get("negative_exposure") or 0.0)),
+                clamp(support_count / 16.0, 0.0, 1.0),
+                clamp(risk_count / 16.0, 0.0, 1.0),
+                1.0 if outcome.get("terminal") else 0.0,
+                clamp(float(outcome.get("reward") or 0.0)),
+            ],
+            "event_mu": _numeric_sequence(chronometric.get("event_mu"), 4),
+            "branch_direction_n": _numeric_sequence(chronometric.get("branch_direction_n"), 4),
+            "potential_family_vector": _numeric_sequence(
+                chronometric.get("potential_family_vector"),
+                len(chronometric.get("potential_family_names") or DEFAULT_POTENTIAL_FAMILY_ORDER),
+            ),
+            "signed_outcome_y": signed_outcome_y,
+            "progress_label": _dream_progress_label(branch, outcome),
+            "control_label": "dream_kernel_deterministic_branch",
+            "chronometric_transform_version": transform_version,
+            "source_schema": sequence.get("schema"),
+            "sequence_hash": sequence_hash,
+            "frame_hash": branch.get("frame_hash"),
+            "potential_family_names": chronometric.get("potential_family_names") or list(DEFAULT_POTENTIAL_FAMILY_ORDER),
+            "target_signed_y": signed_outcome_y,
+            "terminal": bool(outcome.get("terminal")),
+            "reward": outcome.get("reward"),
+            "supporting_objects": branch.get("supporting_objects") or [],
+            "risk_objects": branch.get("risk_objects") or [],
+        }
+        records.append(record)
+    return records
+
+
+def _dream_progress_label(branch: dict[str, Any], outcome: dict[str, Any]) -> str:
+    reward = _number_or_default(outcome.get("reward"), 0.0)
+    if reward > 0:
+        return "dream_kernel_goal_terminal_positive"
+    if reward < 0:
+        return "dream_kernel_hazard_terminal_negative"
+    if _number_or_default(branch.get("positive_mass"), 0.0) > 0:
+        return "dream_kernel_positive_potential"
+    return "dream_kernel_no_terminal_progress"
+
+
+def _number_or_default(value: Any, default: Any) -> float:
+    return float(value) if _is_number(value) else float(default or 0.0)
+
+
+def _numeric_sequence(value: Any, length: int) -> list[float]:
+    if not isinstance(value, list):
+        return [0.0] * max(1, length)
+    out = [float(item) if _is_number(item) else 0.0 for item in value[:length]]
+    return out + [0.0] * max(0, length - len(out))
+
+
 def write_jsonl(path: Path, records: Iterable[dict[str, Any]]) -> None:
     with path.open("w", encoding="utf-8") as handle:
         for record in records:

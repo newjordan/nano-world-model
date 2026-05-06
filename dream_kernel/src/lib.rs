@@ -1174,7 +1174,7 @@ fn category_id_for_cell(cell: CellKind) -> Option<&'static str> {
 fn category_id_for_entity_kind(kind: &EntityKind) -> &'static str {
     match kind {
         EntityKind::Agent => "entity.agent.self",
-        EntityKind::Object => "entity.object.unknown",
+        EntityKind::Object => "object.unknown.open",
     }
 }
 
@@ -1192,7 +1192,7 @@ fn category_id_for_object_id(object_id: &str) -> String {
     } else if object_id.starts_with("max_range:") {
         "synthetic.ray.max_range".to_string()
     } else if object_id.starts_with("object_") {
-        "entity.object.unknown".to_string()
+        "object.unknown.open".to_string()
     } else {
         "object.unknown.open".to_string()
     }
@@ -1379,6 +1379,7 @@ fn sequence_integrity(
     frames: &[DreamFrame],
 ) -> SequenceIntegrity {
     let mut invariant_errors = validate_registry(registry);
+    invariant_errors.extend(validate_branch_matrix(branch_matrix, registry, frames));
     invariant_errors.extend(validate_branch_potentials(
         branch_potentials,
         branch_matrix,
@@ -1386,11 +1387,13 @@ fn sequence_integrity(
     ));
     invariant_errors.extend(validate_object_link_hypotheses(
         object_link_hypotheses,
-        branch_potentials,
+        branch_matrix,
         registry,
     ));
     invariant_errors.extend(validate_nemo_relay(
         nemo_relay,
+        branch_matrix,
+        registry,
         branch_potentials,
         object_link_hypotheses,
     ));
@@ -1443,6 +1446,15 @@ fn validate_registry(registry: &[ObjectRegistryEntry]) -> Vec<String> {
         }
         if entry.category_id.is_empty() {
             errors.push(format!("object {} has empty category_id", entry.object_id));
+        }
+        if entry.kind.is_empty() {
+            errors.push(format!("object {} has empty kind", entry.object_id));
+        }
+        if entry.source.is_empty() {
+            errors.push(format!("object {} has empty source", entry.object_id));
+        }
+        if entry.open_tags.is_empty() {
+            errors.push(format!("object {} has no open_tags", entry.object_id));
         }
         if !ids.insert(entry.object_id.as_str()) {
             errors.push(format!("duplicate object_id {}", entry.object_id));
@@ -1582,6 +1594,71 @@ fn validate_frame(frame: &DreamFrame, registry: &[ObjectRegistryEntry]) -> Vec<S
     errors
 }
 
+fn validate_branch_matrix(
+    branch_matrix: &[BranchSummary],
+    registry: &[ObjectRegistryEntry],
+    frames: &[DreamFrame],
+) -> Vec<String> {
+    let mut errors = Vec::new();
+    let object_ids = registry
+        .iter()
+        .map(|entry| entry.object_id.as_str())
+        .collect::<BTreeSet<_>>();
+    let frame_hash_by_tick = frames
+        .iter()
+        .filter_map(|frame| {
+            frame
+                .integrity
+                .as_ref()
+                .map(|integrity| (frame.tick, integrity.frame_hash.as_str()))
+        })
+        .collect::<BTreeMap<_, _>>();
+    let mut branch_ids = BTreeSet::new();
+    for branch in branch_matrix {
+        if branch.branch_id.is_empty() {
+            errors.push("branch matrix row has empty branch_id".to_string());
+        }
+        if !branch_ids.insert(branch.branch_id.as_str()) {
+            errors.push(format!("duplicate branch_id {}", branch.branch_id));
+        }
+        if branch.action_id.is_empty() {
+            errors.push(format!("branch {} has empty action_id", branch.branch_id));
+        }
+        if branch.end_tick < branch.start_tick {
+            errors.push(format!(
+                "branch {} end_tick before start_tick",
+                branch.branch_id
+            ));
+        }
+        for object_id in branch
+            .supporting_objects
+            .iter()
+            .chain(branch.risk_objects.iter())
+        {
+            if !object_ids.contains(object_id.as_str()) && !is_synthetic_contact_id(object_id) {
+                errors.push(format!(
+                    "branch {} references unknown object {}",
+                    branch.branch_id, object_id
+                ));
+            }
+        }
+        match (&branch.frame_hash, frame_hash_by_tick.get(&branch.end_tick)) {
+            (Some(branch_hash), Some(frame_hash)) if branch_hash != frame_hash => {
+                errors.push(format!(
+                    "branch {} frame_hash does not match end_tick frame",
+                    branch.branch_id
+                ));
+            }
+            (Some(_), None) => errors.push(format!(
+                "branch {} references missing end_tick frame {}",
+                branch.branch_id, branch.end_tick
+            )),
+            _ => {}
+        }
+    }
+    errors
+}
+
 fn validate_branch_potentials(
     branch_potentials: &[BranchPotential],
     branch_matrix: &[BranchSummary],
@@ -1667,13 +1744,13 @@ fn validate_branch_potentials(
 
 fn validate_object_link_hypotheses(
     object_link_hypotheses: &[ObjectLinkHypothesis],
-    branch_potentials: &[BranchPotential],
+    branch_matrix: &[BranchSummary],
     registry: &[ObjectRegistryEntry],
 ) -> Vec<String> {
     let mut errors = Vec::new();
-    let branch_ids = branch_potentials
+    let branch_ids = branch_matrix
         .iter()
-        .map(|potential| potential.branch_id.as_str())
+        .map(|branch| branch.branch_id.as_str())
         .collect::<BTreeSet<_>>();
     let object_ids = registry
         .iter()
@@ -1728,6 +1805,8 @@ fn validate_object_link_hypotheses(
 
 fn validate_nemo_relay(
     nemo_relay: &NemoRelayPacket,
+    branch_matrix: &[BranchSummary],
+    registry: &[ObjectRegistryEntry],
     branch_potentials: &[BranchPotential],
     object_link_hypotheses: &[ObjectLinkHypothesis],
 ) -> Vec<String> {
@@ -1744,6 +1823,14 @@ fn validate_nemo_relay(
     let potential_ids = branch_potentials
         .iter()
         .map(|potential| potential.potential_id.as_str())
+        .collect::<BTreeSet<_>>();
+    let branch_ids = branch_matrix
+        .iter()
+        .map(|branch| branch.branch_id.as_str())
+        .collect::<BTreeSet<_>>();
+    let object_ids = registry
+        .iter()
+        .map(|entry| entry.object_id.as_str())
         .collect::<BTreeSet<_>>();
     let link_ids = object_link_hypotheses
         .iter()
@@ -1770,6 +1857,30 @@ fn validate_nemo_relay(
                 "nemo relay question {} has empty prompt",
                 question.question_id
             ));
+        }
+        if let Some(branch_id) = &question.branch_id {
+            if !branch_ids.contains(branch_id.as_str()) {
+                errors.push(format!(
+                    "nemo relay question {} references unknown branch {}",
+                    question.question_id, branch_id
+                ));
+            }
+        }
+        if let Some(object_id) = &question.object_id {
+            if !object_ids.contains(object_id.as_str()) && !is_synthetic_contact_id(object_id) {
+                errors.push(format!(
+                    "nemo relay question {} references unknown object {}",
+                    question.question_id, object_id
+                ));
+            }
+        }
+        if let Some(link_id) = &question.link_id {
+            if !link_ids.contains(link_id.as_str()) {
+                errors.push(format!(
+                    "nemo relay question {} references unknown link {}",
+                    question.question_id, link_id
+                ));
+            }
         }
         for id in &question.hypothesis_refs {
             if !potential_ids.contains(id.as_str()) && !link_ids.contains(id.as_str()) {
@@ -2791,5 +2902,138 @@ mod tests {
         assert!(json.contains("\"relation_kind\":\"branch.coactivation.open_relation\""));
         assert!(json.contains("\"required_model\":\"nemotron_3_nano_omni\""));
         assert!(json.contains("\"y_chrono\":-1.000000"));
+    }
+
+    #[test]
+    fn sequence_integrity_rejects_unknown_ids_and_bad_probabilities() {
+        let sequence = demo_sequence().unwrap();
+        let mut branch_potentials = sequence.branch_potentials.clone();
+        branch_potentials[0].branch_id = "missing.branch".to_string();
+        branch_potentials[0].outcome_probability = 1.25;
+        let integrity = sequence_integrity(
+            &sequence.object_registry,
+            &sequence.branch_matrix,
+            &branch_potentials,
+            &sequence.object_link_hypotheses,
+            &sequence.nemo_relay,
+            &sequence.frames,
+        );
+
+        assert!(!integrity.invariant_passed);
+        assert!(integrity
+            .invariant_errors
+            .iter()
+            .any(|error| error.contains("references unknown branch missing.branch")));
+        assert!(integrity
+            .invariant_errors
+            .iter()
+            .any(|error| error.contains("outcome_probability out of range")));
+
+        let mut links = sequence.object_link_hypotheses.clone();
+        links[0].source_object_id = "missing_object".to_string();
+        links[0].probability = -0.1;
+        let integrity = sequence_integrity(
+            &sequence.object_registry,
+            &sequence.branch_matrix,
+            &sequence.branch_potentials,
+            &links,
+            &sequence.nemo_relay,
+            &sequence.frames,
+        );
+
+        assert!(!integrity.invariant_passed);
+        assert!(integrity
+            .invariant_errors
+            .iter()
+            .any(|error| error.contains("references unknown object missing_object")));
+        assert!(integrity
+            .invariant_errors
+            .iter()
+            .any(|error| error.contains("probability out of range")));
+
+        let mut nemo = sequence.nemo_relay.clone();
+        nemo.open_questions[0].branch_id = Some("missing.branch".to_string());
+        nemo.open_questions[0].object_id = Some("missing_object".to_string());
+        nemo.open_questions[0].link_id = Some("missing_link".to_string());
+        let integrity = sequence_integrity(
+            &sequence.object_registry,
+            &sequence.branch_matrix,
+            &sequence.branch_potentials,
+            &sequence.object_link_hypotheses,
+            &nemo,
+            &sequence.frames,
+        );
+
+        assert!(!integrity.invariant_passed);
+        assert!(integrity
+            .invariant_errors
+            .iter()
+            .any(|error| error.contains("references unknown branch missing.branch")));
+        assert!(integrity
+            .invariant_errors
+            .iter()
+            .any(|error| error.contains("references unknown object missing_object")));
+        assert!(integrity
+            .invariant_errors
+            .iter()
+            .any(|error| error.contains("references unknown link missing_link")));
+    }
+
+    #[test]
+    fn sequence_hash_changes_when_material_rollout_content_changes() {
+        let state = SimState::from_ascii_layer(&["#####", "#A.G#", "#...#", "#####"]).unwrap();
+        let directions = cardinal_directions();
+        let mut direct_kernel = DreamKernel::new(state.clone());
+        let direct = direct_kernel
+            .rollout(
+                &[
+                    Action::move_agent(Coord::new(1, 0, 0)),
+                    Action::move_agent(Coord::new(1, 0, 0)),
+                ],
+                &directions,
+                8,
+                "agent",
+            )
+            .unwrap();
+        let mut delayed_kernel = DreamKernel::new(state);
+        let delayed = delayed_kernel
+            .rollout(
+                &[
+                    Action::move_agent(Coord::new(1, 0, 0)),
+                    Action::Wait,
+                    Action::move_agent(Coord::new(1, 0, 0)),
+                ],
+                &directions,
+                8,
+                "agent",
+            )
+            .unwrap();
+
+        assert_ne!(direct.integrity.sequence_hash, delayed.integrity.sequence_hash);
+    }
+
+    #[test]
+    fn object_registry_requires_provenance_and_keeps_unknown_objects_open() {
+        let state = SimState::from_ascii_layer(&["#####", "#AO.#", "#####"]).unwrap();
+        let kernel = DreamKernel::new(state);
+        let registry = kernel.object_registry();
+
+        for entry in &registry {
+            assert!(!entry.object_id.is_empty());
+            assert!(!entry.kind.is_empty());
+            assert!(!entry.category_id.is_empty());
+            assert!(!entry.open_tags.is_empty());
+            assert!(!entry.source.is_empty());
+            assert!((0.0..=1.0).contains(&entry.confidence));
+            assert!((0.0..=1.0).contains(&entry.category_confidence));
+        }
+
+        let object = registry
+            .iter()
+            .find(|entry| entry.object_id == "object_2_1_0")
+            .unwrap();
+        assert_eq!(object.category_id, "object.unknown.open");
+        assert!(object.open_tags.contains(&"open_world".to_string()));
+        assert_eq!(object.source, "sim_state.entity");
     }
 }
