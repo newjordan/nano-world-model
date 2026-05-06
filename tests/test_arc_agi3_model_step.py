@@ -166,6 +166,7 @@ def test_model_step_trace_row_records_model_decision_not_policy_loop():
 
     assert row["schema"] == module.TRACE_SCHEMA
     assert row["decision_id"] == "decision-001"
+    assert row["source_model_decision_id"] == "decision-001"
     assert row["standard_model_flow"] == list(module.STANDARD_MODEL_FLOW)
     assert row["observation_artifact"] == "artifact://obs"
     assert row["observation_content_match"] is True
@@ -185,6 +186,7 @@ def test_model_step_trace_row_records_model_decision_not_policy_loop():
     assert row["post_action_mlp_update_artifact"] == "artifact://post-action-mlp"
     assert row["post_action_mlp_update_candidate_written"] is True
     assert row["mlp_weights_updated"] is False
+    assert row["chosen_action"] == "ACTION1:1"
     assert row["chosen_action_value"] == 1
     assert row["level_delta"] == 1
     assert row["online_submission"] is False
@@ -195,7 +197,9 @@ def test_model_step_summary_requires_one_model_decision_actuator_step():
     condition = {"selected_game": {"game_id": "ls20-9607627b", "name": "ls20"}}
     row = {
         "chosen_action_name": "ACTION1",
+        "chosen_action": "ACTION1:1",
         "chosen_action_value": 1,
+        "source_model_decision_id": "decision-001",
         "available_action_values": [1, 2, 3, 4],
         "observation_artifact": "artifact://obs",
         "observation_artifact_sha256": "e" * 64,
@@ -236,6 +240,8 @@ def test_model_step_summary_requires_one_model_decision_actuator_step():
     )
 
     assert metrics["valid_standard_model_flow_step"] is True
+    assert metrics["source_model_decision_id"] == "decision-001"
+    assert metrics["chosen_action"] == "ACTION1:1"
     assert metrics["actuator_steps_executed"] == 1
     assert metrics["observation_content_match"] is True
     assert metrics["observation_guid_match"] is False

@@ -136,6 +136,7 @@ def test_model_decision_producer_writes_valid_artifact_chain_without_actuator_st
     assert selected["source"] == module.SELECTED_ACTION_SOURCE
     assert metrics["valid_standard_model_decision"] is True
     assert metrics["actuator_steps_executed"] == 0
+    assert metrics["selected_action"] == f"{selected['action_name']}:{selected['action_value']}"
     assert env.step_called is False
     assert (tmp_path / "observation.json").exists()
     assert (tmp_path / "world_state_3d.json").exists()

@@ -1008,6 +1008,7 @@ def summarize_producer(
         "mlp_candidate_priors": len(model_decision["mlp_consultation"]["candidate_priors"]),
         "branch_simulation_artifact": model_decision["standard_model_flow"]["branch_simulation_artifact"],
         "selected_branch_id": branch_simulation["selected_branch_id"],
+        "selected_action": f"{selected['action_name']}:{selected['action_value']}",
         "selected_action_name": selected["action_name"],
         "selected_action_value": selected["action_value"],
         "selected_action_source": selected["source"],
