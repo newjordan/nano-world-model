@@ -205,6 +205,15 @@ iteration.
   action-embedding context, `ChronometricCalibrationMLP`, branch-library
   fallback, and `NanoWM.score_chronometric_branch` packet before any action can
   be selected.
+- V047: Added the ARC-AGI-3 reset-only ModelDecision producer for `ls20`.
+  Result: `scripts/run_arc_agi3_model_decision_producer.py` reads the real
+  `ls20-9607627b` reset observation, emits observation, 3D/world-state,
+  chronometric game-knowledge, branch-simulation, trust-check,
+  internal-thinking-lock, Nemo3 final-confirmation, and ModelDecision
+  artifacts, validates the decision through `require_standard_model_decision`,
+  and executes `0` actuator steps. The recorded run used explicit
+  `contract-local` Nemo mode, so it is a contract/path proof, not a live
+  external Nemo3 invocation.
 
 ## Active Queue
 
@@ -219,13 +228,12 @@ iteration.
    detector stub that produces the palette-labeled image required by V031.
    Goal: separate image parsing accuracy from geometry/raycast correctness.
 
-4. ARC-AGI-3 ModelDecision producer for `ls20`: route the reset observation
-   through the actual Nemo3/world-model path and write a valid
-   `arc_agi3.model_decision.v001` artifact.
-   Goal: produce 3D/world-state, branch-simulation, trust-check, locked
-   chronometric game-knowledge link, internal-thinking, intermittent Nemo3
-   ambiguity confirmation when needed, final Nemo3 signoff, and selected-action
-   artifacts before any actuator step.
+4. ARC-AGI-3 live Nemo3 confirmation gate for `ls20`: rerun the V047 producer
+   with `--nemo-mode live-relay` against the configured Nemo3 relay and require
+   a valid external final confirmation before any actuator step.
+   Goal: replace the contract-local confirmation with real Nemo3 signoff, then
+   feed the resulting `arc_agi3.model_decision.v001` artifact to the standard
+   one-step actuator runner.
 
 5. Fresh heldout family: build or select the next heldout family beyond
    V015/V016 after the action-candidate manifest is available.

@@ -55,7 +55,14 @@ path and the chronometric calibration/library path at the action boundary: a
 valid ModelDecision must carry a `chronometric.game_knowledge_link.v001` packet
 showing that branch simulation consumed the SwiGLU/action-embedding backbone,
 `ChronometricCalibrationMLP`, branch-library fallback, and
-`NanoWM.score_chronometric_branch` surface.
+`NanoWM.score_chronometric_branch` surface. V047 adds the reset-only producer
+side: the real offline `ls20-9607627b` reset observation now emits the full
+observation -> 3D/world-state -> chronometric game knowledge -> branch
+simulation -> trust checks -> internal-thinking lock -> Nemo3 final
+confirmation -> ModelDecision artifact chain with `0` actuator steps. The
+recorded V047 run used explicit `contract-local` Nemo confirmation, so the next
+readiness gate is a `--nemo-mode live-relay` run before any challenge-step
+claim.
 
 ## Hard Boundaries
 
@@ -89,6 +96,9 @@ showing that branch simulation consumed the SwiGLU/action-embedding backbone,
   internal-thinking lock and before the actuator step. Nemo3 may confirm
   ambiguous internal navigation intermittently, but it is not the selected
   action source.
+- Treat `contract-local` Nemo confirmation as a contract/path smoke only. It
+  can validate artifact shape and ordering, but it is not live external Nemo3
+  signoff for a challenge step.
 - Keep observed outcome values as post-action calibration labels, not as visual
   or temporal sense inputs.
 - Keep imagined outcome values as pre-action simulation outputs that the

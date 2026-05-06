@@ -2,6 +2,63 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V047 ARC-AGI-3 Reset-Only ModelDecision Producer
+
+Artifacts:
+
+- `scripts/run_arc_agi3_model_decision_producer.py`
+- `tests/test_arc_agi3_model_decision_producer.py`
+- `experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/`
+
+Status:
+
+- loaded real offline `ls20-9607627b` from `/home/frosty40/world_model_1`
+- produced `arc_agi3.model_decision.v001`
+- produced observation, 3D/world-state, chronometric game-knowledge,
+  branch-simulation, trust-check, internal-thinking-lock, Nemo3
+  final-confirmation, and ModelDecision artifacts
+- validated the artifact with `require_standard_model_decision`
+- selected action source is `world_model_internal_thinking`
+- executed `0` ARC actuator steps
+- used explicit `contract-local` Nemo confirmation mode
+- did not invoke an external Nemo3 model in this run
+- no online submission, no score claim, no training data promotion
+
+Run metrics:
+
+- selected game: `ls20-9607627b`
+- model decision:
+  `experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/model_decision.json`
+- valid standard ModelDecision: `True`
+- selected action: `ACTION1:1`
+- candidate action packets: `4`
+- object anchors: `4093`
+- rays: `32744`
+- Nemo3 confirmation mode: `contract-local`
+- external Nemo3 model invoked: `False`
+- interim Nemo confirmations: `0`
+- actuator steps executed: `0`
+- `nano-world-model` git dirty at run time: `False`
+- ARC toolkit source repo dirty at run time: `True`
+  (`/home/frosty40/world_model_1` had unrelated untracked experiment logs)
+
+Verification:
+
+- `python -m py_compile scripts/run_arc_agi3_model_decision_producer.py src/arc_agi3_model_flow.py scripts/run_arc_agi3_model_step.py`
+- `python -m pytest tests/test_arc_agi3_model_decision_producer.py tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py`
+- result: `14 passed`
+- `/home/frosty40/world_model_1/.venv/bin/python scripts/run_arc_agi3_model_decision_producer.py --run-label arc_agi3_model_decision_v047_ls20_reset --out-dir experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset --arc-repo /home/frosty40/world_model_1 --environments-dir /home/frosty40/world_model_1/environment_files --source-condition-artifact /home/frosty40/world_model_1/docs/arc-agi-3-env.md --operation-mode OFFLINE --game ls20 --max-candidate-actions 8 --nemo-mode contract-local`
+- result: valid ModelDecision artifact, `0` actuator steps, no online
+  submission, no ARC solve claim
+
+Decision:
+
+V047 closes the missing producer-path gap: a real `ls20` reset observation can
+now be converted into the full standard ModelDecision artifact chain before the
+actuator is touched. This is not yet live external Nemo3 readiness. The next
+gate is the same producer with `--nemo-mode live-relay`; only after that passes
+should the standard one-step actuator runner consume the ModelDecision.
+
 ## V046 ARC-AGI-3 Chronometric Game-Knowledge Link
 
 Artifacts:

@@ -183,6 +183,7 @@ def write_model_decision_artifacts(
         game_knowledge_ref=game_knowledge_ref,
     )
     _write_json(paths["branch_simulation"], branch_simulation)
+    branch_simulation_ref = model_flow_ref(paths["branch_simulation"])
 
     trust_checks = build_trust_checks_artifact(
         state_id=state_id,
@@ -207,6 +208,7 @@ def write_model_decision_artifacts(
         state_id=state_id,
         selected_branch=selected_branch,
         branch_simulation=branch_simulation,
+        branch_simulation_ref=branch_simulation_ref,
         ambiguity=ambiguity,
         interim_confirmations=interim_confirmations,
     )
@@ -229,7 +231,7 @@ def write_model_decision_artifacts(
         "observation_artifact": model_flow_ref(paths["observation"])["artifact"],
         "world_state_3d_artifact": model_flow_ref(paths["world_state_3d"])["artifact"],
         "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
-        "branch_simulation_artifact": model_flow_ref(paths["branch_simulation"])["artifact"],
+        "branch_simulation_artifact": branch_simulation_ref["artifact"],
         "trust_checks_artifact": model_flow_ref(paths["trust_checks"])["artifact"],
         "internal_thinking_artifact": internal_lock_ref["artifact"],
         "nemo3_final_confirmation_artifact": final_ref["artifact"],
@@ -590,6 +592,7 @@ def build_internal_thinking_lock_artifact(
     state_id: str,
     selected_branch: dict[str, Any],
     branch_simulation: dict[str, Any],
+    branch_simulation_ref: dict[str, str],
     ambiguity: dict[str, Any],
     interim_confirmations: list[dict[str, Any]],
 ) -> dict[str, Any]:
@@ -605,7 +608,8 @@ def build_internal_thinking_lock_artifact(
         "selected_action_name": selected_branch["action_name"],
         "selected_branch_id": selected_branch["branch_id"],
         "selected_action_source": SELECTED_ACTION_SOURCE,
-        "branch_simulation_artifact": branch_simulation.get("selected_branch_id"),
+        "branch_simulation_artifact": branch_simulation_ref["artifact"],
+        "branch_simulation_sha256": branch_simulation_ref["sha256"],
         "ambiguity_detected": ambiguity["ambiguity_detected"],
         "open_question_ids": open_questions,
         "nemo3_interim_confirmations": interim_confirmations,
