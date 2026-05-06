@@ -1,0 +1,21 @@
+{
+  "calibration_metrics": "experiments/2026-05-05_chronometric_branch_library_v020_v018_geometry_predictions/metrics.json",
+  "calibration_metrics_sha256": "7fba6982b42593b763e3fdf6ac0528c195aadfced0c2e5c150f2138f0891a919",
+  "created_at_utc": "2026-05-06T02:04:16.064846+00:00",
+  "eval_scope": "posthoc_bucket_analysis",
+  "git_commit": "cdd8c0569887db728f03a17b61764a238ddd6abd",
+  "git_dirty": false,
+  "manifest": "experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl",
+  "manifest_sha256": "c9db243d749dd37cacc1ceb1896f59477ef8bcd014a46f9c1560dd8ebcd2045b",
+  "predictions": "experiments/2026-05-05_chronometric_branch_library_v020_v018_geometry_predictions/predictions.jsonl",
+  "predictions_sha256": "e160211aed7c5cf8ab962fdf7e67f59327c2e170c5c2689102eac99c0dde4bdf",
+  "records": 7732,
+  "run_kind": "diagnostic_analysis_no_training",
+  "run_label": "chronometric_bucket_eval_v020_branch_library_v018_geometry_predictions",
+  "script": "scripts/analyze_chronometric_error_buckets.py",
+  "splits": {
+    "heldout": 400,
+    "train": 7332
+  },
+  "training_data_promoted": false
+}
