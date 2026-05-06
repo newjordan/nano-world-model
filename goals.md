@@ -224,3 +224,17 @@ The remaining top residual is now
 `ACTION5|dominant_group:translation` at signed-Y MAE `0.0751201`. The
 failure rows are mostly missing exact changed-cell prototypes for the heldout
 `g50t` movement pattern, not an ACTION6 time-phase issue.
+
+V023 added an observation-derived fallback for missing translation prototypes:
+
+- fallback scope `dominant_translation_potential` is opt-in and defaults off.
+- when no train library key exists for a dominant translation row, it uses the
+  observed `transition.changed_cells` potential as the signed-Y estimate.
+- V023 adjusted `6072` records, including `15` heldout fallback rows, with no
+  heldout labels.
+- heldout signed-Y MAE improved from V022 `0.0064036` to `0.00214512`.
+- heldout translation MAE reached `0.0`; progress accuracy stayed `1.0`.
+
+The remaining top residual is small and now sits in missing time-phase
+prototype rows, led by `ACTION1|dominant_group:time_phase` at signed-Y MAE
+`0.023844`.

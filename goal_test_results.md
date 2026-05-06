@@ -2,6 +2,62 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V023 Translation Potential Fallback
+
+Artifacts:
+
+- `src/chronometric_branch_library.py`
+- `scripts/apply_chronometric_branch_library.py`
+- `src/models/chronometric_contortion.py`
+- `src/models/nanowm.py`
+- `tests/test_chronometric_branch_library.py`
+- `tests/test_chronometric_contortion.py`
+- `experiments/2026-05-05_chronometric_branch_library_v023_translation_fallback_v018_geometry_predictions/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v023_translation_fallback/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v023_translation_fallback/`
+
+Condition:
+
+- source predictions:
+  `experiments/2026-05-05_chronometric_calibration_v018_geometry_v015_support_v016_holdout_balance_cpu/predictions.jsonl`
+- manifest:
+  `experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl`
+- branch library source split: `train`
+- library scope: `time_phase_translation`
+- fallback scope: `dominant_translation_potential`
+- fallback source field: `potential_family_vector.transition.changed_cells`
+- heldout labels used: `False`
+- training data promoted: `False`
+- clean diagnostic condition: `git_dirty=False`
+
+Verification:
+
+- `python -m pytest tests/test_chronometric_branch_library.py tests/test_chronometric_contortion.py tests/test_chronometric_calibration.py`
+- result: `26 passed`
+- `python -m py_compile src/chronometric_branch_library.py scripts/apply_chronometric_branch_library.py src/models/chronometric_contortion.py src/models/nanowm.py`
+
+Metrics:
+
+- library entries: `120`
+- adjusted records: `6072`
+- fallback records: `15`
+- heldout fallback records: `15`
+- heldout signed-Y MAE: `0.002145120054483414`
+- heldout progress accuracy: `1.0`
+- heldout translation signed-Y MAE: `0.0`
+- heldout time-phase signed-Y MAE: `0.0053871463645588265`
+- top heldout action-control bucket:
+  `ACTION1|dominant_group:time_phase` at signed-Y MAE
+  `0.023844023545583088`
+
+Decision:
+
+V023 validates the first conceptual-library fallback: missing translation
+prototypes can be resolved from observed potential-family context without
+touching heldout labels. The next residual is the same missing-prototype shape
+inside time-phase rows, where the safe observation fields are
+`time_phase.repeated_effect_size` and `transition.changed_cells`.
+
 ## V022 Time-Phase And Translation Branch Library
 
 Artifacts:

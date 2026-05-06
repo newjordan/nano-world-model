@@ -87,13 +87,17 @@ iteration.
   `time_phase_translation` scopes. Result: heldout signed-Y MAE improved from
   V020 `0.0180276` to `0.0064036` with progress accuracy `1.0`; the blocker
   moved to missing exact ACTION5 translation prototypes.
+- V023: Added an opt-in observation-derived translation fallback for missing
+  branch-library prototypes. Result: heldout signed-Y MAE improved to
+  `0.00214512`, translation MAE reached `0.0`, and progress accuracy stayed
+  `1.0`.
 
 ## Active Queue
 
-1. V023: add a safe fallback for missing translation prototypes.
-   Goal: handle heldout ACTION5 translation rows whose changed-cell counts are
-   absent from the train-built library, using observation-derived potential
-   context rather than direct heldout labels.
+1. V024: add a safe fallback for missing time-phase prototypes.
+   Goal: handle heldout time-phase rows whose changed-cell counts are absent
+   from the train-built library, using observed potential-family context rather
+   than direct heldout labels.
 
 2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.
