@@ -15,5 +15,9 @@ var_scale: 1.0
 # Evaluation frequency (evaluate every N iterations)
 eval_every: 1
 
+# Return the lowest-loss sampled sequence by default. Use "mean" only when an
+# experiment explicitly wants the final elite mean for continuous actions.
+return_policy: "best_sample"
+
 # Planner name (for logging)
 name: "CEM"

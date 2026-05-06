@@ -39,6 +39,7 @@ cem:
   sigma_min: 1e-3
   action_low: null
   action_high: null
+  return_policy: best_sample
 
 # Objective (DINO-WM: MSE on last frame)
 objective:

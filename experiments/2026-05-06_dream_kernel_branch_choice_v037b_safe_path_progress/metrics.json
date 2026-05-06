@@ -1,0 +1,118 @@
+{
+  "candidate_summary": {
+    "accepted": 1637,
+    "candidates": 2640,
+    "outcome_reasons": {
+      "blocked by entity": 49,
+      "blocked by wall": 954,
+      "moved into empty": 1013,
+      "moved into goal": 96,
+      "wait": 528
+    },
+    "selected_by_policy": 528,
+    "terminal_positive": 96
+  },
+  "condition": {
+    "arc_solve_claim": false,
+    "compile_kernel_policy": "cargo_dev_profile",
+    "created_at_utc": "2026-05-06T19:29:24.356661+00:00",
+    "dataset_path": "experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair/curriculum_eval_rows.jsonl",
+    "git_commit": "e9d72629452c38ed99bfc5847b11cd05c75eb678",
+    "git_dirty": true,
+    "gpu_count": 0,
+    "historical_comparator": "none_first_dream_kernel_pre_action_branch_choice_smoke",
+    "historical_comparator_artifact": null,
+    "kernel_build_command": [
+      "cargo",
+      "build",
+      "--manifest-path",
+      "/home/frosty40/nano-world-model/dream_kernel/Cargo.toml"
+    ],
+    "loader_mode": "jsonl_arc_dream_eval_rows_with_existing_proxy_maps",
+    "loader_settings": {
+      "candidate_actions": [
+        "east",
+        "south",
+        "north",
+        "west",
+        "wait"
+      ],
+      "max_ray_range": 16,
+      "max_steps": 16,
+      "oracle": "shortest_safe_path_on_trusted_proxy_map"
+    },
+    "metric_to_compare": "pre_action_policy_oracle_match_rate",
+    "oracle_uses_trusted_proxy_map": true,
+    "quantization_policy": "none",
+    "run_kind": "deterministic_dream_kernel_pre_action_branch_choice_smoke",
+    "run_label": "dream_kernel_branch_choice_v037b_safe_path_progress",
+    "run_label_semantics": "scout_pre_action_branch_choice_from_v036_proxy_maps",
+    "schema": "dream_kernel.branch_choice_smoke.v001",
+    "script": "scripts/run_dream_kernel_branch_choice_smoke.py",
+    "script_sha256": "582647544f96b553c21a4e61e57e01e0ce2e4e93cbed2c457210fb8b6b4cd2f2",
+    "seed": "not_applicable_deterministic_greedy_planner",
+    "selection_uses_oracle": false,
+    "selection_uses_post_action_labels": false,
+    "source_condition_artifact": "experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair/metrics.json",
+    "source_eval_metric": "proxy_goal_solve_rate_and_planner_integrity_by_tier",
+    "source_eval_metrics": "experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair/metrics.json",
+    "source_eval_metrics_sha256": "87eecec651a60943af704fddd9da1baabc3f7e0e6013a5f8eb64f63dc9507489",
+    "source_eval_rows": "experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair/curriculum_eval_rows.jsonl",
+    "source_eval_rows_sha256": "976d628b9a911938c7484131c1182fb67a345eb08f19fc32cd77fa0682dfa2b7",
+    "source_eval_run_label": "arc_dream_curriculum_eval_v002_branch_value_projection_repair",
+    "tokenizer_path": "not_applicable",
+    "training_data_promoted": false,
+    "vocab_size": "not_applicable",
+    "wallclock_budget": "not_applicable_posthoc_local_replay",
+    "world_size": 1
+  },
+  "decision_summary": {
+    "by_tier": {
+      "t1_local_translation": {
+        "decisions": 72,
+        "policy_oracle_match_rate": 1.0,
+        "value_oracle_match_rate": 1.0
+      },
+      "t2_action_coordinate": {
+        "decisions": 120,
+        "policy_oracle_match_rate": 1.0,
+        "value_oracle_match_rate": 1.0
+      },
+      "t3_object_relative_branching": {
+        "decisions": 120,
+        "policy_oracle_match_rate": 1.0,
+        "value_oracle_match_rate": 1.0
+      },
+      "t4_nonlocal_goal_hazard": {
+        "decisions": 216,
+        "policy_oracle_match_rate": 1.0,
+        "value_oracle_match_rate": 0.9861111111111112
+      }
+    },
+    "decisions": 528,
+    "policy_oracle_match_count": 528,
+    "policy_oracle_match_rate": 1.0,
+    "value_oracle_match_count": 525,
+    "value_oracle_match_rate": 0.9943181818181818
+  },
+  "scenario_summary": {
+    "branch_rank_top_match": 96,
+    "decision_count": 528,
+    "invariant_passed": 96,
+    "scenario_count": 96,
+    "solved": 96,
+    "terminal": 96,
+    "total_steps": 528
+  },
+  "schema": "dream_kernel.branch_choice_smoke.v001",
+  "source_gate_summary": {
+    "branch_rank_top_mismatch": 0,
+    "object_identity_integrity": 96,
+    "passed_proxy_gate": 96,
+    "proxy_goal_unreachable_in_projection": 0,
+    "ray_contacts_have_object_ids": 96,
+    "source_rows": 96,
+    "training_data_promoted": 0
+  },
+  "source_row_count": 96
+}

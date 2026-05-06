@@ -337,7 +337,7 @@ def map_for_tier(tier: int, *, progress: bool, negative: bool, control: str) -> 
         return ["#######", "#A..H.#", "#.##..#", "#...G.#", "#######"]
     if progress and not negative:
         return ["########", "#A..H.G#", "#.####.#", "#......#", "########"]
-    return ["########", "#A.H..G#", "#.####.#", "#..O...#", "########"]
+    return ["########", "#A.H..G#", "#.####.#", "#......#", "#..O...#", "########"]
 
 
 def outcome_class(row: dict[str, Any]) -> str:

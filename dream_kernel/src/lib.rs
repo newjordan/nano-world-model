@@ -1917,6 +1917,7 @@ fn branch_matrix_from_frames(frames: &[DreamFrame]) -> Vec<BranchSummary> {
                     risk_objects.insert(datum.object_id.clone());
                 }
             }
+            let terminal_calibrated_net = calibrated_branch_chrono_y_net(chrono_y_net, outcome);
             Some(BranchSummary {
                 branch_id: outcome.branch_id.clone(),
                 action_id: outcome.action_id.clone(),
@@ -1928,7 +1929,7 @@ fn branch_matrix_from_frames(frames: &[DreamFrame]) -> Vec<BranchSummary> {
                     .iter()
                     .find(|datum| datum.object_id == "agent")
                     .map(|datum| datum.position),
-                chrono_y_net: chrono_y_net.clamp(-1.0, 1.0),
+                chrono_y_net: terminal_calibrated_net,
                 chrono_y_min,
                 positive_mass,
                 negative_exposure,
@@ -1941,6 +1942,16 @@ fn branch_matrix_from_frames(frames: &[DreamFrame]) -> Vec<BranchSummary> {
             })
         })
         .collect()
+}
+
+fn calibrated_branch_chrono_y_net(raw_chrono_y_net: f32, outcome: &StepOutcome) -> f32 {
+    if outcome.terminal && outcome.reward > 0.0 {
+        return 1.0;
+    }
+    if outcome.terminal && outcome.reward < 0.0 {
+        return -1.0;
+    }
+    raw_chrono_y_net.clamp(-1.0, 0.99)
 }
 
 fn branch_potentials_from_frames(
@@ -2801,6 +2812,51 @@ mod tests {
     }
 
     #[test]
+    fn positive_terminal_branch_ranks_above_saturated_nonterminal_progress() {
+        let state = SimState::from_ascii_layer(&["######", "#A#.G#", "#....#", "######"]).unwrap();
+        let mut kernel = DreamKernel::new(state);
+        let sequence = kernel
+            .rollout(
+                &[
+                    Action::move_agent(Coord::new(0, 1, 0)),
+                    Action::move_agent(Coord::new(1, 0, 0)),
+                    Action::move_agent(Coord::new(1, 0, 0)),
+                    Action::move_agent(Coord::new(1, 0, 0)),
+                    Action::move_agent(Coord::new(0, -1, 0)),
+                ],
+                &cardinal_directions(),
+                8,
+                "agent",
+            )
+            .unwrap();
+        let terminal_outcome = sequence
+            .frames
+            .iter()
+            .filter_map(|frame| frame.outcome.as_ref())
+            .find(|outcome| outcome.reward > 0.0)
+            .unwrap();
+        let best_branch = sequence
+            .branch_matrix
+            .iter()
+            .max_by(|left, right| {
+                left.chrono_y_net
+                    .partial_cmp(&right.chrono_y_net)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
+            .unwrap();
+
+        assert_eq!(terminal_outcome.branch_id, best_branch.branch_id);
+        assert_eq!(best_branch.chrono_y_net, 1.0);
+        assert!(
+            sequence
+                .branch_matrix
+                .iter()
+                .filter(|branch| branch.branch_id != terminal_outcome.branch_id)
+                .all(|branch| branch.chrono_y_net < best_branch.chrono_y_net)
+        );
+    }
+
+    #[test]
     fn chronometric_frame_exposes_ray_networks_and_potentials() {
         let sequence = demo_sequence().unwrap();
         let first_frame = sequence.frames.first().unwrap();
@@ -2920,14 +2976,18 @@ mod tests {
         );
 
         assert!(!integrity.invariant_passed);
-        assert!(integrity
-            .invariant_errors
-            .iter()
-            .any(|error| error.contains("references unknown branch missing.branch")));
-        assert!(integrity
-            .invariant_errors
-            .iter()
-            .any(|error| error.contains("outcome_probability out of range")));
+        assert!(
+            integrity
+                .invariant_errors
+                .iter()
+                .any(|error| error.contains("references unknown branch missing.branch"))
+        );
+        assert!(
+            integrity
+                .invariant_errors
+                .iter()
+                .any(|error| error.contains("outcome_probability out of range"))
+        );
 
         let mut links = sequence.object_link_hypotheses.clone();
         links[0].source_object_id = "missing_object".to_string();
@@ -2942,14 +3002,18 @@ mod tests {
         );
 
         assert!(!integrity.invariant_passed);
-        assert!(integrity
-            .invariant_errors
-            .iter()
-            .any(|error| error.contains("references unknown object missing_object")));
-        assert!(integrity
-            .invariant_errors
-            .iter()
-            .any(|error| error.contains("probability out of range")));
+        assert!(
+            integrity
+                .invariant_errors
+                .iter()
+                .any(|error| error.contains("references unknown object missing_object"))
+        );
+        assert!(
+            integrity
+                .invariant_errors
+                .iter()
+                .any(|error| error.contains("probability out of range"))
+        );
 
         let mut nemo = sequence.nemo_relay.clone();
         nemo.open_questions[0].branch_id = Some("missing.branch".to_string());
@@ -2965,18 +3029,24 @@ mod tests {
         );
 
         assert!(!integrity.invariant_passed);
-        assert!(integrity
-            .invariant_errors
-            .iter()
-            .any(|error| error.contains("references unknown branch missing.branch")));
-        assert!(integrity
-            .invariant_errors
-            .iter()
-            .any(|error| error.contains("references unknown object missing_object")));
-        assert!(integrity
-            .invariant_errors
-            .iter()
-            .any(|error| error.contains("references unknown link missing_link")));
+        assert!(
+            integrity
+                .invariant_errors
+                .iter()
+                .any(|error| error.contains("references unknown branch missing.branch"))
+        );
+        assert!(
+            integrity
+                .invariant_errors
+                .iter()
+                .any(|error| error.contains("references unknown object missing_object"))
+        );
+        assert!(
+            integrity
+                .invariant_errors
+                .iter()
+                .any(|error| error.contains("references unknown link missing_link"))
+        );
     }
 
     #[test]
@@ -3009,7 +3079,10 @@ mod tests {
             )
             .unwrap();
 
-        assert_ne!(direct.integrity.sequence_hash, delayed.integrity.sequence_hash);
+        assert_ne!(
+            direct.integrity.sequence_hash,
+            delayed.integrity.sequence_hash
+        );
     }
 
     #[test]

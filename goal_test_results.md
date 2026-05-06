@@ -2,6 +2,614 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V046 ARC-AGI-3 Chronometric Game-Knowledge Link
+
+Artifacts:
+
+- `src/arc_agi3_model_flow.py`
+- `scripts/run_arc_agi3_model_step.py`
+- `tests/test_arc_agi3_model_flow.py`
+- `tests/test_arc_agi3_model_step.py`
+
+Status:
+
+- chronometric game knowledge is now a required ModelDecision component
+- the standard model flow includes `chronometric_game_knowledge` before
+  internal branch simulation
+- requires `chronometric.game_knowledge_link.v001`
+- links the NanoWM action-conditioned transformer/SwiGLU path
+- links action-embedding context into branch scoring
+- links `ChronometricCalibrationMLP+branch_library_fallback`
+- requires `NanoWM.score_chronometric_branch` as the scoring surface
+- requires knowledge domains for `basic_movement`, `known_interactions`, and
+  `branch_value_calibration`
+- requires branch simulation to be driven by this linked knowledge packet
+- requires updates to come from post-action calibration only
+- requires heldout labels to be unused
+- requires online/general-knowledge updates to have an explicit promotion
+  condition
+- no new ARC environment action was executed for this contract change
+
+Verification:
+
+- `python -m py_compile src/arc_agi3_model_flow.py scripts/run_arc_agi3_model_step.py`
+- `python -m pytest tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py`
+- result: `10 passed`
+- `python -m py_compile scripts/run_arc_agi3_model_step.py scripts/run_arc_agi3_closed_loop_smoke.py scripts/run_arc_agi3_io_smoke.py scripts/run_dream_kernel_cem_rollout_smoke.py scripts/run_dream_kernel_branch_choice_smoke.py scripts/build_arc_dream_curriculum.py scripts/run_arc_dream_curriculum_eval.py scripts/build_dream_kernel_branch_rank_goal.py src/arc_agi3_model_flow.py src/planning/cem_planner.py src/experiments/planning_experiment.py`
+- `python -m pytest tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_closed_loop_smoke.py tests/test_arc_agi3_io_smoke.py tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `37 passed`
+- `cargo test --manifest-path dream_kernel/Cargo.toml`
+- result: `11 passed`
+- `git diff --check`
+- result: clean
+
+Decision:
+
+V046 stops treating the NanoWM backbone/action MLP path and the chronometric
+calibration/library path as separate systems at the action boundary. A valid
+ModelDecision must now prove that internal branch simulation consumed a linked
+chronometric game-knowledge packet before internal thinking can lock and before
+Nemo3 can sign off.
+
+## V045 ARC-AGI-3 Nemo Final Confirmation Contract
+
+Artifacts:
+
+- `src/arc_agi3_model_flow.py`
+- `scripts/run_arc_agi3_model_step.py`
+- `tests/test_arc_agi3_model_flow.py`
+- `tests/test_arc_agi3_model_step.py`
+
+Status:
+
+- final Nemo3 confirmation is mandatory for every ModelDecision
+- final confirmation must be created after the internal-thinking lock and
+  before the actuator step
+- selected action must come from `world_model_internal_thinking`
+- Nemo3 must be `confirmation_not_action_source`
+- `decision_delegated_to_nemo` must be `False`
+- final confirmation must set `confirms_selected_action=True`
+- final confirmation must set `nemo_supplied_action=False`
+- final confirmation selected-action value must match the actuator-selected
+  action
+- interim Nemo3 confirmations are mandatory when internal thinking records
+  ambiguity or open questions
+- missing final signoff, Nemo-as-action-source, or missing ambiguity signoff
+  means no ARC actuator step
+- no new ARC environment action was executed for this contract change
+
+Verification:
+
+- `python -m py_compile src/arc_agi3_model_flow.py scripts/run_arc_agi3_model_step.py`
+- `python -m pytest tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py`
+- result: `9 passed`
+- `python -m py_compile scripts/run_arc_agi3_model_step.py scripts/run_arc_agi3_closed_loop_smoke.py scripts/run_arc_agi3_io_smoke.py scripts/run_dream_kernel_cem_rollout_smoke.py scripts/run_dream_kernel_branch_choice_smoke.py scripts/build_arc_dream_curriculum.py scripts/run_arc_dream_curriculum_eval.py scripts/build_dream_kernel_branch_rank_goal.py src/arc_agi3_model_flow.py src/planning/cem_planner.py src/experiments/planning_experiment.py`
+- `python -m pytest tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_closed_loop_smoke.py tests/test_arc_agi3_io_smoke.py tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `36 passed`
+- `cargo test --manifest-path dream_kernel/Cargo.toml`
+- result: `11 passed`
+- `git diff --check`
+- result: clean
+
+Decision:
+
+V045 locks the mental-loop boundary. The world model/internal-thinking process
+chooses the action, not Nemo3. Nemo3 is mandatory as confirmation/signoff at the
+end of internal thinking, and it is also required during internal thinking when
+ambiguity or open questions are recorded. The actuator can only consume a
+ModelDecision after that final signoff artifact is present and bound to the same
+selected action.
+
+## V044 ARC-AGI-3 Internal Thinking Lock
+
+Artifacts:
+
+- `src/arc_agi3_model_flow.py`
+- `scripts/run_arc_agi3_model_step.py`
+- `tests/test_arc_agi3_model_flow.py`
+- `tests/test_arc_agi3_model_step.py`
+
+Status:
+
+- internal model process is a required ModelDecision component
+- requires `arc_agi3.internal_thinking_lock.v001`
+- requires internal-thinking artifact path
+- requires internal-thinking artifact sha256
+- requires `locked=True`
+- requires `drives_selected_action=True`
+- requires `created_before_actuator_step=True`
+- requires lock-selected action value to match actuator-selected action value
+- missing or mismatched internal thinking means no ARC actuator step
+- no new ARC environment action was executed for this contract change
+
+Verification:
+
+- `python -m py_compile src/arc_agi3_model_flow.py scripts/run_arc_agi3_model_step.py`
+- `python -m pytest tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py`
+- result: `7 passed`
+- `python -m py_compile scripts/run_arc_agi3_model_step.py scripts/run_arc_agi3_closed_loop_smoke.py scripts/run_arc_agi3_io_smoke.py scripts/run_dream_kernel_cem_rollout_smoke.py scripts/run_dream_kernel_branch_choice_smoke.py scripts/build_arc_dream_curriculum.py scripts/run_arc_dream_curriculum_eval.py scripts/build_dream_kernel_branch_rank_goal.py src/arc_agi3_model_flow.py src/planning/cem_planner.py src/experiments/planning_experiment.py`
+- `python -m pytest tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_closed_loop_smoke.py tests/test_arc_agi3_io_smoke.py tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `34 passed`
+- `cargo test --manifest-path dream_kernel/Cargo.toml`
+- result: `11 passed`
+- `git diff --check`
+- result: clean
+
+Decision:
+
+V044 turns "internal thinking guides action" into a fail-closed contract. The
+standard ModelDecision is no longer just a bundle of world-state/trust artifacts:
+it must include a locked internal-thinking artifact with a stable hash and an
+explicit selected-action binding. The ARC actuator can only consume the selected
+action after this lock is present and validated.
+
+## V043 ARC-AGI-3 Standard Model-Flow Boundary
+
+Artifacts:
+
+- `src/arc_agi3_model_flow.py`
+- `scripts/run_arc_agi3_model_step.py`
+- `tests/test_arc_agi3_model_flow.py`
+- `tests/test_arc_agi3_model_step.py`
+- `scripts/run_arc_agi3_closed_loop_smoke.py`
+- `tests/test_arc_agi3_closed_loop_smoke.py`
+
+Status:
+
+- actuator and model boundary merged
+- direct multi-step actuator policy route disabled
+- standard execution route:
+  observation -> 3D/world state -> internal branch simulation -> trust checks
+  -> ModelDecision artifact -> actuator step
+- requires `arc_agi3.model_decision.v001`
+- requires Nemo3 confirmation artifact
+- requires 3D/world-state artifact
+- requires branch-simulation artifact
+- requires locked internal-thinking artifact
+- requires trusted map, geometry, ray, temporal, and branch-selection flags
+- executes at most one actuator step per validated ModelDecision
+- no new ARC environment action was executed for this boundary change
+
+Verification:
+
+- `python -m py_compile src/arc_agi3_model_flow.py scripts/run_arc_agi3_model_step.py scripts/run_arc_agi3_closed_loop_smoke.py`
+- `python -m pytest tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_closed_loop_smoke.py`
+- result: `10 passed`
+- `python -m py_compile scripts/run_arc_agi3_model_step.py scripts/run_arc_agi3_closed_loop_smoke.py scripts/run_arc_agi3_io_smoke.py scripts/run_dream_kernel_cem_rollout_smoke.py scripts/run_dream_kernel_branch_choice_smoke.py scripts/build_arc_dream_curriculum.py scripts/run_arc_dream_curriculum_eval.py scripts/build_dream_kernel_branch_rank_goal.py src/arc_agi3_model_flow.py src/planning/cem_planner.py src/experiments/planning_experiment.py`
+- `python -m pytest tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_closed_loop_smoke.py tests/test_arc_agi3_io_smoke.py tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `33 passed`
+- `cargo test --manifest-path dream_kernel/Cargo.toml`
+- result: `11 passed`
+- `git diff --check`
+- result: clean
+
+Decision:
+
+V043 makes the architecture explicit in code: the ARC wrapper is an actuator
+inside the standard Nemo3/world-model flow, not a separate policy surface. The
+new standard runner validates a complete `arc_agi3.model_decision.v001` artifact
+before it can execute one ARC action. The old V042 closed-loop script is
+guarded as actuator-only plumbing and refuses multi-step use. The next real
+work is to produce a valid ModelDecision from the actual 3D/Nemo3 world-model
+path for `ls20`, not to tune any direct environment policy.
+
+## V042 Invalidated ARC-AGI-3 Actuator-Only Smoke
+
+Artifacts:
+
+- `scripts/run_arc_agi3_closed_loop_smoke.py`
+- `tests/test_arc_agi3_closed_loop_smoke.py`
+- `experiments/2026-05-06_arc_agi3_closed_loop_v042_ls20_repeat_capped_cycle/`
+
+Status:
+
+- invalid as model evidence
+- actuator/interface plumbing only
+- Nemo3/world-model flow invoked: `False`
+- 3D grid/geometry invoked: `False`
+- ray gate invoked: `False`
+- temporal branch simulation invoked: `False`
+- ModelDecision artifact produced: `False`
+
+Condition:
+
+- run label: `arc_agi3_closed_loop_v042_ls20_repeat_capped_cycle`
+- source condition:
+  `/home/frosty40/world_model_1/docs/arc-agi-3-env.md`
+- source repo:
+  `/home/frosty40/world_model_1`
+- environments dir:
+  `/home/frosty40/world_model_1/environment_files`
+- operation mode: `OFFLINE`
+- selected game: `ls20-9607627b`
+- toolkit: `arc_agi.Arcade`
+- Python interpreter:
+  `/home/frosty40/world_model_1/.venv/bin/python`
+- policy: `repeat_capped_cycle`
+- max steps: `40`
+- max repeat: `2`
+- standard model flow: `not invoked`
+- GPU count: `0`
+- world size: `1`
+- loader mode: `arc_agi_offline_local_environment_wrapper`
+- metric: `arc_agi3_offline_closed_loop_level_progress_and_trace_validity`
+- historical comparator: `arc_agi3_io_v041_offline_smoke`
+- historical comparator artifact:
+  `experiments/2026-05-06_arc_agi3_io_v041_offline_smoke/metrics.json`
+- online submission: `False`
+- scorecard submission: `False`
+- training data promoted: `False`
+- no ARC solve claim
+- not a model attempt
+- provenance note: recorded condition has `git_dirty=True`; current repo
+  contains the active V036-V042 uncommitted code/artifact lane, and the source
+  repo dirtiness is untracked router-smoke logs/PID files, not inspected source
+  code changes.
+
+Verification:
+
+- `python -m py_compile scripts/run_arc_agi3_closed_loop_smoke.py`
+- `python -m pytest tests/test_arc_agi3_closed_loop_smoke.py`
+- result: `4 passed`
+- `python -m py_compile scripts/run_arc_agi3_closed_loop_smoke.py scripts/run_arc_agi3_io_smoke.py scripts/run_dream_kernel_cem_rollout_smoke.py scripts/run_dream_kernel_branch_choice_smoke.py scripts/build_arc_dream_curriculum.py scripts/run_arc_dream_curriculum_eval.py scripts/build_dream_kernel_branch_rank_goal.py src/planning/cem_planner.py src/experiments/planning_experiment.py`
+- `python -m pytest tests/test_arc_agi3_closed_loop_smoke.py tests/test_arc_agi3_io_smoke.py tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `27 passed`
+- `cargo test --manifest-path dream_kernel/Cargo.toml`
+- result: `11 passed`
+- `git diff --check`
+- result: clean
+- `/home/frosty40/world_model_1/.venv/bin/python scripts/run_arc_agi3_closed_loop_smoke.py --run-label arc_agi3_closed_loop_v042_ls20_repeat_capped_cycle --out-dir experiments/2026-05-06_arc_agi3_closed_loop_v042_ls20_repeat_capped_cycle --arc-repo /home/frosty40/world_model_1 --environments-dir /home/frosty40/world_model_1/environment_files --source-condition-artifact /home/frosty40/world_model_1/docs/arc-agi-3-env.md --operation-mode OFFLINE --game ls20 --max-steps 40 --max-repeat 2 --policy repeat_capped_cycle --historical-comparator arc_agi3_io_v041_offline_smoke --historical-comparator-artifact experiments/2026-05-06_arc_agi3_io_v041_offline_smoke/metrics.json`
+- follow-up code guard: `scripts/run_arc_agi3_closed_loop_smoke.py` now refuses
+  actuator-only execution unless `--allow-actuator-only` is passed, and it
+  rejects `max_steps != 1`. Multi-step ARC runs must enter through the standard
+  Nemo3/world-model flow.
+
+Metrics:
+
+- valid closed-loop smoke: `True`
+- available games: `11`
+- trace rows: `40`
+- candidate action packets: `160`
+- steps executed: `40`
+- frame shapes: `[[64, 64]]`
+- unique frame hashes: `41`
+- changed/no-change steps: `40/0`
+- action count range: `4..4`
+- action counts:
+  `{'ACTION1:1': 10, 'ACTION2:2': 10, 'ACTION3:3': 10, 'ACTION4:4': 10}`
+- states observed: `['NOT_FINISHED']`
+- levels completed: `0 -> 0`
+- max levels completed: `0`
+- win levels: `7`
+- final state: `NOT_FINISHED`
+- local environment win: `False`
+- online submission: `False`
+- ARC solve claim: `False`
+
+Decision:
+
+V042 is invalid as a model test. It records a 40-step actuator trace over the
+official offline `ls20` environment, but it bypassed the standard model flow:
+no Nemo3/world-model call, no 3D grid/geometry, no ray gate, no temporal branch
+simulation, and no ModelDecision artifact. The only valid conclusion is that
+ARC actuator plumbing can step and write traces. This result must not be used
+as ARC-readiness, model-readiness, or policy evidence. Any future non-I/O ARC
+run must enter through the standard model path first:
+observation -> 3D/world state -> internal branch simulation -> trust checks ->
+model decision -> at most one actuator step.
+
+## V041 ARC-AGI-3 Offline I/O Readiness Smoke
+
+Artifacts:
+
+- `scripts/run_arc_agi3_io_smoke.py`
+- `tests/test_arc_agi3_io_smoke.py`
+- `experiments/2026-05-06_arc_agi3_io_v041_offline_smoke/`
+
+Condition:
+
+- run label: `arc_agi3_io_v041_offline_smoke`
+- source condition:
+  `/home/frosty40/world_model_1/docs/arc-agi-3-env.md`
+- source repo:
+  `/home/frosty40/world_model_1`
+- environments dir:
+  `/home/frosty40/world_model_1/environment_files`
+- operation mode: `OFFLINE`
+- selected game: `ls20-9607627b`
+- toolkit: `arc_agi.Arcade`
+- Python interpreter:
+  `/home/frosty40/world_model_1/.venv/bin/python`
+- GPU count: `0`
+- world size: `1`
+- loader mode: `arc_agi_offline_local_environment_wrapper`
+- metric: `arc_agi3_io_validity_and_candidate_action_packet_count`
+- online submission: `False`
+- scorecard submission: `False`
+- training data promoted: `False`
+- no ARC solve claim
+
+Verification:
+
+- `python -m py_compile scripts/run_arc_agi3_io_smoke.py`
+- `python -m pytest tests/test_arc_agi3_io_smoke.py`
+- result: `4 passed`
+- `python -m pytest tests/test_arc_agi3_io_smoke.py tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `23 passed`
+- `cargo test --manifest-path dream_kernel/Cargo.toml`
+- result: `11 passed`
+- `git diff --check`
+- result: clean
+- `/home/frosty40/world_model_1/.venv/bin/python scripts/run_arc_agi3_io_smoke.py --run-label arc_agi3_io_v041_offline_smoke --out-dir experiments/2026-05-06_arc_agi3_io_v041_offline_smoke --arc-repo /home/frosty40/world_model_1 --environments-dir /home/frosty40/world_model_1/environment_files --source-condition-artifact /home/frosty40/world_model_1/docs/arc-agi-3-env.md --operation-mode OFFLINE --game ls20 --step-count 1 --max-candidate-actions 8`
+
+Metrics:
+
+- valid I/O smoke: `True`
+- available games: `11`
+- observation rows: `2`
+- candidate action packets: `8`
+- executed local steps: `1`
+- frame shapes: `[[64, 64]]`
+- action count range: `4..4`
+- states observed: `['NOT_FINISHED']`
+- max levels completed: `0`
+- max win levels: `7`
+- online submission: `False`
+- ARC solve claim: `False`
+
+Decision:
+
+V041 crosses from proxy/curriculum artifacts into the actual ARC-AGI-3
+environment surface. It proves this repo can use the official toolkit shape:
+discover downloaded games, load `ls20`, reset, read `64x64` frames, enumerate
+available actions, emit candidate action packets, and execute one local offline
+step. It is still not a solver and not a score claim. The next useful test is a
+closed-loop local policy run that consumes these packets and chooses actions
+from V040/CEM-compatible state summaries.
+
+## V040 Dream Kernel CEM Default Return Fix
+
+Artifacts:
+
+- `src/planning/cem_planner.py`
+- `src/experiments/planning_experiment.py`
+- `src/configs/planning/base.yaml`
+- `src/configs/planning/planner/cem.yaml`
+- `scripts/run_dream_kernel_cem_rollout_smoke.py`
+- `tests/test_dream_kernel_cem_rollout_smoke.py`
+- `experiments/2026-05-06_dream_kernel_cem_rollout_v040_default_best_sample_fix/`
+
+Condition:
+
+- run label: `dream_kernel_cem_rollout_v040_default_best_sample_fix`
+- source eval:
+  `experiments/2026-05-06_arc_dream_curriculum_eval_v003_safe_path_progress_regate/curriculum_eval_rows.jsonl`
+- historical comparator:
+  `dream_kernel_cem_rollout_v038_complexity_smoke_mean_return`
+- historical comparator artifact:
+  `experiments/2026-05-06_dream_kernel_cem_rollout_v038_complexity_smoke/metrics.json`
+- GPU count: `0`
+- world size: `1`
+- loader mode: `jsonl_arc_dream_eval_rows_with_existing_proxy_maps`
+- planner: `src.planning.cem_planner.CEMPlanner`
+- CEM budget: horizon `16`, samples `128`, topk `16`, opt steps `8`
+- return policy: default `best_sample`
+- metric: `cem_goal_success_rate_and_mean_final_safe_distance`
+- training data promoted: `False`
+- no ARC solve claim
+
+Verification:
+
+- `python -m py_compile src/planning/cem_planner.py src/experiments/planning_experiment.py scripts/run_dream_kernel_cem_rollout_smoke.py`
+- `python -m pytest tests/test_dream_kernel_cem_rollout_smoke.py`
+- result: `4 passed`
+- `python -m pytest tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `19 passed`
+- `cargo test --manifest-path dream_kernel/Cargo.toml`
+- result: `11 passed`
+- `git diff --check`
+- result: clean
+- `python scripts/run_dream_kernel_cem_rollout_smoke.py --run-label dream_kernel_cem_rollout_v040_default_best_sample_fix --out-dir experiments/2026-05-06_dream_kernel_cem_rollout_v040_default_best_sample_fix --num-samples 128 --topk 16 --opt-steps 8 --horizon 16 --eval-every 8 --historical-comparator dream_kernel_cem_rollout_v038_complexity_smoke_mean_return --historical-comparator-artifact experiments/2026-05-06_dream_kernel_cem_rollout_v038_complexity_smoke/metrics.json`
+
+Metrics:
+
+- source passed proxy gate: `96/96`
+- source branch-rank mismatches: `0`
+- source unreachable projections: `0`
+- CEM solved: `96/96`
+- CEM success rate: `1.0`
+- mean final safe path steps: `0.0`
+- mean steps to goal: `7.604166666666667`
+- mean extra steps to goal: `2.1041666666666665`
+- hazard hits: `0`
+- blocked steps: `36`
+
+Decision:
+
+V040 promotes the V039B return-policy fix to the default planner path. The
+planner now returns the lowest-loss sampled sequence by default and keeps the
+old elite mean behavior available through explicit `return_policy: mean`. The
+planning experiment and CEM YAML configs now pass/record the default
+`best_sample` policy, so future rollout runs do not silently reintroduce the
+mean-decoding failure found in V038.
+
+## V039B Dream Kernel CEM Best-Sample Rollout
+
+Artifacts:
+
+- `src/planning/cem_planner.py`
+- `scripts/run_dream_kernel_cem_rollout_smoke.py`
+- `tests/test_dream_kernel_cem_rollout_smoke.py`
+- `experiments/2026-05-06_dream_kernel_cem_rollout_v038_complexity_smoke/`
+- `experiments/2026-05-06_dream_kernel_cem_rollout_v038b_budget_probe/`
+- `experiments/2026-05-06_dream_kernel_cem_rollout_v039_best_sample_base_budget/`
+- `experiments/2026-05-06_dream_kernel_cem_rollout_v039b_best_sample_condition_lock/`
+
+Condition:
+
+- run label: `dream_kernel_cem_rollout_v039b_best_sample_condition_lock`
+- source eval:
+  `experiments/2026-05-06_arc_dream_curriculum_eval_v003_safe_path_progress_regate/curriculum_eval_rows.jsonl`
+- historical comparator:
+  `dream_kernel_cem_rollout_v038_complexity_smoke_mean_return`
+- historical comparator artifact:
+  `experiments/2026-05-06_dream_kernel_cem_rollout_v038_complexity_smoke/metrics.json`
+- GPU count: `0`
+- world size: `1`
+- loader mode: `jsonl_arc_dream_eval_rows_with_existing_proxy_maps`
+- planner: `src.planning.cem_planner.CEMPlanner`
+- world model adapter: `DreamKernelMapWorldModel`
+- CEM budget: horizon `16`, samples `128`, topk `16`, opt steps `8`
+- return policy: `best_sample`
+- metric: `cem_goal_success_rate_and_mean_final_safe_distance`
+- training data promoted: `False`
+- no ARC solve claim
+
+Verification:
+
+- `python -m py_compile scripts/run_dream_kernel_cem_rollout_smoke.py src/planning/cem_planner.py`
+- `python -m pytest tests/test_dream_kernel_cem_rollout_smoke.py`
+- result: `4 passed`
+- `python -m pytest tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `19 passed`
+- `cargo test --manifest-path dream_kernel/Cargo.toml`
+- result: `11 passed`
+- `git diff --check`
+- result: clean
+- `python scripts/run_dream_kernel_cem_rollout_smoke.py --run-label dream_kernel_cem_rollout_v039b_best_sample_condition_lock --out-dir experiments/2026-05-06_dream_kernel_cem_rollout_v039b_best_sample_condition_lock --return-policy best_sample --num-samples 128 --topk 16 --opt-steps 8 --horizon 16 --eval-every 8 --historical-comparator dream_kernel_cem_rollout_v038_complexity_smoke_mean_return --historical-comparator-artifact experiments/2026-05-06_dream_kernel_cem_rollout_v038_complexity_smoke/metrics.json`
+
+Metrics:
+
+- source passed proxy gate: `96/96`
+- source branch-rank mismatches: `0`
+- source unreachable projections: `0`
+- CEM solved: `96/96`
+- CEM success rate: `1.0`
+- mean final safe path steps: `0.0`
+- mean steps to goal: `7.604166666666667`
+- mean extra steps to goal: `2.1041666666666665`
+- hazard hits: `0`
+- blocked steps: `36`
+
+Decision:
+
+V038 turned the saturated Dream Kernel proxy into a real rollout-complexity
+test by routing the same `96/96` source maps through the repository's CEM
+planner. The default mean-return policy solved `94/96`; increasing budget to
+`512/64/12/h18` solved `95/96` but still produced a miss with zero CEM loss,
+which showed that solved elite samples were being averaged into a bad discrete
+decoded plan. V039B keeps the original CEM budget and changes only the return
+policy to `best_sample`; it solves `96/96`. The backend/value surface is still
+clean, and the next real integration risk is trained checkpoint rollout or
+discrete-action return semantics, not projection reachability.
+
+## V037 Dream Kernel Pre-Action Branch Choice
+
+Artifacts:
+
+- `dream_kernel/src/main.rs`
+- `scripts/run_dream_kernel_branch_choice_smoke.py`
+- `tests/test_dream_kernel_branch_choice_smoke.py`
+- `experiments/2026-05-06_dream_kernel_branch_choice_v037_pre_action_oracle/`
+- `experiments/2026-05-06_dream_kernel_branch_choice_v037b_safe_path_progress/`
+- `experiments/2026-05-06_arc_dream_curriculum_eval_v003_safe_path_progress_regate/`
+
+Condition:
+
+- run label: `dream_kernel_branch_choice_v037b_safe_path_progress`
+- source eval:
+  `experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair/curriculum_eval_rows.jsonl`
+- GPU count: `0`
+- world size: `1`
+- loader mode: `jsonl_arc_dream_eval_rows_with_existing_proxy_maps`
+- metric: `pre_action_policy_oracle_match_rate`
+- training data promoted: `False`
+- no ARC solve claim
+
+Verification:
+
+- `cargo test --manifest-path dream_kernel/Cargo.toml`
+- result: `11 passed`
+- `python -m py_compile scripts/run_dream_kernel_branch_choice_smoke.py`
+- `python -m pytest tests/test_dream_kernel_branch_choice_smoke.py`
+- result: `2 passed`
+- `python scripts/run_dream_kernel_branch_choice_smoke.py`
+- first scout result: `529/530` policy/oracle decisions matched
+- `python scripts/run_dream_kernel_branch_choice_smoke.py --run-label dream_kernel_branch_choice_v037b_safe_path_progress --out-dir experiments/2026-05-06_dream_kernel_branch_choice_v037b_safe_path_progress`
+- repaired result: `528/528` policy/oracle decisions matched
+- `python scripts/run_arc_dream_curriculum_eval.py --curriculum experiments/2026-05-06_arc_dream_curriculum_v002_projection_reachability_repair/curriculum_challenges.jsonl --run-label arc_dream_curriculum_eval_v003_safe_path_progress_regate --out-dir experiments/2026-05-06_arc_dream_curriculum_eval_v003_safe_path_progress_regate`
+- re-gate result: `96/96` passed proxy gate
+
+Metrics:
+
+- scenarios solved: `96/96`
+- scenario invariants passed: `96/96`
+- pre-action decisions: `528`
+- policy/oracle match rate: `1.0`
+- value/oracle match rate: `0.9943181818181818`
+- ARC-Dream proxy re-gate planner integrity: `1.0`
+- ARC-Dream proxy re-gate failure reasons: `{'passed_proxy_gate': 96}`
+
+Decision:
+
+V037 exposed one real pre-action inefficiency in the tier-4 repaired map: local
+ray/branch score preferred a longer safe detour over the shortest safe progress
+move. V037B fixed it by adding the already-allowed reachable safe-path progress
+signal to the deterministic policy score. The repaired policy keeps the V036
+branch-rank/projection gate green while making the pre-action branch-choice
+surface match the trusted-map oracle on all decisions.
+
+## V036 Dream Kernel Branch-Rank Zero Gate
+
+Artifacts:
+
+- `dream_kernel/src/lib.rs`
+- `scripts/build_arc_dream_curriculum.py`
+- `tests/test_arc_dream_curriculum.py`
+- `experiments/2026-05-06_arc_dream_curriculum_v002_projection_reachability_repair/`
+- `experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair/`
+- `experiments/2026-05-06_goal_v036_dream_kernel_branch_rank_zero_gate/`
+
+Condition:
+
+- run label: `arc_dream_curriculum_eval_v002_branch_value_projection_repair`
+- source curriculum:
+  `experiments/2026-05-06_arc_dream_curriculum_v002_projection_reachability_repair/curriculum_challenges.jsonl`
+- git dirty: `True`
+- GPU count: `0`
+- world size: `1`
+- training data promoted: `False`
+- no ARC solve claim
+
+Verification:
+
+- `cargo test --manifest-path dream_kernel/Cargo.toml`
+- result: `11 passed`
+- `python -m py_compile scripts/build_arc_dream_curriculum.py scripts/run_arc_dream_curriculum_eval.py scripts/build_dream_kernel_branch_rank_goal.py`
+- `python -m pytest tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `13 passed`
+- `python scripts/build_arc_dream_curriculum.py --run-label arc_dream_curriculum_v002_projection_reachability_repair --out-dir experiments/2026-05-06_arc_dream_curriculum_v002_projection_reachability_repair`
+- `python scripts/run_arc_dream_curriculum_eval.py --curriculum experiments/2026-05-06_arc_dream_curriculum_v002_projection_reachability_repair/curriculum_challenges.jsonl --run-label arc_dream_curriculum_eval_v002_branch_value_projection_repair --out-dir experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair`
+- `python scripts/build_dream_kernel_branch_rank_goal.py --eval-rows experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair/curriculum_eval_rows.jsonl --eval-metrics experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair/metrics.json --run-label goal_v036_dream_kernel_branch_rank_zero_gate --out-dir experiments/2026-05-06_goal_v036_dream_kernel_branch_rank_zero_gate`
+
+Metrics:
+
+- proxy goal solved: `96/96`
+- proxy goal reachable avoiding hazard: `96/96`
+- planner integrity passed: `96/96`
+- branch-rank top-match rate: `1.0`
+- terminal branch rank counts: `{'1': 96}`
+- failure reasons: `{'passed_proxy_gate': 96}`
+- calibration cases remaining: `0`
+
+Decision:
+
+V036 closes the V035 stop rule. Branch value is calibrated so the observed
+terminal-positive branch outranks saturated nonterminal progress branches, and
+the one unreachable tier-4 projection map is repaired by moving the open object
+off the only safe route. Object identity, ray contacts, invariants, quarantine
+status, and no-training-promotion conditions remain part of the same eval gate.
+
 ## V035 Dream Kernel Branch-Rank Calibration Goal
 
 Artifacts:

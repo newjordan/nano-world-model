@@ -84,6 +84,28 @@ def test_arc_dream_curriculum_preserves_quarantine_and_builds_tiers(tmp_path):
     assert "not an ARC solve claim" in (out_dir / "RESULTS.md").read_text(encoding="utf-8")
 
 
+def test_tier4_negative_projection_keeps_object_off_safe_goal_route():
+    module = _load_module()
+    projection = module.dream_projection(
+        _bridge_row(
+            transition_id="hard:negative",
+            split="arc_sprint0_v033_nonlocal_family_v011_heldout",
+            task_id="hard",
+            control_label="terminal_or_failure",
+            action_id="ACTION6",
+            signed_outcome_y=-1.0,
+            changed_cells=400,
+        ),
+        tier=4,
+    )
+    eval_module = _load_eval_module()
+    reachability = eval_module.map_reachability(projection["known_map_ascii"])
+
+    assert reachability["goal_reachable_avoiding_hazard"] is True
+    assert projection["known_map_ascii"][4] == "#..O...#"
+    assert "object_3_4_0" in projection["object_ids_expected"]
+
+
 def _bridge_row(
     *,
     transition_id: str,
@@ -129,3 +151,12 @@ def _bridge_row(
         "frame_hash": "before",
         "next_frame_hash": "after",
     }
+
+
+def _load_eval_module():
+    path = ROOT / "scripts" / "run_arc_dream_curriculum_eval.py"
+    spec = importlib.util.spec_from_file_location("run_arc_dream_curriculum_eval", path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module

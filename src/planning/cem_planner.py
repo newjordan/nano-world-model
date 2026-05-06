@@ -24,6 +24,7 @@ class CEMPlanner:
         sigma_min: float = 1e-3,
         action_low: Optional[float] = None,
         action_high: Optional[float] = None,
+        return_policy: str = "best_sample",
     ):
         """
         Initialize CEM planner.
@@ -40,6 +41,9 @@ class CEMPlanner:
             eval_every: Evaluation frequency
             name: Name for logging
             device: Device to run on
+            return_policy: Which optimized trajectory to return. "best_sample"
+                returns the lowest-loss sampled sequence seen during
+                optimization; "mean" returns the final elite mean.
         """
         self.world_model = world_model
         self.objective_fn = objective_fn
@@ -57,6 +61,9 @@ class CEMPlanner:
         # Optional clip range to keep samples in-distribution.
         self.action_low = action_low
         self.action_high = action_high
+        if return_policy not in {"mean", "best_sample"}:
+            raise ValueError(f"unsupported CEM return_policy: {return_policy}")
+        self.return_policy = return_policy
 
     def init_mu_sigma(self, batch_size: int, actions: Optional[torch.Tensor] = None):
         """
@@ -119,6 +126,8 @@ class CEMPlanner:
         # Initialize action distribution
         mu, sigma = self.init_mu_sigma(batch_size, actions)
         mu, sigma = mu.to(self.device), sigma.to(self.device)
+        best_actions = torch.zeros_like(mu)
+        best_action_loss = torch.full((batch_size,), float("inf"), device=self.device)
 
         losses_history = []
 
@@ -166,7 +175,12 @@ class CEMPlanner:
                 # Select top-k
                 topk_idx = torch.argsort(loss)[:self.topk]
                 topk_actions = action_samples[topk_idx]
-                batch_losses.append(loss[topk_idx[0]].item())
+                best_idx = topk_idx[0]
+                best_loss = loss[best_idx]
+                batch_losses.append(best_loss.item())
+                if best_loss < best_action_loss[b]:
+                    best_action_loss[b] = best_loss
+                    best_actions[b] = action_samples[best_idx]
 
                 # Update distribution, flooring sigma so it doesn't collapse.
                 mu[b] = topk_actions.mean(dim=0)
@@ -181,7 +195,11 @@ class CEMPlanner:
         info = {
             "losses": losses_history,
             "final_loss": losses_history[-1],
+            "best_loss": best_action_loss.mean().item(),
             "num_iterations": self.opt_steps,
+            "return_policy": self.return_policy,
         }
 
+        if self.return_policy == "best_sample":
+            return best_actions, info
         return mu, info

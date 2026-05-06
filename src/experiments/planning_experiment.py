@@ -98,6 +98,7 @@ class PlanningExperiment(BaseExperiment):
             sigma_min=plan_cfg.cem.get("sigma_min", 1e-3),
             action_low=plan_cfg.cem.get("action_low", None),
             action_high=plan_cfg.cem.get("action_high", None),
+            return_policy=plan_cfg.cem.get("return_policy", "best_sample"),
             name="CEM",
             device=str(device),
         )

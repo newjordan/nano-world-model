@@ -24,7 +24,38 @@ V032 separates visual and temporal senses into confirmation records, and V033
 makes imagined signed-Y outcome a pre-action simulation channel. V035 turns the
 Dream Kernel ARC-Dream branch-rank mismatch into an explicit goal loop: every
 reachable solved proxy map must rank the terminal-positive branch first without
-weakening ray, identity, invariant, or quarantine gates.
+weakening ray, identity, invariant, or quarantine gates. V036 closes that loop
+with `96/96` terminal-positive branches ranked first and `0` unreachable
+projection maps in the refreshed proxy eval. V037 then tests pre-action branch
+choice over the same maps; V037B reaches `528/528` trusted-map oracle matches
+after adding reachable safe-path progress to deterministic policy scoring.
+V038 routes the same source maps through the repository's real CEM planner and
+exposes mean-return rollout fragility (`94/96`, then `95/96` with a larger
+budget). V039B isolates the issue by returning the best sampled trajectory for
+the discrete decoded action surface and restores the base-budget CEM result to
+`96/96`. V040 makes that fix the default CEM return path across planner,
+experiment wiring, and configs, while preserving explicit `return_policy: mean`
+as an override. V041 then crosses into the actual ARC-AGI-3 toolkit surface:
+offline `ls20-9607627b` loads through `arc_agi.Arcade`, produces `64x64`
+frames, enumerates current actions, emits candidate packets, and executes one
+local step without online submission or score claims. V042 is invalidated as
+model evidence: it was an actuator-only trace that bypassed the Nemo3/world
+model, 3D geometry, ray gates, temporal simulation, and ModelDecision path.
+V043 installs the standard boundary in code: the ARC wrapper is an actuator
+inside the Nemo3/world-model flow, and the runner requires a validated
+`arc_agi3.model_decision.v001` artifact before any non-I/O actuator step. V044
+locks the internal model process inside that decision: the decision must include
+an `arc_agi3.internal_thinking_lock.v001` artifact with sha256, pre-actuator
+ordering, and selected-action binding. V045 makes Nemo3 final confirmation a
+mandatory end-of-thinking signoff: action selection must come from the internal
+world-model process, Nemo3 must confirm the locked decision before the actuator
+steps, and ambiguity or open questions must trigger interim Nemo3 confirmation
+inside the mental loop. V046 links the NanoWM action-conditioned transformer
+path and the chronometric calibration/library path at the action boundary: a
+valid ModelDecision must carry a `chronometric.game_knowledge_link.v001` packet
+showing that branch simulation consumed the SwiGLU/action-embedding backbone,
+`ChronometricCalibrationMLP`, branch-library fallback, and
+`NanoWM.score_chronometric_branch` surface.
 
 ## Hard Boundaries
 
@@ -44,6 +75,20 @@ weakening ray, identity, invariant, or quarantine gates.
   confidence, and candidate branches.
 - Do not let raycasts influence action selection unless the map perception gate
   reports trusted labels, geometry, and ray contacts.
+- Do not run non-I/O ARC actions from a direct `env.action_space` policy. The
+  only standard execution route is observation -> 3D/world state -> internal
+  chronometric game-knowledge link -> branch simulation -> trust checks ->
+  ModelDecision artifact -> actuator step.
+- Do not execute an ARC actuator step unless the ModelDecision contains a
+  locked internal-thinking artifact that predates the actuator step and binds
+  to the selected action.
+- Do not execute an ARC actuator step unless branch simulation proves it used
+  the linked NanoWM/action-embedding and chronometric calibration/library
+  knowledge packet.
+- Do not execute an ARC actuator step unless Nemo3 has signed off after the
+  internal-thinking lock and before the actuator step. Nemo3 may confirm
+  ambiguous internal navigation intermittently, but it is not the selected
+  action source.
 - Keep observed outcome values as post-action calibration labels, not as visual
   or temporal sense inputs.
 - Keep imagined outcome values as pre-action simulation outputs that the
@@ -59,6 +104,13 @@ weakening ray, identity, invariant, or quarantine gates.
 - Heldout bucket signed-Y MAE by action, control label, movement, and time.
 - Top heldout false-progress probability.
 - Dream Kernel terminal-positive branch rank on reachable solved proxy maps.
+- Dream Kernel pre-action policy/oracle branch-choice match rate.
+- Dream Kernel CEM rollout success rate and mean final safe path steps.
+- ARC-AGI-3 offline I/O validity and candidate action packet count.
+- ARC-AGI-3 standard model-flow validity: trusted 3D/world-state artifact,
+  linked chronometric game-knowledge artifact, branch simulation, locked
+  internal-thinking artifact, ModelDecision artifact, mandatory Nemo3 final
+  signoff, and at most one actuator step.
 
 ## Current Best Checkpoint
 

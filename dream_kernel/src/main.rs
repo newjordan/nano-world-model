@@ -1,7 +1,8 @@
 use dream_kernel::{
-    Action, Coord, DreamKernel, DreamSequence, SimState, compass_directions, demo_sequence,
-    sequence_to_json,
+    Action, CellKind, Coord, DreamKernel, DreamSequence, SimState, compass_directions,
+    demo_sequence, sequence_to_json,
 };
+use std::collections::{HashSet, VecDeque};
 use std::path::PathBuf;
 
 fn main() {
@@ -146,6 +147,33 @@ struct ScenarioResult {
     accepted_steps: usize,
     rejected_steps: usize,
     invariant_passed: bool,
+    decision_trace: Vec<DecisionTrace>,
+}
+
+#[derive(Clone, Debug)]
+struct DecisionTrace {
+    tick_before: u32,
+    agent_position: Coord,
+    selected_action_id: String,
+    candidates: Vec<CandidateTrace>,
+}
+
+#[derive(Clone, Debug)]
+struct CandidateTrace {
+    action: Action,
+    action_id: String,
+    policy_score: f32,
+    branch_chrono_y_net: f32,
+    outcome_accepted: bool,
+    outcome_reward: f32,
+    outcome_terminal: bool,
+    outcome_reason: String,
+    next_position: Option<Coord>,
+    safe_path_progress_delta: Option<i32>,
+    safe_path_progress_bonus: f32,
+    revisit_penalty_applied: bool,
+    wait_penalty_applied: bool,
+    selected: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -289,12 +317,20 @@ fn solve_lines(
     let directions = compass_directions();
     let mut actions = Vec::new();
     let mut planned_actions = Vec::new();
+    let mut decision_trace = Vec::new();
     let mut visited = vec![agent_position(&kernel)?];
     for _ in 0..max_steps {
         if kernel.state.terminal {
             break;
         }
-        let best = choose_action(&kernel, &directions, &visited)?;
+        let candidates = score_action_candidates(&kernel, &directions, &visited)?;
+        let best = choose_action_from_candidates(&candidates)?;
+        decision_trace.push(mark_selected_candidate(
+            kernel.state.tick,
+            agent_position(&kernel)?,
+            best,
+            candidates,
+        ));
         let outcome = kernel.step(best);
         actions.push(best);
         planned_actions.push(best.action_id());
@@ -346,15 +382,16 @@ fn solve_lines(
             accepted_steps,
             rejected_steps,
             invariant_passed,
+            decision_trace,
         },
     ))
 }
 
-fn choose_action(
+fn score_action_candidates(
     kernel: &DreamKernel,
     directions: &[Coord],
     visited: &[Coord],
-) -> Result<Action, String> {
+) -> Result<Vec<CandidateTrace>, String> {
     let candidates = [
         Action::move_agent(Coord::new(1, 0, 0)),
         Action::move_agent(Coord::new(0, 1, 0)),
@@ -362,7 +399,9 @@ fn choose_action(
         Action::move_agent(Coord::new(-1, 0, 0)),
         Action::Wait,
     ];
-    let mut best: Option<(f32, Action)> = None;
+    let mut scored = Vec::with_capacity(candidates.len());
+    let current_safe_distance =
+        shortest_safe_path_to_positive_goal(&kernel.state, agent_position(kernel)?);
     for action in candidates {
         let mut clone = kernel.clone();
         let sequence = clone.rollout(&[action], directions, 16, "agent")?;
@@ -376,7 +415,15 @@ fn choose_action(
             .last()
             .and_then(|frame| frame.outcome.as_ref());
         let mut score = branch_score;
+        let mut outcome_accepted = false;
+        let mut outcome_reward = 0.0;
+        let mut outcome_terminal = false;
+        let mut outcome_reason = "no outcome".to_string();
         if let Some(outcome) = outcome {
+            outcome_accepted = outcome.accepted;
+            outcome_reward = outcome.reward;
+            outcome_terminal = outcome.terminal;
+            outcome_reason = outcome.reason.clone();
             score += outcome.reward * 3.0;
             if outcome.accepted {
                 score += 0.05;
@@ -390,6 +437,7 @@ fn choose_action(
                 score -= 3.0;
             }
         }
+        let wait_penalty_applied = matches!(action, Action::Wait);
         if matches!(action, Action::Wait) {
             score -= 0.45;
         }
@@ -397,19 +445,135 @@ fn choose_action(
             .frames
             .last()
             .and_then(|frame| frame.rays.first().map(|ray| ray.origin));
+        let mut safe_path_progress_delta = None;
+        let mut safe_path_progress_bonus = 0.0;
+        if outcome_accepted {
+            if let (Some(current_distance), Some(position)) = (current_safe_distance, next_position)
+            {
+                if let Some(next_distance) =
+                    shortest_safe_path_to_positive_goal(&kernel.state, position)
+                {
+                    let delta = current_distance as i32 - next_distance as i32;
+                    safe_path_progress_delta = Some(delta);
+                    safe_path_progress_bonus = 0.2 * delta as f32;
+                    score += safe_path_progress_bonus;
+                }
+            }
+        }
+        let mut revisit_penalty_applied = false;
         if let Some(position) = next_position {
             if visited.contains(&position) {
+                revisit_penalty_applied = true;
                 score -= 0.35;
             }
         }
-        match best {
-            None => best = Some((score, action)),
-            Some((best_score, _)) if score > best_score => best = Some((score, action)),
-            _ => {}
+        scored.push(CandidateTrace {
+            action,
+            action_id: action.action_id(),
+            policy_score: score,
+            branch_chrono_y_net: branch_score,
+            outcome_accepted,
+            outcome_reward,
+            outcome_terminal,
+            outcome_reason,
+            next_position,
+            safe_path_progress_delta,
+            safe_path_progress_bonus,
+            revisit_penalty_applied,
+            wait_penalty_applied,
+            selected: false,
+        });
+    }
+    Ok(scored)
+}
+
+fn choose_action_from_candidates(candidates: &[CandidateTrace]) -> Result<Action, String> {
+    candidates
+        .iter()
+        .fold(None, |best: Option<(f32, Action)>, candidate| match best {
+            None => Some((candidate.policy_score, candidate.action)),
+            Some((best_score, _)) if candidate.policy_score > best_score => {
+                Some((candidate.policy_score, candidate.action))
+            }
+            Some(best) => Some(best),
+        })
+        .map(|row| row.1)
+        .ok_or_else(|| "no candidate action scored".to_string())
+}
+
+fn mark_selected_candidate(
+    tick_before: u32,
+    agent_position: Coord,
+    selected_action: Action,
+    candidates: Vec<CandidateTrace>,
+) -> DecisionTrace {
+    let selected_action_id = selected_action.action_id();
+    DecisionTrace {
+        tick_before,
+        agent_position,
+        selected_action_id: selected_action_id.clone(),
+        candidates: candidates
+            .into_iter()
+            .map(|mut candidate| {
+                candidate.selected = candidate.action == selected_action;
+                candidate
+            })
+            .collect(),
+    }
+}
+
+fn shortest_safe_path_to_positive_goal(state: &SimState, start: Coord) -> Option<usize> {
+    if !safe_path_cell(state, start, start) {
+        return None;
+    }
+    let mut queue = VecDeque::from([(start, 0usize)]);
+    let mut seen = HashSet::from([start]);
+    while let Some((position, distance)) = queue.pop_front() {
+        if state
+            .map
+            .cell(position)
+            .and_then(CellKind::terminal_reward)
+            .is_some_and(|reward| reward > 0.0)
+        {
+            return Some(distance);
+        }
+        for delta in cardinal_policy_directions() {
+            let candidate = position.add(delta);
+            if seen.contains(&candidate) || !safe_path_cell(state, candidate, start) {
+                continue;
+            }
+            seen.insert(candidate);
+            queue.push_back((candidate, distance + 1));
         }
     }
-    best.map(|row| row.1)
-        .ok_or_else(|| "no candidate action scored".to_string())
+    None
+}
+
+fn safe_path_cell(state: &SimState, position: Coord, start: Coord) -> bool {
+    let Some(cell) = state.map.cell(position) else {
+        return false;
+    };
+    if matches!(cell, CellKind::Wall | CellKind::Hazard) {
+        return false;
+    }
+    if position != start
+        && state
+            .entities
+            .iter()
+            .any(|entity| entity.id != "agent" && entity.position == position)
+    {
+        return false;
+    }
+    true
+}
+
+fn cardinal_policy_directions() -> [Coord; 4] {
+    [
+        Coord::new(1, 0, 0),
+        Coord::new(0, 1, 0),
+        Coord::new(0, -1, 0),
+        Coord::new(-1, 0, 0),
+    ]
 }
 
 fn agent_position(kernel: &DreamKernel) -> Result<Coord, String> {
@@ -439,7 +603,7 @@ fn branch_rank_top_match(sequence: &DreamSequence) -> bool {
 
 fn scenario_result_to_json(row: &ScenarioResult) -> String {
     format!(
-        "{{\"name\":\"{}\",\"solved\":{},\"final_reward\":{},\"terminal\":{},\"steps\":{},\"planned_actions\":{},\"final_reason\":\"{}\",\"sequence_file\":\"{}\",\"sequence_hash\":\"{}\",\"branch_rank_top_match\":{},\"accepted_steps\":{},\"rejected_steps\":{},\"invariant_passed\":{}}}",
+        "{{\"name\":\"{}\",\"solved\":{},\"final_reward\":{},\"terminal\":{},\"steps\":{},\"planned_actions\":{},\"final_reason\":\"{}\",\"sequence_file\":\"{}\",\"sequence_hash\":\"{}\",\"branch_rank_top_match\":{},\"accepted_steps\":{},\"rejected_steps\":{},\"invariant_passed\":{},\"decision_trace\":{}}}",
         json_escape(&row.name),
         row.solved,
         number_to_json(row.final_reward),
@@ -452,8 +616,66 @@ fn scenario_result_to_json(row: &ScenarioResult) -> String {
         row.branch_rank_top_match,
         row.accepted_steps,
         row.rejected_steps,
-        row.invariant_passed
+        row.invariant_passed,
+        decision_trace_to_json(&row.decision_trace)
     )
+}
+
+fn decision_trace_to_json(rows: &[DecisionTrace]) -> String {
+    format!(
+        "[{}]",
+        rows.iter()
+            .map(decision_trace_row_to_json)
+            .collect::<Vec<_>>()
+            .join(",")
+    )
+}
+
+fn decision_trace_row_to_json(row: &DecisionTrace) -> String {
+    format!(
+        "{{\"tick_before\":{},\"agent_position\":{},\"selected_action_id\":\"{}\",\"candidates\":[{}]}}",
+        row.tick_before,
+        coord_to_json(row.agent_position),
+        json_escape(&row.selected_action_id),
+        row.candidates
+            .iter()
+            .map(candidate_trace_to_json)
+            .collect::<Vec<_>>()
+            .join(",")
+    )
+}
+
+fn candidate_trace_to_json(row: &CandidateTrace) -> String {
+    let next_position = row
+        .next_position
+        .map(coord_to_json)
+        .unwrap_or_else(|| "null".to_string());
+    format!(
+        "{{\"action_id\":\"{}\",\"policy_score\":{},\"branch_chrono_y_net\":{},\"outcome_accepted\":{},\"outcome_reward\":{},\"outcome_terminal\":{},\"outcome_reason\":\"{}\",\"next_position\":{},\"safe_path_progress_delta\":{},\"safe_path_progress_bonus\":{},\"revisit_penalty_applied\":{},\"wait_penalty_applied\":{},\"selected\":{}}}",
+        json_escape(&row.action_id),
+        number_to_json(row.policy_score),
+        number_to_json(row.branch_chrono_y_net),
+        row.outcome_accepted,
+        number_to_json(row.outcome_reward),
+        row.outcome_terminal,
+        json_escape(&row.outcome_reason),
+        next_position,
+        optional_i32_to_json(row.safe_path_progress_delta),
+        number_to_json(row.safe_path_progress_bonus),
+        row.revisit_penalty_applied,
+        row.wait_penalty_applied,
+        row.selected
+    )
+}
+
+fn coord_to_json(coord: Coord) -> String {
+    format!("{{\"x\":{},\"y\":{},\"z\":{}}}", coord.x, coord.y, coord.z)
+}
+
+fn optional_i32_to_json(value: Option<i32>) -> String {
+    value
+        .map(|value| value.to_string())
+        .unwrap_or_else(|| "null".to_string())
 }
 
 fn string_vec_to_json(values: &[String]) -> String {

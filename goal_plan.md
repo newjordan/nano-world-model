@@ -150,44 +150,89 @@ iteration.
   all with terminal-positive branch rank `5`; cases split evenly across
   `t2_action_coordinate` and `t3_object_relative_branching`, while the one
   unsolved row remains isolated as `proxy_goal_unreachable_in_projection`.
+- V036: Calibrated Dream Kernel branch values and repaired the isolated
+  unreachable tier-4 projection. Result: the refreshed ARC-Dream proxy eval
+  solved `96/96`, reached `96/96` goals avoiding hazards, passed planner
+  integrity on `96/96`, produced terminal branch rank counts `{'1': 96}`, and
+  left `0` branch-rank calibration cases.
+- V037: Added a pre-action branch-choice scout over the V036 proxy maps. Result:
+  the first run exposed one tier-4 detour where policy score chose a longer safe
+  route (`529/530` policy/oracle matches), then V037B added reachable safe-path
+  progress to policy scoring and reached `528/528` policy/oracle matches while
+  the ARC-Dream proxy re-gate stayed `96/96` passed.
+- V038: Added a real CEM rollout-complexity smoke over the V037B proxy maps.
+  Result: the repository CEM planner with default mean-return policy solved
+  `94/96`; a larger `512/64/12/h18` budget solved `95/96` but still exposed a
+  zero-loss miss caused by averaging solved elite samples into a bad discrete
+  decoded action sequence.
+- V039B: Added an opt-in `best_sample` CEM return policy and reran the original
+  `128/16/8/h16` budget against the V038 mean-return comparator artifact.
+  Result: solved `96/96`, final safe path steps `0.0`, hazard hits `0`, and no
+  training data promoted. The rollout complexity failure is now isolated to
+  return semantics, not Dream Kernel reachability.
+- V040: Promoted `best_sample` to the default CEM return policy across
+  `CEMPlanner`, planning experiment wiring, CEM configs, and the rollout smoke
+  CLI. Result: default-path V040 solved `96/96` at the original `128/16/8/h16`
+  budget against the V038 comparator, with final safe path steps `0.0` and no
+  training data promoted.
+- V041: Added an ARC-AGI-3 offline I/O smoke over the real toolkit surface.
+  Result: loaded downloaded `ls20-9607627b` from `/home/frosty40/world_model_1`,
+  reset/read `64x64` frames, emitted `8` candidate action packets, executed
+  one local offline step, and recorded no online submission, no score claim,
+  and no training promotion.
+- V042: Invalidated an ARC-AGI-3 actuator-only trace. Result: the runner
+  stepped `ls20-9607627b` for `40` local actions with `repeat_capped_cycle`,
+  but it bypassed the Nemo3/world-model flow, 3D geometry, ray gates, temporal
+  simulation, and ModelDecision artifact. It is actuator plumbing evidence
+  only, not model evidence. The runner now fails closed for multi-step use.
+- V043: Added the ARC-AGI-3 standard model-flow boundary. Result:
+  `src/arc_agi3_model_flow.py` defines the required ModelDecision contract,
+  `scripts/run_arc_agi3_model_step.py` executes exactly one actuator step from
+  that artifact, and direct multi-step actuator policy remains blocked.
+- V044: Added the internal-thinking lock to the ARC-AGI-3 ModelDecision
+  contract. Result: every model action now requires an
+  `arc_agi3.internal_thinking_lock.v001` artifact with path, sha256,
+  pre-actuator ordering, and selected-action binding before the actuator can
+  step.
+- V045: Added the mandatory Nemo3 final-confirmation contract. Result: every
+  model action now requires final Nemo3 signoff after the internal-thinking
+  lock and before the actuator step; Nemo3 is explicitly confirmation, not the
+  action source, and interim Nemo3 confirmations are required when internal
+  thinking records ambiguity or open questions.
+- V046: Added the chronometric game-knowledge link to the ARC-AGI-3
+  ModelDecision contract. Result: branch simulation must now prove it consumed
+  a linked NanoWM action-conditioned transformer/SwiGLU surface,
+  action-embedding context, `ChronometricCalibrationMLP`, branch-library
+  fallback, and `NanoWM.score_chronometric_branch` packet before any action can
+  be selected.
 
 ## Active Queue
 
-1. Run the V035 branch-rank goal loop. Goal: make every reachable solved
-   ARC-Dream proxy map rank the terminal-positive branch first while preserving
-   object identity, ray contacts, invariants, and quarantine boundaries.
-
-2. Projection-map reachability repair. Goal: separate bad proxy map generation
-   from kernel planner/value failures by eliminating unreachable generated
-   maps before treating a row as solver failure.
-
-3. Ingest V034 human labels after review. Goal: compare human accept/reject
+1. Ingest V034 human labels after review. Goal: compare human accept/reject
    judgments against visual, temporal, and outcome-imagination trust signals.
 
-4. Outcome-imagined branch selection: feed V033 trusted visual+temporal+
-   imagined-outcome records into V029-style candidate selection as auxiliary
-   evidence.
-   Goal: prove the internal map can constrain action choice without bypassing
-   NanoWM scoring.
-
-5. Batch sensory-record builder: convert recorded state/action traces into
+2. Batch sensory-record builder: convert recorded state/action traces into
    confirmation-record JSONL for correlation sweeps.
    Goal: turn each datapoint into comparable visual and temporal evidence.
 
-6. Raw screenshot perception adapter: add a renderer/screenshot fixture or
+3. Raw screenshot perception adapter: add a renderer/screenshot fixture or
    detector stub that produces the palette-labeled image required by V031.
    Goal: separate image parsing accuracy from geometry/raycast correctness.
 
-7. Full NanoWM/CEM integration: wire chronometric scoring into the real
-   planner path once heldout branch choice has a small deterministic smoke.
-   Goal: avoid hiding scorer bugs inside diffusion rollout complexity.
+4. ARC-AGI-3 ModelDecision producer for `ls20`: route the reset observation
+   through the actual Nemo3/world-model path and write a valid
+   `arc_agi3.model_decision.v001` artifact.
+   Goal: produce 3D/world-state, branch-simulation, trust-check, locked
+   chronometric game-knowledge link, internal-thinking, intermittent Nemo3
+   ambiguity confirmation when needed, final Nemo3 signoff, and selected-action
+   artifacts before any actuator step.
 
-8. Fresh heldout family: build or select the next heldout family beyond
+5. Fresh heldout family: build or select the next heldout family beyond
    V015/V016 after the action-candidate manifest is available.
    Goal: test whether the mechanism survives a new family with real branch
    alternatives instead of polishing a nearly saturated split.
 
-9. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
+6. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
    but do not tune directly against it unless it grows on a new heldout family.
    Goal: prevent research drift into cosmetic residual chasing.
 

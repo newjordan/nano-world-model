@@ -1,0 +1,54 @@
+# ARC Dream Curriculum Eval V001 Results
+
+Status: deterministic Dream Kernel proxy curriculum eval. No training data promoted.
+
+This is not an ARC solve claim. It tests projected known-map simulation, ray/object integrity, branch ranking, and Nemo relay availability.
+
+## Condition
+
+- run label: `arc_dream_curriculum_eval_v003_safe_path_progress_regate`
+- run kind: `deterministic_arc_dream_curriculum_proxy_eval_no_training`
+- git commit: `e9d72629452c38ed99bfc5847b11cd05c75eb678`
+- git dirty at run: `True`
+- curriculum: `experiments/2026-05-06_arc_dream_curriculum_v002_projection_reachability_repair/curriculum_challenges.jsonl`
+- challenges: `96`
+- max steps: `16`
+- training data promoted: `False`
+
+## Overall
+
+- proxy goal solved: `96/96`
+- proxy goal solve rate: `1.000000`
+- proxy goal reachable avoiding hazard: `96/96`
+- planner integrity pass rate: `1.000000`
+- invariant pass rate: `1.000000`
+- object identity pass rate: `1.000000`
+- branch-rank top-match rate: `1.000000`
+- terminal branch rank counts: `{'1': 96}`
+- accepted step rate: `1.000000`
+- Nemo callback policy required: `72`
+- kernel Nemo relay required: `96`
+
+## By Tier
+
+| tier | count | reachable | solve rate | planner pass | branch top match | rejected steps | Nemo policy required |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| t1_local_translation | 24 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 0 | 0 |
+| t2_action_coordinate | 24 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 0 | 24 |
+| t3_object_relative_branching | 24 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 0 | 24 |
+| t4_nonlocal_goal_hazard | 24 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 0 | 24 |
+
+## Failure Reasons
+
+`{'passed_proxy_gate': 96}`
+
+## Ray Networks
+
+`{'adversarial': 48, 'beneficial': 216, 'neutral': 124, 'structural': 4604}`
+
+## Interpretation
+
+- `proxy_goal_solve_rate` means the Dream Kernel solved the projected map, not the source ARC task.
+- `proxy_goal_reachable_avoiding_hazard` is a map-integrity preflight that treats walls, hazards, and objects as blockers.
+- `planner_integrity_pass_rate` requires solve, invariant integrity, ubiquitous object IDs, and branch-rank top-match.
+- Nemo remains a relay: callback needs are recorded, but the deterministic kernel action sequence is the evaluated driver.

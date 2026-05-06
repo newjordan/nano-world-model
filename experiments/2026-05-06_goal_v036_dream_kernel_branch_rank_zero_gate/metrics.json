@@ -1,0 +1,70 @@
+{
+  "calibration_case_count": 0,
+  "case_failure_counts": {
+    "passed_proxy_gate": 96
+  },
+  "case_terminal_rank_counts": {},
+  "case_tier_counts": {},
+  "condition": {
+    "arc_solve_claim": false,
+    "created_at_utc": "2026-05-06T19:13:29.686995+00:00",
+    "git_commit": "e9d72629452c38ed99bfc5847b11cd05c75eb678",
+    "git_dirty": true,
+    "goal_stop_rule": "branch_rank_top_mismatch_count == 0 and proxy_goal_unreachable_in_projection_count == 0",
+    "metric_to_compare": "terminal_positive_branch_rank_1_on_reachable_solved_proxy_maps",
+    "run_kind": "dream_kernel_branch_rank_calibration_goal_definition",
+    "run_label": "goal_v036_dream_kernel_branch_rank_zero_gate",
+    "schema": "dream_kernel.goal.branch_rank_calibration.v001",
+    "script": "scripts/build_dream_kernel_branch_rank_goal.py",
+    "script_sha256": "99dfec6916e33f6b47286199c8b1b682b7a1eb6a1bf22115a2a1b3ced1197b8f",
+    "source_eval_metrics": "experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair/metrics.json",
+    "source_eval_metrics_sha256": "87eecec651a60943af704fddd9da1baabc3f7e0e6013a5f8eb64f63dc9507489",
+    "source_eval_rows": "experiments/2026-05-06_arc_dream_curriculum_eval_v002_branch_value_projection_repair/curriculum_eval_rows.jsonl",
+    "source_eval_rows_sha256": "976d628b9a911938c7484131c1182fb67a345eb08f19fc32cd77fa0682dfa2b7",
+    "training_data_promoted": false
+  },
+  "gap_stats": {
+    "max": null,
+    "mean": null,
+    "min": null
+  },
+  "goal": {
+    "baseline": {
+      "branch_rank_top_match_rate": 1.0,
+      "failure_reasons": {
+        "passed_proxy_gate": 96
+      },
+      "planner_integrity_pass_rate": 1.0,
+      "proxy_goal_solve_rate": 1.0,
+      "terminal_branch_rank_counts": {
+        "1": 96
+      }
+    },
+    "calibration_case_count": 0,
+    "goal_id": "goal_v036_dream_kernel_branch_rank_zero_gate",
+    "goal_name": "Dream Kernel branch-rank calibration",
+    "goal_statement": "For every reachable solved ARC-Dream proxy map, the internal branch matrix must rank the terminal-positive branch first.",
+    "iteration_constraints": [
+      "Use reachable solved proxy rows as calibration cases, not as ARC answer evidence.",
+      "Separate projection-map reachability fixes from branch-value calibration.",
+      "Nemo may produce semantic hypotheses, but Dream Kernel branch scoring remains the measured driver.",
+      "Do not weaken object identity, ray contact, or invariant gates to improve the score."
+    ],
+    "schema": "dream_kernel.goal.branch_rank_calibration.v001",
+    "source_row_count": 96,
+    "success_criteria": {
+      "arc_solve_claim": false,
+      "branch_rank_top_mismatch_count": 0,
+      "planner_integrity_pass_rate": 1.0,
+      "proxy_goal_unreachable_in_projection_count": 0,
+      "terminal_branch_rank_counts_allowed": {
+        "1": "all reachable solved proxy maps"
+      },
+      "training_data_promoted": false
+    },
+    "why_this_is_good": "The kernel already solves the maps and preserves object/ray integrity. The remaining failure is therefore a clean value-calibration target."
+  },
+  "ready_for_goal_loop": false,
+  "schema": "dream_kernel.goal.branch_rank_calibration.v001",
+  "source_row_count": 96
+}
