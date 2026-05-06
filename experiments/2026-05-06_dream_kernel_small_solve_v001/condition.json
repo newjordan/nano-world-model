@@ -1,0 +1,52 @@
+{
+  "command": [
+    "cargo",
+    "run",
+    "--manifest-path",
+    "/home/frosty40/nano-world-model/dream_kernel/Cargo.toml",
+    "--",
+    "solve-suite",
+    "--out-dir",
+    "/home/frosty40/nano-world-model/experiments/2026-05-06_dream_kernel_small_solve_v001"
+  ],
+  "compile_kernel_policy": "cargo_dev_profile",
+  "created_at_utc": "2026-05-06T17:27:47.298332+00:00",
+  "dataset_path": "not_applicable_hardcoded_dream_kernel_scenarios",
+  "git_commit": "99ff265444fef51e0c2c49be261c5d41e3cddb5f",
+  "git_dirty": false,
+  "gpu_count": 0,
+  "historical_comparator": "none_first_small_solve_suite",
+  "historical_comparator_artifact": null,
+  "kernel_lib": "dream_kernel/src/lib.rs",
+  "kernel_lib_sha256": "a9923c5791b2239e91f08b7a6496f1563cb2c94f7134b1ce3b236a32663b0bf7",
+  "kernel_main": "dream_kernel/src/main.rs",
+  "kernel_main_sha256": "e476c8faeae74fe6ab6400e371e4abf67b3973f24f8b3ccf0a53db62bc408c57",
+  "kernel_manifest": "dream_kernel/Cargo.toml",
+  "kernel_manifest_sha256": "832318f5c5b0588e672d490acb5116f1d62bbd2648ece0d53e68d5aa1c33bba4",
+  "loader_mode": "rust_hardcoded_scenario_suite",
+  "loader_settings": {
+    "candidate_actions": [
+      "east",
+      "south",
+      "north",
+      "west",
+      "wait"
+    ],
+    "max_ray_range": 16,
+    "ray_directions": "compass_8",
+    "scenario_count": 4
+  },
+  "metric_to_compare": "terminal_goal_pass_rate",
+  "quantization_policy": "none",
+  "run_kind": "deterministic_dream_kernel_small_solve_no_training",
+  "run_label": "dream_kernel_small_solve_v001",
+  "run_label_semantics": "new_experiment",
+  "script": "scripts/run_dream_kernel_small_solve.py",
+  "script_sha256": "b172b7792d186cd196e3281655b3423174c0db91ca68b384d62dbc31e4afd3e8",
+  "seed": "not_applicable_deterministic_greedy_planner",
+  "tokenizer_path": "not_applicable",
+  "training_data_promoted": false,
+  "vocab_size": "not_applicable",
+  "wallclock_budget": "not_applicable_local_deterministic_suite",
+  "world_size": 1
+}
