@@ -1,0 +1,111 @@
+{
+  "actuator_step_count": 0,
+  "arc_data_used": true,
+  "arc_solve_claim": false,
+  "arcade_class": "Arcade",
+  "compile_kernel_policy": "not_applicable_python_sdk_decision_step",
+  "created_at_utc": "2026-05-06T22:48:20.490690+00:00",
+  "dataset_path": "environment_files",
+  "environments_dir": "/home/frosty40/world_model_1/environment_files",
+  "git_commit": "874f9e59fdd300618b80a036feca83b1dc550425",
+  "git_dirty": false,
+  "gpu_count": 0,
+  "historical_comparator": "v052_v053_single_step_connected_standard",
+  "historical_comparator_artifact": null,
+  "loader_mode": "arc_agi_offline_local_environment_current_observation_decision_step",
+  "loader_settings": {
+    "branch_ambiguity_gap_threshold": 0.0,
+    "game": "ls20",
+    "max_candidate_actions": 8,
+    "online_submission": false,
+    "operation_mode": "OFFLINE",
+    "scorecard_submission": false
+  },
+  "metric_to_compare": "arc_agi3_valid_model_decision_artifact_and_zero_actuator_steps",
+  "model_decision_schema": "arc_agi3.model_decision.v001",
+  "nemo_external_model_required": true,
+  "nemo_mode": "live-relay",
+  "nemo_model": "nemotron_3_nano_omni",
+  "nemo_relay_url": "http://127.0.0.1:8000/v1/responses",
+  "online_submission": false,
+  "operation_mode": "OFFLINE",
+  "parent_run_label": "arc_agi3_model_solve_scout_v054_ls20_live_nemo3_mlp_loop",
+  "prior_post_action_update_candidates": [
+    {
+      "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v054_ls20_live_nemo3_mlp_loop/steps/000_actuator_step/post_action_mlp_update.json",
+      "mlp_weights_updated": false,
+      "sha256": "bf2c08940362a882f1694f9b4a92db934fe4bbc7946886f3b1b14386ab380bd5",
+      "source_step_index": 0,
+      "training_data_promoted": false,
+      "update_mode": "candidate-only"
+    },
+    {
+      "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v054_ls20_live_nemo3_mlp_loop/steps/001_actuator_step/post_action_mlp_update.json",
+      "mlp_weights_updated": false,
+      "sha256": "2333de3548c8a0caf933ff80ab2158e7a62b3f1b34bc8a3bb483fe09cf43c827",
+      "source_step_index": 1,
+      "training_data_promoted": false,
+      "update_mode": "candidate-only"
+    },
+    {
+      "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v054_ls20_live_nemo3_mlp_loop/steps/002_actuator_step/post_action_mlp_update.json",
+      "mlp_weights_updated": false,
+      "sha256": "d266015d88681430fdb0c9c98a50b21021c4195407e0f22995eecddab807965a",
+      "source_step_index": 2,
+      "training_data_promoted": false,
+      "update_mode": "candidate-only"
+    },
+    {
+      "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v054_ls20_live_nemo3_mlp_loop/steps/003_actuator_step/post_action_mlp_update.json",
+      "mlp_weights_updated": false,
+      "sha256": "18d02d65940bd3479b02bad105ba6d7601972e194a7c02a95b300d6cf694d79a",
+      "source_step_index": 3,
+      "training_data_promoted": false,
+      "update_mode": "candidate-only"
+    }
+  ],
+  "prior_post_action_update_context_count": 4,
+  "producer_module": "scripts/run_arc_agi3_model_decision_producer.py",
+  "producer_module_sha256": "a8d6296526514a141fd47f909d4acd5a7c7d40d2e70101fb50a95ef27a776a05",
+  "quantization_policy": "none",
+  "run_kind": "arc_agi3_model_solve_scout_decision_step",
+  "run_label": "arc_agi3_model_solve_scout_v054_ls20_live_nemo3_mlp_loop_step_004_decision",
+  "schema": "arc_agi3.model_decision_producer.v001",
+  "scorecard_submission": false,
+  "script": "scripts/run_arc_agi3_model_solve_scout.py",
+  "script_sha256": "d8358d09c42d5da78040c03653f3ab25f9f3447ed11a5317a1341257a4031084",
+  "seed": "deterministic_from_current_frame_sha_action_values_and_candidate_update_context",
+  "selected_game": {
+    "game_id": "ls20-9607627b",
+    "name": "ls20",
+    "title": "LS20"
+  },
+  "source_condition_artifact": "docs/arc-agi-3-env.md",
+  "source_condition_sha256": "849201c55c4287e913937dd9c02e1891f73c937c6e0c452c643c42cd44c8df6b",
+  "source_repo_commit": "9c850edf476bc5363a3c7de43b6d73f28a2eb5a8",
+  "source_repo_dirty": true,
+  "source_repo_path": "/home/frosty40/world_model_1",
+  "standard_model_flow": [
+    "observation",
+    "world_state_3d",
+    "chronometric_game_knowledge",
+    "mlp_consultation",
+    "internal_branch_simulation",
+    "trust_checks",
+    "internal_thinking_lock",
+    "nemo3_final_confirmation",
+    "model_decision",
+    "actuator_step"
+  ],
+  "step_index": 4,
+  "tokenizer_path": "not_applicable",
+  "toolkit": "arc_agi.Arcade",
+  "toolkit_versions": {
+    "arc_agi": "unknown",
+    "arcengine": "0.1.0"
+  },
+  "training_data_promoted": false,
+  "vocab_size": "not_applicable",
+  "wallclock_budget": "parent_max_steps=12",
+  "world_size": 1
+}

@@ -1,0 +1,21 @@
+{
+  "actuator_steps_executed": 0,
+  "ambiguity_detected": false,
+  "arc_solve_claim": false,
+  "branch_simulation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v054_ls20_live_nemo3_mlp_loop/steps/011_model_decision/branch_simulation.json",
+  "branch_simulation_sha256": "9a4d52af72e7099536ec5d5380fe2a0ba3512606bd97ab42a369d989be45d227",
+  "created_at_utc": "2026-05-06T22:48:48.905482+00:00",
+  "created_before_actuator_step": true,
+  "drives_selected_action": true,
+  "lock_reason": "internal chronometric branch simulation selected the action before actuator use",
+  "locked": true,
+  "nemo3_interim_confirmations": [],
+  "open_question_ids": [],
+  "schema": "arc_agi3.internal_thinking_lock.v001",
+  "selected_action_name": "ACTION2",
+  "selected_action_source": "world_model_internal_thinking",
+  "selected_action_value": 2,
+  "selected_branch_id": "ls20:reset:3d0439fb-e2d4-4340-b2c1-09d923eab787:action:2",
+  "state_id": "ls20:reset:3d0439fb-e2d4-4340-b2c1-09d923eab787",
+  "training_data_promoted": false
+}
