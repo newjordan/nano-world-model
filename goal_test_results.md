@@ -47,6 +47,9 @@ Verification:
 - `python -m py_compile scripts/run_arc_agi3_model_decision_producer.py src/arc_agi3_model_flow.py scripts/run_arc_agi3_model_step.py`
 - `python -m pytest tests/test_arc_agi3_model_decision_producer.py tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py`
 - result: `14 passed`
+- `python -m py_compile scripts/run_arc_agi3_model_decision_producer.py scripts/run_arc_agi3_model_step.py scripts/run_arc_agi3_closed_loop_smoke.py scripts/run_arc_agi3_io_smoke.py scripts/run_dream_kernel_cem_rollout_smoke.py scripts/run_dream_kernel_branch_choice_smoke.py scripts/build_arc_dream_curriculum.py scripts/run_arc_dream_curriculum_eval.py scripts/build_dream_kernel_branch_rank_goal.py src/arc_agi3_model_flow.py src/planning/cem_planner.py src/experiments/planning_experiment.py`
+- `python -m pytest tests/test_arc_agi3_model_decision_producer.py tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_closed_loop_smoke.py tests/test_arc_agi3_io_smoke.py tests/test_dream_kernel_cem_rollout_smoke.py tests/test_dream_kernel_branch_choice_smoke.py tests/test_arc_dream_curriculum.py tests/test_arc_dream_curriculum_eval.py tests/test_dream_kernel_branch_rank_goal.py tests/test_dream_kernel_ablations.py`
+- result: `41 passed`
 - `/home/frosty40/world_model_1/.venv/bin/python scripts/run_arc_agi3_model_decision_producer.py --run-label arc_agi3_model_decision_v047_ls20_reset --out-dir experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset --arc-repo /home/frosty40/world_model_1 --environments-dir /home/frosty40/world_model_1/environment_files --source-condition-artifact /home/frosty40/world_model_1/docs/arc-agi-3-env.md --operation-mode OFFLINE --game ls20 --max-candidate-actions 8 --nemo-mode contract-local`
 - result: valid ModelDecision artifact, `0` actuator steps, no online
   submission, no ARC solve claim

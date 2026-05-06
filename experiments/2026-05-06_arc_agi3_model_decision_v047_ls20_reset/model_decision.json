@@ -1,0 +1,98 @@
+{
+  "actuator_steps_executed": 0,
+  "arc_solve_claim": false,
+  "chronometric_game_knowledge": {
+    "action_embedding_context_linked": true,
+    "artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/chronometric_game_knowledge.json",
+    "backbone_surface": "nanowm_action_conditioned_transformer",
+    "branch_library_linked": true,
+    "calibration_mlp_linked": true,
+    "calibration_surface": "ChronometricCalibrationMLP+branch_library_fallback",
+    "created_before_internal_branch_simulation": true,
+    "drives_branch_simulation": true,
+    "heldout_labels_used": false,
+    "knowledge_domains": [
+      "basic_movement",
+      "known_interactions",
+      "branch_value_calibration"
+    ],
+    "online_update_requires_promotion_condition": true,
+    "schema": "chronometric.game_knowledge_link.v001",
+    "score_surface": "NanoWM.score_chronometric_branch",
+    "sha256": "19c6a0068052ecc4c9ecaf6206d73b97e035710bb57ca11cd85155675bee5546",
+    "swiglu_backbone_linked": true,
+    "updates_from_post_action_calibration_only": true
+  },
+  "created_at_utc": "2026-05-06T21:22:48.498464+00:00",
+  "decision_id": "arc_agi3_model_decision_v047_ls20_reset:b8ee464d72355db7",
+  "internal_thinking_lock": {
+    "ambiguity_detected": false,
+    "artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/internal_thinking_lock.json",
+    "created_before_actuator_step": true,
+    "drives_selected_action": true,
+    "locked": true,
+    "open_question_ids": [],
+    "schema": "arc_agi3.internal_thinking_lock.v001",
+    "selected_action_value": 1,
+    "sha256": "49976f6aaf58e5ef603bc1895cacf4bf3aa42439d9d9f669b54270e5a37c1025"
+  },
+  "nemo3": {
+    "confirmation_mode": "contract-local",
+    "decision_delegated_to_nemo": false,
+    "external_nemo3_model_invoked": false,
+    "final_confirmation": {
+      "artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/nemo3_final_confirmation.json",
+      "confirms_selected_action": true,
+      "created_after_internal_thinking_lock": true,
+      "created_before_actuator_step": true,
+      "nemo_supplied_action": false,
+      "schema": "arc_agi3.nemo3_final_confirmation.v001",
+      "selected_action_value": 1,
+      "sha256": "53ef7d9cf1388c7fd0e1b3de0d034ef75d5e45b47b7c7bf49149064f85131016"
+    },
+    "interim_confirmation_policy": {
+      "call_on_ambiguity_or_open_questions": true
+    },
+    "interim_confirmations": [],
+    "invoked": true,
+    "role": "confirmation_not_action_source"
+  },
+  "online_submission": false,
+  "schema": "arc_agi3.model_decision.v001",
+  "selected_action": {
+    "action_data": null,
+    "action_name": "ACTION1",
+    "action_value": 1,
+    "source": "world_model_internal_thinking"
+  },
+  "standard_model_flow": {
+    "branch_simulation_artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/branch_simulation.json",
+    "chronometric_game_knowledge_artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/chronometric_game_knowledge.json",
+    "internal_thinking_artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/internal_thinking_lock.json",
+    "model_decision_artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/model_decision.json",
+    "nemo3_final_confirmation_artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/nemo3_final_confirmation.json",
+    "observation_artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/observation.json",
+    "sequence": [
+      "observation",
+      "world_state_3d",
+      "chronometric_game_knowledge",
+      "internal_branch_simulation",
+      "trust_checks",
+      "internal_thinking_lock",
+      "nemo3_final_confirmation",
+      "model_decision",
+      "actuator_step"
+    ],
+    "trust_checks_artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/trust_checks.json",
+    "world_state_3d_artifact": "experiments/2026-05-06_arc_agi3_model_decision_v047_ls20_reset/world_state_3d.json"
+  },
+  "state_id": "ls20:reset:27058cde-c974-4db0-bf18-0164cc398001",
+  "training_data_promoted": false,
+  "trust": {
+    "branch_selection_trusted": true,
+    "geometry_trusted": true,
+    "map_trusted": true,
+    "ray_trusted": true,
+    "temporal_trusted": true
+  }
+}
