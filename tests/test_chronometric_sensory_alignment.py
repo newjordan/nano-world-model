@@ -15,6 +15,7 @@ from chronometric_map_perception import ColorLabel, build_grid_geometry  # noqa:
 from chronometric_sensory_alignment import (  # noqa: E402
     build_sensory_confirmation_record,
     evaluate_2d_3d_alignment,
+    evaluate_outcome_imagination,
     evaluate_temporal_alignment,
     project_geometry_to_grid,
 )
@@ -110,7 +111,46 @@ def test_temporal_alignment_blocks_trust_when_change_prediction_misses_motion():
     assert set(metrics["gate_failures"]) == {"transition_cell_accuracy", "change_recall"}
 
 
-def test_sensory_confirmation_record_combines_visual_temporal_and_outcome_label():
+def test_outcome_imagination_is_pre_action_prediction_compared_to_observed_label():
+    metrics = evaluate_outcome_imagination(
+        imagined_signed_y=0.5,
+        imagined_confidence=0.75,
+        observed_signed_y=0.4,
+        min_imagined_confidence=0.5,
+    )
+
+    assert metrics["trusted"] is True
+    assert metrics["imagined"] == {
+        "signed_y": 0.5,
+        "polarity": "positive",
+        "confidence": 0.75,
+        "source": "pre_action_simulation",
+    }
+    assert metrics["observed"] == {"signed_y": 0.4, "polarity": "positive"}
+    assert metrics["comparison"]["signed_abs_error"] == pytest.approx(0.1)
+    assert metrics["comparison"]["polarity_match"] is True
+
+
+def test_outcome_imagination_blocks_trust_on_missing_or_wrong_pre_action_prediction():
+    missing = evaluate_outcome_imagination(
+        imagined_signed_y=None,
+        imagined_confidence=0.0,
+        observed_signed_y=0.5,
+    )
+    mismatch = evaluate_outcome_imagination(
+        imagined_signed_y=-0.5,
+        imagined_confidence=1.0,
+        observed_signed_y=0.5,
+    )
+
+    assert missing["trusted"] is False
+    assert "imagined_outcome_missing" in missing["gate_failures"]
+    assert mismatch["trusted"] is False
+    assert mismatch["comparison"]["polarity_match"] is False
+    assert "outcome_polarity_match" in mismatch["gate_failures"]
+
+
+def test_sensory_confirmation_record_combines_senses_with_imagined_outcome():
     before = (
         (9, 9, 9),
         (9, 2, 0),
@@ -132,6 +172,8 @@ def test_sensory_confirmation_record_combines_visual_temporal_and_outcome_label(
         labels=LABELS,
         playable_values=(0,),
         wall_values=(9,),
+        imagined_outcome_y=0.5,
+        imagined_outcome_confidence=0.9,
         signed_outcome_y=0.5,
     )
 
@@ -142,7 +184,10 @@ def test_sensory_confirmation_record_combines_visual_temporal_and_outcome_label(
     assert record["senses"]["visual"]["map"]["trusted"] is True
     assert record["senses"]["visual"]["geometry_projection"]["trusted"] is True
     assert record["senses"]["temporal"]["trusted"] is True
-    assert record["outcome_label"] == {"signed_y": 0.5, "polarity": "positive"}
+    assert record["pre_action_simulation"]["imagined_outcome"]["signed_y"] == 0.5
+    assert record["pre_action_simulation"]["imagined_outcome"]["source"] == "pre_action_simulation"
+    assert record["outcome_imagination"]["trusted"] is True
+    assert record["post_action_observation"]["observed_outcome"] == {"signed_y": 0.5, "polarity": "positive"}
 
 
 def test_sensory_record_script_writes_confirmation_artifacts(tmp_path):
@@ -191,6 +236,10 @@ def test_sensory_record_script_writes_confirmation_artifacts(tmp_path):
             str(out_dir),
             "--wall-values",
             "9",
+            "--imagined-outcome-y",
+            "0.5",
+            "--imagined-outcome-confidence",
+            "0.9",
             "--signed-outcome-y",
             "0.5",
         ],
@@ -204,6 +253,7 @@ def test_sensory_record_script_writes_confirmation_artifacts(tmp_path):
     record = json.loads((out_dir / "sensory_record.json").read_text(encoding="utf-8"))
     condition = json.loads((out_dir / "condition.json").read_text(encoding="utf-8"))
     assert record["confirmation"]["trusted"] is True
-    assert record["outcome_label"]["polarity"] == "positive"
-    assert condition["run_type"] == "chronometric_sensory_alignment_v032"
+    assert record["pre_action_simulation"]["imagined_outcome"]["polarity"] == "positive"
+    assert record["outcome_imagination"]["comparison"]["polarity_match"] is True
+    assert condition["run_type"] == "chronometric_sensory_alignment_v033"
     assert (out_dir / "RESULTS.md").exists()

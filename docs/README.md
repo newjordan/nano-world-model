@@ -18,6 +18,8 @@ docs/
 │                         (labeled image/grid/3D geometry accuracy gate)
 ├── chronometric_sensory_alignment_v032.md
 │                         (visual + temporal confirmation records)
+├── chronometric_outcome_imagination_v033.md
+│                         (pre-action imagined outcome vs observed outcome)
 ├── chronometric_testing.md
 │                         (first mechanics smoke and bridge-manifest gate)
 ├── datasets/
@@ -37,7 +39,8 @@ docs/
 - **[Chronometric Foundation Review V002](chronometric_foundation_review_v002.md)** — stricter audit of what is installed, what is still placeholder, and the staged path before ARC/data integration.
 - **[Chronometric A/B Q/A Overlay V030](chronometric_ab_qa_overlay_v030.md)** — A/B-centered open question loop for Nemo-style semantic reasoning feeding NanoWM branch scoring.
 - **[Chronometric Map Perception Gate V031](chronometric_map_perception_v031.md)** — palette-labeled image to grid, simple 3D geometry, object ray anchors, and strict accuracy gating before ray evidence is trusted.
-- **[Chronometric Sensory Alignment V032](chronometric_sensory_alignment_v032.md)** — visual and temporal confirmation records linking 2D maps, 3D geometry, predicted transitions, observed transitions, and outcome labels.
+- **[Chronometric Sensory Alignment V032](chronometric_sensory_alignment_v032.md)** — visual and temporal confirmation records linking 2D maps, 3D geometry, predicted transitions, observed transitions, and outcome imagination.
+- **[Chronometric Outcome Imagination V033](chronometric_outcome_imagination_v033.md)** — corrected outcome channel: pre-action imagined signed-Y is available for planning, observed signed-Y is post-action calibration truth.
 - **[Chronometric Testing](chronometric_testing.md)** — dated mechanics smoke condition, gates, and the bridge-manifest schema used before ARC data can enter NanoWM tests.
 - **[Evaluation](evaluation.md)** — `experiment=evaluate_only`, scheduling modes, metric definitions, headline numbers on each domain.
 - **[Datasets](datasets/README.md)** — DINO-WM (5 envs), RT-1 fractal, CSGO. Download / split / format / config.

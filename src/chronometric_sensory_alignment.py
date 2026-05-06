@@ -30,6 +30,14 @@ class OutcomeLabel:
     polarity: str = "unknown"
 
 
+@dataclass(frozen=True)
+class ImaginedOutcome:
+    signed_y: float | None = None
+    polarity: str = "unknown"
+    confidence: float = 0.0
+    source: str = "pre_action_simulation"
+
+
 def project_geometry_to_grid(geometry: GridGeometry) -> Grid:
     """Flatten 3D geometry labels back into a 2D label grid."""
     rows = [[0 for _ in range(geometry.width)] for _ in range(geometry.height)]
@@ -157,6 +165,63 @@ def evaluate_temporal_alignment(
     }
 
 
+def evaluate_outcome_imagination(
+    *,
+    imagined_signed_y: float | None,
+    imagined_confidence: float,
+    observed_signed_y: float | None = None,
+    min_imagined_confidence: float = 0.0,
+    max_signed_abs_error: float | None = None,
+) -> dict[str, Any]:
+    """Compare pre-action imagined outcome against post-action observed outcome.
+
+    The imagined outcome is part of the branch simulation and is available
+    before action. The observed outcome is an optional post-action label for
+    calibration and must not be treated as pre-action evidence.
+    """
+    _validate_confidence(imagined_confidence, "imagined_confidence")
+    imagined = ImaginedOutcome(
+        signed_y=imagined_signed_y,
+        polarity=_outcome_polarity(imagined_signed_y),
+        confidence=imagined_confidence,
+    )
+    observed = OutcomeLabel(
+        signed_y=observed_signed_y,
+        polarity=_outcome_polarity(observed_signed_y),
+    )
+    gate_failures: list[str] = []
+    if imagined.signed_y is None:
+        gate_failures.append("imagined_outcome_missing")
+    if imagined.confidence < min_imagined_confidence:
+        gate_failures.append("imagined_outcome_confidence")
+
+    signed_abs_error = None
+    polarity_match = None
+    if imagined.signed_y is not None and observed.signed_y is not None:
+        signed_abs_error = abs(imagined.signed_y - observed.signed_y)
+        polarity_match = imagined.polarity == observed.polarity
+        if not polarity_match:
+            gate_failures.append("outcome_polarity_match")
+        if max_signed_abs_error is not None and signed_abs_error > max_signed_abs_error:
+            gate_failures.append("outcome_signed_abs_error")
+
+    return {
+        "imagined": asdict(imagined),
+        "observed": asdict(observed),
+        "comparison": {
+            "observed_available": observed.signed_y is not None,
+            "signed_abs_error": signed_abs_error,
+            "polarity_match": polarity_match,
+        },
+        "trusted": not gate_failures,
+        "gate_failures": tuple(gate_failures),
+        "gate_thresholds": {
+            "min_imagined_confidence": min_imagined_confidence,
+            "max_signed_abs_error": max_signed_abs_error,
+        },
+    }
+
+
 def build_sensory_confirmation_record(
     *,
     state_id: str,
@@ -168,12 +233,15 @@ def build_sensory_confirmation_record(
     labels: Sequence[ColorLabel],
     playable_values: Sequence[int] = (0,),
     wall_values: Sequence[int] = (),
+    imagined_outcome_y: float | None = None,
+    imagined_outcome_confidence: float = 0.0,
     signed_outcome_y: float | None = None,
 ) -> dict[str, Any]:
     """Build one state/action confirmation record from visual and temporal senses.
 
-    Outcome is kept as a label for later correlation. It is not part of the
-    sensory trust gate and should not be fed back as a perception input.
+    Imagined outcome is pre-action simulation and can guide branch choice.
+    Observed outcome is post-action truth for calibration and must not be
+    leaked into the visual/temporal senses.
     """
     geometry = build_grid_geometry(
         predicted_grid,
@@ -197,15 +265,24 @@ def build_sensory_confirmation_record(
         predicted_after_grid,
         actual_after_grid,
     )
-    outcome = OutcomeLabel(
-        signed_y=signed_outcome_y,
-        polarity=_outcome_polarity(signed_outcome_y),
+    outcome = evaluate_outcome_imagination(
+        imagined_signed_y=imagined_outcome_y,
+        imagined_confidence=imagined_outcome_confidence,
+        observed_signed_y=signed_outcome_y,
     )
-    trusted = bool(visual_map["trusted"] and visual_geometry["trusted"] and temporal["trusted"])
+    trusted = bool(
+        visual_map["trusted"]
+        and visual_geometry["trusted"]
+        and temporal["trusted"]
+        and outcome["trusted"]
+    )
 
     return {
         "state_id": state_id,
         "action": action,
+        "pre_action_simulation": {
+            "imagined_outcome": outcome["imagined"],
+        },
         "senses": {
             "visual": {
                 "map": visual_map,
@@ -213,11 +290,17 @@ def build_sensory_confirmation_record(
             },
             "temporal": temporal,
         },
+        "post_action_observation": {
+            "observed_outcome": outcome["observed"],
+        },
+        "outcome_imagination": outcome,
         "confirmation": {
             "trusted": trusted,
+            "sensory_trusted": bool(visual_map["trusted"] and visual_geometry["trusted"] and temporal["trusted"]),
+            "outcome_imagination_trusted": outcome["trusted"],
             "failed_senses": _failed_senses(visual_map, visual_geometry, temporal),
+            "failed_outcome": tuple(outcome["gate_failures"]),
         },
-        "outcome_label": asdict(outcome),
     }
 
 
@@ -274,6 +357,11 @@ def _outcome_polarity(signed_outcome_y: float | None) -> str:
     if signed_outcome_y < 0:
         return "negative"
     return "neutral"
+
+
+def _validate_confidence(value: float, name: str) -> None:
+    if value < 0.0 or value > 1.0:
+        raise ValueError(f"{name} must be in [0, 1]")
 
 
 def _failed_senses(

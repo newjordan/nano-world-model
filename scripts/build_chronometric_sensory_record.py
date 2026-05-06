@@ -38,11 +38,13 @@ def main() -> int:
         labels=labels,
         playable_values=playable_values,
         wall_values=wall_values,
+        imagined_outcome_y=args.imagined_outcome_y,
+        imagined_outcome_confidence=args.imagined_outcome_confidence,
         signed_outcome_y=args.signed_outcome_y,
     )
     condition = {
         "run_label": args.run_label,
-        "run_type": "chronometric_sensory_alignment_v032",
+        "run_type": "chronometric_sensory_alignment_v033",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "state_id": args.state_id,
         "action": args.action,
@@ -53,7 +55,9 @@ def main() -> int:
         "labels": str(args.labels),
         "playable_values": playable_values,
         "wall_values": wall_values,
-        "signed_outcome_y_attached_as_label": args.signed_outcome_y is not None,
+        "imagined_outcome_y": args.imagined_outcome_y,
+        "imagined_outcome_confidence": args.imagined_outcome_confidence,
+        "observed_signed_outcome_y_attached": args.signed_outcome_y is not None,
         "training_data_promoted": False,
         **_git_condition(),
     }
@@ -77,6 +81,8 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--out-dir", required=True, type=Path)
     parser.add_argument("--playable-values", default="0")
     parser.add_argument("--wall-values", default="")
+    parser.add_argument("--imagined-outcome-y", required=True, type=float)
+    parser.add_argument("--imagined-outcome-confidence", type=float, default=1.0)
     parser.add_argument("--signed-outcome-y", type=float, default=None)
     return parser.parse_args()
 
@@ -128,6 +134,7 @@ def _run_git(*args: str) -> str:
 def _write_results(path: Path, condition: dict[str, Any], record: dict[str, Any]) -> None:
     visual = record["senses"]["visual"]
     temporal = record["senses"]["temporal"]
+    outcome = record["outcome_imagination"]
     lines = [
         f"# {condition['run_label']}",
         "",
@@ -148,10 +155,16 @@ def _write_results(path: Path, condition: dict[str, Any], record: dict[str, Any]
         f"- change recall: `{temporal['change_recall']}`",
         f"- actual change count: `{temporal['actual_change_count']}`",
         "",
-        "## Outcome Label",
+        "## Outcome Imagination",
         "",
-        f"- signed_y: `{record['outcome_label']['signed_y']}`",
-        f"- polarity: `{record['outcome_label']['polarity']}`",
+        f"- imagined signed_y: `{outcome['imagined']['signed_y']}`",
+        f"- imagined polarity: `{outcome['imagined']['polarity']}`",
+        f"- imagined confidence: `{outcome['imagined']['confidence']}`",
+        f"- observed signed_y: `{outcome['observed']['signed_y']}`",
+        f"- observed polarity: `{outcome['observed']['polarity']}`",
+        f"- polarity match: `{outcome['comparison']['polarity_match']}`",
+        f"- signed abs error: `{outcome['comparison']['signed_abs_error']}`",
+        f"- outcome imagination trusted: `{outcome['trusted']}`",
         "",
         "## Condition",
         "",

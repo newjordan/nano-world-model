@@ -2,6 +2,46 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V033 Pre-Action Outcome Imagination
+
+Artifacts:
+
+- `docs/chronometric_outcome_imagination_v033.md`
+- `docs/chronometric_sensory_alignment_v032.md`
+- `scripts/build_chronometric_sensory_record.py`
+- `src/chronometric_sensory_alignment.py`
+- `tests/test_chronometric_sensory_alignment.py`
+
+Condition:
+
+- no training run
+- no ARC solve claim
+- no Nemo call yet
+- run label: `new_experiment`
+- imagined signed-Y outcome is pre-action simulation
+- observed signed-Y outcome is post-action calibration truth
+- planner may use imagined outcome before action: `True`
+- observed outcome used as visual/temporal input: `False`
+- condition/result harness requires `--imagined-outcome-y`
+- condition run type: `chronometric_sensory_alignment_v033`
+- training data promoted: `False`
+
+Verification:
+
+- `python -m py_compile src/chronometric_sensory_alignment.py src/chronometric_map_perception.py scripts/build_chronometric_sensory_record.py`
+- `python -m pytest tests/test_chronometric_sensory_alignment.py tests/test_chronometric_map_perception.py`
+- result: `15 passed`
+- `python -m pytest tests/test_chronometric_sensory_alignment.py tests/test_chronometric_map_perception.py tests/test_chronometric_ab_overlay.py tests/test_chronometric_grid_imagination.py tests/test_chronometric_branch_selection.py tests/test_chronometric_planner_scoring.py tests/test_chronometric_branch_library.py tests/test_chronometric_contortion.py`
+- result: `43 passed`
+
+Decision:
+
+V033 fixes the V032 wording and interface bug. Outcome is no longer only a
+post-action label. The record now contains a pre-action `imagined_outcome` with
+confidence, a post-action `observed_outcome` when available, and an
+`outcome_imagination` comparison gate. This is the branch-level target the
+world model should simulate before action.
+
 ## V032 Visual And Temporal Sensory Alignment
 
 Artifacts:
@@ -20,8 +60,9 @@ Condition:
 - visual sense includes current map trust, 2D/3D geometry projection, and ray
   contact trust
 - temporal sense includes predicted next-state versus observed next-state
-- signed-Y outcome may be attached only as a label for later correlation
-- outcome values used as sensory inputs: `False`
+- corrected by V033: imagined signed-Y outcome is a pre-action simulation
+  channel; observed signed-Y remains post-action truth
+- observed outcome values used as visual/temporal inputs: `False`
 - condition/result harness implemented: `True`
 - training data promoted: `False`
 
@@ -37,9 +78,9 @@ Decision:
 
 V032 formalizes the visual and temporal senses. Each state/action datapoint can
 now become a confirmation record: current 2D map, simple 3D projection, ray
-trust, predicted next-state, observed next-state, and optional outcome label.
-This gives the later planner/correlation work a clean evidence unit without
-letting the outcome leak into perception.
+trust, predicted next-state, and observed next-state. V033 extends this record
+with pre-action imagined outcome and post-action observed outcome comparison
+without letting observed outcome leak into perception.
 
 ## V031 Labeled Map Perception And Ray Accuracy Gate
 

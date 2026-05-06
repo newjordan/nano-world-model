@@ -20,7 +20,8 @@ API, V028 proves deterministic selection works when multi-action state groups
 exist, V029 validates heldout branch choice on the V033 nonlocal candidate
 surface, V030 defines the A/B Q/A packet plus gridspace imagination raymap,
 V031 adds the labeled-image to grid, 3D geometry, and strict ray accuracy gate,
-and V032 separates visual and temporal senses into confirmation records.
+V032 separates visual and temporal senses into confirmation records, and V033
+makes imagined signed-Y outcome a pre-action simulation channel.
 
 ## Hard Boundaries
 
@@ -40,8 +41,10 @@ and V032 separates visual and temporal senses into confirmation records.
   confidence, and candidate branches.
 - Do not let raycasts influence action selection unless the map perception gate
   reports trusted labels, geometry, and ray contacts.
-- Keep outcome values as labels for correlation/evaluation, not as visual or
-  temporal sense inputs.
+- Keep observed outcome values as post-action calibration labels, not as visual
+  or temporal sense inputs.
+- Keep imagined outcome values as pre-action simulation outputs that the
+  planner may use for branch choice.
 
 ## Active Metrics
 

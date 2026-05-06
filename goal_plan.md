@@ -132,15 +132,17 @@ iteration.
   harness now writes condition, geometry, metrics, and result artifacts.
 - V032: Added visual and temporal sensory alignment records. Result: 2D map,
   3D geometry projection, ray trust, predicted next-state, observed next-state,
-  and optional signed-Y outcome label now form one confirmation record per
-  state/action; the outcome is carried as a correlation label, not a sense
-  input.
+  and outcome confirmation now form one confirmation record per state/action.
+- V033: Corrected outcome handling. Result: imagined signed-Y outcome is now a
+  pre-action simulation channel with confidence, observed signed-Y outcome is
+  post-action calibration truth, and the record compares the two without
+  leaking observed outcome into visual/temporal perception.
 
 ## Active Queue
 
-1. Ray-gated branch selection: feed V032 trusted visual+temporal confirmation
-   records into V029-style candidate selection as auxiliary evidence, not as
-   target labels.
+1. Outcome-imagined branch selection: feed V033 trusted visual+temporal+
+   imagined-outcome records into V029-style candidate selection as auxiliary
+   evidence.
    Goal: prove the internal map can constrain action choice without bypassing
    NanoWM scoring.
 
