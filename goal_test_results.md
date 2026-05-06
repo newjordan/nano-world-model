@@ -2,6 +2,45 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V032 Visual And Temporal Sensory Alignment
+
+Artifacts:
+
+- `docs/chronometric_sensory_alignment_v032.md`
+- `scripts/build_chronometric_sensory_record.py`
+- `src/chronometric_sensory_alignment.py`
+- `tests/test_chronometric_sensory_alignment.py`
+
+Condition:
+
+- no training run
+- no ARC solve claim
+- no Nemo call yet
+- run label: `new_experiment`
+- visual sense includes current map trust, 2D/3D geometry projection, and ray
+  contact trust
+- temporal sense includes predicted next-state versus observed next-state
+- signed-Y outcome may be attached only as a label for later correlation
+- outcome values used as sensory inputs: `False`
+- condition/result harness implemented: `True`
+- training data promoted: `False`
+
+Verification:
+
+- `python -m py_compile src/chronometric_sensory_alignment.py src/chronometric_map_perception.py scripts/build_chronometric_sensory_record.py`
+- `python -m pytest tests/test_chronometric_sensory_alignment.py tests/test_chronometric_map_perception.py`
+- result: `13 passed`
+- `python -m pytest tests/test_chronometric_sensory_alignment.py tests/test_chronometric_map_perception.py tests/test_chronometric_ab_overlay.py tests/test_chronometric_grid_imagination.py tests/test_chronometric_branch_selection.py tests/test_chronometric_planner_scoring.py tests/test_chronometric_branch_library.py tests/test_chronometric_contortion.py`
+- result: `41 passed`
+
+Decision:
+
+V032 formalizes the visual and temporal senses. Each state/action datapoint can
+now become a confirmation record: current 2D map, simple 3D projection, ray
+trust, predicted next-state, observed next-state, and optional outcome label.
+This gives the later planner/correlation work a clean evidence unit without
+letting the outcome leak into perception.
+
 ## V031 Labeled Map Perception And Ray Accuracy Gate
 
 Artifacts:

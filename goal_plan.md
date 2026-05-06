@@ -130,29 +130,38 @@ iteration.
   3D height geometry, non-wall objects emit rays, and cell/height/ray contact
   accuracy must pass a strict trust gate before ray evidence is usable; a
   harness now writes condition, geometry, metrics, and result artifacts.
+- V032: Added visual and temporal sensory alignment records. Result: 2D map,
+  3D geometry projection, ray trust, predicted next-state, observed next-state,
+  and optional signed-Y outcome label now form one confirmation record per
+  state/action; the outcome is carried as a correlation label, not a sense
+  input.
 
 ## Active Queue
 
-1. Ray-gated branch selection: feed V031 trusted ray evidence into V029-style
-   candidate selection as an auxiliary explanation/trust signal, not as a
-   target label.
+1. Ray-gated branch selection: feed V032 trusted visual+temporal confirmation
+   records into V029-style candidate selection as auxiliary evidence, not as
+   target labels.
    Goal: prove the internal map can constrain action choice without bypassing
    NanoWM scoring.
 
-2. Raw screenshot perception adapter: add a renderer/screenshot fixture or
+2. Batch sensory-record builder: convert recorded state/action traces into
+   confirmation-record JSONL for correlation sweeps.
+   Goal: turn each datapoint into comparable visual and temporal evidence.
+
+3. Raw screenshot perception adapter: add a renderer/screenshot fixture or
    detector stub that produces the palette-labeled image required by V031.
    Goal: separate image parsing accuracy from geometry/raycast correctness.
 
-3. Full NanoWM/CEM integration: wire chronometric scoring into the real
+4. Full NanoWM/CEM integration: wire chronometric scoring into the real
    planner path once heldout branch choice has a small deterministic smoke.
    Goal: avoid hiding scorer bugs inside diffusion rollout complexity.
 
-4. Fresh heldout family: build or select the next heldout family beyond
+5. Fresh heldout family: build or select the next heldout family beyond
    V015/V016 after the action-candidate manifest is available.
    Goal: test whether the mechanism survives a new family with real branch
    alternatives instead of polishing a nearly saturated split.
 
-5. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
+6. Stasis-no-change guardrail: keep the tiny residual visible in diagnostics,
    but do not tune directly against it unless it grows on a new heldout family.
    Goal: prevent research drift into cosmetic residual chasing.
 

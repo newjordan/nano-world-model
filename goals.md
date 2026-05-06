@@ -18,8 +18,9 @@ Wire perception-trusted imagination into planner-facing branch choice. V027
 proves branch scores flow through the NanoWM-compatible chronometric scoring
 API, V028 proves deterministic selection works when multi-action state groups
 exist, V029 validates heldout branch choice on the V033 nonlocal candidate
-surface, V030 defines the A/B Q/A packet plus gridspace imagination raymap, and
-V031 adds the labeled-image to grid, 3D geometry, and strict ray accuracy gate.
+surface, V030 defines the A/B Q/A packet plus gridspace imagination raymap,
+V031 adds the labeled-image to grid, 3D geometry, and strict ray accuracy gate,
+and V032 separates visual and temporal senses into confirmation records.
 
 ## Hard Boundaries
 
@@ -39,6 +40,8 @@ V031 adds the labeled-image to grid, 3D geometry, and strict ray accuracy gate.
   confidence, and candidate branches.
 - Do not let raycasts influence action selection unless the map perception gate
   reports trusted labels, geometry, and ray contacts.
+- Keep outcome values as labels for correlation/evaluation, not as visual or
+  temporal sense inputs.
 
 ## Active Metrics
 
