@@ -95,12 +95,17 @@ iteration.
   with the translation fallback. Result: heldout signed-Y MAE improved to
   `0.00184883`, translation/time-phase MAE reached `0.0`, and progress
   accuracy stayed `1.0`.
+- V025: Broadened train-built branch-library coverage to stasis-loop behavior
+  with time-separated stasis-loop keys. Result: heldout signed-Y MAE improved
+  to `0.0000961539`, translation/time-phase/stasis-loop MAE all reached `0.0`,
+  and progress accuracy stayed `1.0`.
 
 ## Active Queue
 
-1. V025: broaden train-built library coverage to stasis-loop behavior.
-   Goal: test whether stasis-loop residuals can be reduced by train-derived
-   branch prototypes before inventing any new fallback rule.
+1. Cross-family validation: rerun the broader library/fallback stack on a
+   different heldout family or build the next bridge manifest.
+   Goal: verify V025 is a reusable chronometric mechanism, not just saturation
+   of the V016 heldout family.
 
 2. C-model integration: route the calibration head output back into NanoWM
    chronometric branch scoring.

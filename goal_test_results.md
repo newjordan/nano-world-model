@@ -2,6 +2,58 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V025 Stasis-Loop Branch Library Scope
+
+Artifacts:
+
+- `src/chronometric_branch_library.py`
+- `tests/test_chronometric_branch_library.py`
+- `experiments/2026-05-05_chronometric_branch_library_v025_stasis_loop_scope_v018_geometry_predictions/`
+- `experiments/2026-05-05_chronometric_bucket_eval_v025_stasis_loop_scope/`
+- `experiments/2026-05-05_chronometric_feature_coverage_v025_stasis_loop_scope/`
+
+Condition:
+
+- source predictions:
+  `experiments/2026-05-05_chronometric_calibration_v018_geometry_v015_support_v016_holdout_balance_cpu/predictions.jsonl`
+- manifest:
+  `experiments/2026-05-05_arc_bridge_manifest_v017_v015_support_v016_holdout/arc_bridge_manifest.jsonl`
+- branch library source split: `train`
+- library scope: `time_phase_translation_stasis_loop`
+- fallback scope: `time_phase_translation_potential`
+- stasis-loop key fields: `action_id`, `control_label`, `t`, `changed_cells`
+- heldout labels used: `False`
+- training data promoted: `False`
+- clean diagnostic condition: `git_dirty=False`
+
+Verification:
+
+- `python -m pytest tests/test_chronometric_branch_library.py tests/test_chronometric_contortion.py tests/test_chronometric_calibration.py`
+- result: `28 passed`
+- `python -m py_compile src/chronometric_branch_library.py scripts/apply_chronometric_branch_library.py src/models/chronometric_contortion.py src/models/nanowm.py`
+
+Metrics:
+
+- library entries: `548`
+- adjusted records: `6770`
+- fallback records: `20`
+- heldout adjusted records: `335`
+- heldout signed-Y MAE: `0.00009615391492843628`
+- heldout progress accuracy: `1.0`
+- heldout translation signed-Y MAE: `0.0`
+- heldout time-phase signed-Y MAE: `0.0`
+- heldout stasis-loop signed-Y MAE: `0.0`
+- top heldout action-control bucket:
+  `ACTION1|stasis_no_change` at signed-Y MAE `0.0010143592953681946`
+
+Decision:
+
+V025 validates train-built stasis-loop prototypes and avoids mixing early
+partial loop penalties with late full-stasis penalties by including time step
+in the key. The V016 heldout family is now close to saturated; the next useful
+evidence should be cross-family validation or planner integration, not another
+weight tweak on this split.
+
 ## V024 Time-Phase And Translation Potential Fallback
 
 Artifacts:

@@ -252,3 +252,20 @@ V024 added the matching observation-derived fallback for time-phase rows:
 The remaining residual has moved to stasis-loop behavior. The top bucket is
 `ACTION6|dominant_group:stasis_loop` at signed-Y MAE `0.0108481`, followed by
 `ACTION5|dominant_group:stasis_loop` at `0.00760109`.
+
+V025 broadened the train-built branch library to stasis-loop behavior:
+
+- added `dominant_stasis_loop` and combined
+  `time_phase_translation_stasis_loop` library scopes.
+- stasis-loop keys use action, changed-cell count, and safe time step, which
+  keeps early partial loop penalties separate from later full stasis penalties.
+- V025 used train targets only, with the V024 potential fallback still enabled
+  for missing time-phase/translation rows.
+- heldout signed-Y MAE improved from V024 `0.00184883` to
+  `0.0000961539`.
+- heldout translation, time-phase, and stasis-loop MAE all reached `0.0`;
+  progress accuracy stayed `1.0`.
+
+The remaining residual is now tiny stasis-no-change bias, led by
+`ACTION1|stasis_no_change` at signed-Y MAE `0.00101436`. This suggests the
+current heldout family is nearly saturated as a calibration target.
