@@ -23,7 +23,9 @@ sys.path.insert(0, str(SRC))
 from chronometric_calibration import (  # noqa: E402
     FEATURE_NAMES,
     LEAKAGE_EXCLUDED_FIELDS,
+    BranchConsistencyPair,
     ChronometricCalibrationMLP,
+    branch_consistency_pairs,
     examples_to_action6_time_phase_mask,
     examples_to_negative_control_mask,
     examples_to_tensors,
@@ -306,6 +308,51 @@ def _signed_loss_weights(
     }
 
 
+def _branch_consistency_loss(
+    train_outputs: dict[str, torch.Tensor],
+    pairs: list[BranchConsistencyPair],
+    *,
+    heldout_outputs: dict[str, torch.Tensor] | None = None,
+) -> torch.Tensor:
+    if not pairs:
+        return train_outputs["signed_y"].new_tensor(0.0)
+    losses = []
+    for pair in pairs:
+        left = _pair_signed_output(pair.left_split, pair.left_index, train_outputs, heldout_outputs)
+        right = _pair_signed_output(pair.right_split, pair.right_index, train_outputs, heldout_outputs)
+        losses.append((left - right).pow(2))
+    return torch.stack(losses).mean()
+
+
+def _pair_signed_output(
+    split: str,
+    index: int,
+    train_outputs: dict[str, torch.Tensor],
+    heldout_outputs: dict[str, torch.Tensor] | None,
+) -> torch.Tensor:
+    if split == "train":
+        return train_outputs["signed_y"][index]
+    if split == "heldout":
+        if heldout_outputs is None:
+            raise ValueError("heldout branch consistency pair requires heldout outputs")
+        return heldout_outputs["signed_y"][index]
+    raise ValueError(f"unsupported branch consistency split: {split}")
+
+
+def _branch_consistency_summary(pairs: list[BranchConsistencyPair]) -> dict[str, Any]:
+    pair_types: dict[str, int] = {}
+    keys: dict[str, int] = {}
+    for pair in pairs:
+        pair_type = f"{pair.left_split}->{pair.right_split}"
+        pair_types[pair_type] = pair_types.get(pair_type, 0) + 1
+        keys[pair.key] = keys.get(pair.key, 0) + 1
+    return {
+        "pairs": len(pairs),
+        "pair_types": dict(sorted(pair_types.items())),
+        "keys": dict(sorted(keys.items())),
+    }
+
+
 def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> dict[str, Any]:
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -355,6 +402,16 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             heldout_families,
         )
     pos_weight = _pos_weight(train_progress)
+    branch_pairs = branch_consistency_pairs(
+        split.train,
+        heldout=split.heldout,
+        include_heldout=args.branch_consistency_include_heldout,
+        max_pairs=args.branch_consistency_max_pairs,
+    )
+    branch_summary = _branch_consistency_summary(branch_pairs)
+    branch_uses_heldout_features = any(
+        pair.left_split == "heldout" or pair.right_split == "heldout" for pair in branch_pairs
+    )
 
     model = ChronometricCalibrationMLP(
         input_dim=train_x.shape[1],
@@ -429,6 +486,26 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             negative_control_weight=args.negative_control_weight,
             negative_control_margin=args.negative_control_margin,
         )
+        if args.branch_consistency_weight > 0.0 and branch_pairs:
+            heldout_outputs_for_branch = None
+            if branch_uses_heldout_features:
+                if heldout_tensors is None:
+                    raise ValueError("heldout branch consistency requested without heldout tensors")
+                heldout_outputs_for_branch = model(heldout_tensors[0])
+            branch_loss = _branch_consistency_loss(
+                outputs,
+                branch_pairs,
+                heldout_outputs=heldout_outputs_for_branch,
+            )
+            loss = loss + args.branch_consistency_weight * branch_loss
+            parts["branch_consistency_mse"] = float(branch_loss.detach().cpu().item())
+            parts["branch_consistency_weighted"] = float(
+                (args.branch_consistency_weight * branch_loss).detach().cpu().item()
+            )
+            parts["total"] = float(loss.detach().cpu().item())
+        else:
+            parts["branch_consistency_mse"] = 0.0
+            parts["branch_consistency_weighted"] = 0.0
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
         optimizer.step()
@@ -467,6 +544,12 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
     if split.heldout:
         eval_scope = f"group_holdout_by_{args.holdout_key}"
         run_kind = "group_holdout_calibration_smoke"
+    if args.branch_consistency_weight > 0.0 and branch_pairs:
+        if branch_uses_heldout_features:
+            eval_scope = f"{eval_scope}_with_unlabeled_heldout_branch_consistency"
+            run_kind = "transductive_branch_consistency_diagnostic"
+        else:
+            run_kind = f"{run_kind}_with_train_branch_consistency"
     condition = {
         "run_label": args.run_label,
         "run_kind": run_kind,
@@ -510,6 +593,7 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             "progress": args.progress_weight,
             "family": args.family_weight,
             "negative_control": args.negative_control_weight,
+            "branch_consistency": args.branch_consistency_weight,
         },
         "auxiliary_objectives": {
             "negative_control_labels": [
@@ -529,6 +613,15 @@ def train(args: argparse.Namespace, *, fallback_reason: str | None = None) -> di
             "bucket": "action6_coordinate_dominant_time_phase",
             "train": train_signed_balance,
             "heldout": heldout_signed_balance,
+        },
+        "branch_consistency": {
+            "enabled": args.branch_consistency_weight > 0.0,
+            "weight": args.branch_consistency_weight,
+            "include_heldout_features": args.branch_consistency_include_heldout,
+            "uses_heldout_features": branch_uses_heldout_features,
+            "heldout_labels_used": False,
+            "max_pairs": args.branch_consistency_max_pairs,
+            **branch_summary,
         },
         "feature_names": list(FEATURE_NAMES),
         "leakage_excluded_fields": list(LEAKAGE_EXCLUDED_FIELDS),
@@ -621,6 +714,7 @@ def _format_results(summary: dict[str, Any]) -> str:
     auxiliary = condition.get("auxiliary_objectives") or {}
     signed_balance = condition.get("signed_objective_balancing") or {}
     train_signed_balance = signed_balance.get("train") or {}
+    branch_consistency = condition.get("branch_consistency") or {}
     status = "supervised fit smoke for a small chronometric calibration head."
     claim = (
         "This is not a held-out quality claim. It verifies that bridge rows can drive a learned "
@@ -658,6 +752,10 @@ def _format_results(summary: dict[str, Any]) -> str:
         f"- ACTION6 time-phase signed balance: `{train_signed_balance.get('enabled')}`",
         f"- ACTION6 time-phase train records: `{train_signed_balance.get('action6_time_phase_records')}`",
         f"- ACTION6 time-phase signed weight: `{train_signed_balance.get('applied_action6_time_phase_weight')}`",
+        f"- branch consistency enabled: `{branch_consistency.get('enabled')}`",
+        f"- branch consistency weight: `{branch_consistency.get('weight')}`",
+        f"- branch consistency pairs: `{branch_consistency.get('pairs')}`",
+        f"- branch consistency uses heldout features: `{branch_consistency.get('uses_heldout_features')}`",
         f"- training data promoted: `{condition['training_data_promoted']}`",
         "",
         "## Metrics",
@@ -746,6 +844,23 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=256.0,
         help="Maximum rare-bucket signed-Y loss weight when ACTION6 time-phase balancing is enabled.",
+    )
+    parser.add_argument(
+        "--branch-consistency-weight",
+        type=float,
+        default=0.0,
+        help="Signed-Y consistency loss weight for matched ACTION6 time-phase coordinate branches.",
+    )
+    parser.add_argument(
+        "--branch-consistency-include-heldout",
+        action="store_true",
+        help="Allow unlabeled heldout branch features in consistency pairs. Labels remain excluded.",
+    )
+    parser.add_argument(
+        "--branch-consistency-max-pairs",
+        type=int,
+        default=256,
+        help="Maximum number of branch-consistency pairs to include.",
     )
     parser.add_argument(
         "--negative-control-weight",

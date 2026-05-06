@@ -90,6 +90,15 @@ class CalibrationExampleSplit:
     heldout_groups: list[str]
 
 
+@dataclass(frozen=True)
+class BranchConsistencyPair:
+    left_split: str
+    left_index: int
+    right_split: str
+    right_index: int
+    key: str
+
+
 def _number(value: Any, default: float = 0.0) -> float:
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         return float(value)
@@ -129,6 +138,65 @@ def is_action6_coordinate_time_phase_record(record: dict[str, Any]) -> bool:
         and record.get("control_label") == "dominant_group:time_phase"
         and family.get("time_phase.repeated_effect_size", 0.0) > 0.0
     )
+
+
+def action6_time_phase_geometry_key(record: dict[str, Any], *, grid_scale: int = 64) -> str | None:
+    """Geometry key for ACTION6 time-phase branch consistency.
+
+    The key deliberately ignores source family, phase, time, movement, and
+    target outcome. It keeps only the action bucket and coordinate cell so the
+    consistency objective can connect matched coordinate-family branches.
+    """
+    if not is_action6_coordinate_time_phase_record(record):
+        return None
+    action_context = record.get("action_context")
+    x_index = round(_get_sequence_number(action_context, 2) * grid_scale)
+    y_index = round(_get_sequence_number(action_context, 3) * grid_scale)
+    return f"ACTION6|dominant_group:time_phase|x:{x_index}|y:{y_index}"
+
+
+def branch_consistency_pairs(
+    train: list[CalibrationExample],
+    *,
+    heldout: list[CalibrationExample] | None = None,
+    include_heldout: bool = False,
+    max_pairs: int = 256,
+) -> list[BranchConsistencyPair]:
+    train_by_key: dict[str, list[int]] = defaultdict(list)
+    for index, example in enumerate(train):
+        key = action6_time_phase_geometry_key(example.record)
+        if key is not None:
+            train_by_key[key].append(index)
+
+    pairs: list[BranchConsistencyPair] = []
+    for key, indices in sorted(train_by_key.items()):
+        sorted_indices = sorted(indices, key=lambda index: _source_order_key(train[index].record, index))
+        for left_position, left_index in enumerate(sorted_indices):
+            for right_index in sorted_indices[left_position + 1 :]:
+                if _source_family_key(train[left_index].record) == _source_family_key(train[right_index].record):
+                    continue
+                pairs.append(BranchConsistencyPair("train", left_index, "train", right_index, key))
+
+    if include_heldout and heldout:
+        for heldout_index, example in enumerate(heldout):
+            key = action6_time_phase_geometry_key(example.record)
+            if key is None:
+                continue
+            for train_index in sorted(train_by_key.get(key, []), key=lambda index: _source_order_key(train[index].record, index)):
+                if _source_family_key(train[train_index].record) == _source_family_key(example.record):
+                    continue
+                pairs.append(BranchConsistencyPair("train", train_index, "heldout", heldout_index, key))
+
+    return pairs[: max(max_pairs, 0)]
+
+
+def _source_family_key(record: dict[str, Any]) -> str:
+    value = record.get("source_condition_artifact") or record.get("source_artifact_path") or ""
+    return str(value)
+
+
+def _source_order_key(record: dict[str, Any], index: int) -> tuple[str, str, int]:
+    return (_source_family_key(record), str(record.get("source_artifact_path", "")), index)
 
 
 def calibration_features(record: dict[str, Any], *, max_steps: float = 100.0) -> list[float]:

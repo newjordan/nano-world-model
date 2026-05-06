@@ -13,6 +13,8 @@ import torch
 from chronometric_calibration import (  # noqa: E402
     FEATURE_NAMES,
     ChronometricCalibrationMLP,
+    action6_time_phase_geometry_key,
+    branch_consistency_pairs,
     calibration_example,
     calibration_features,
     examples_to_action6_time_phase_mask,
@@ -158,6 +160,50 @@ def test_action6_time_phase_mask_uses_safe_bucket_fields():
     mask = examples_to_action6_time_phase_mask(examples, device=torch.device("cpu"))
 
     assert mask.squeeze(-1).tolist() == [1.0, 0.0, 0.0, 0.0, 0.0]
+
+
+def test_branch_consistency_pairs_match_geometry_across_families_without_targets():
+    train_a = synthetic_bridge_records()[0]
+    train_a["source_condition_artifact"] = "family_a"
+    train_a["source_artifact_path"] = "family_a/ka59.jsonl"
+    train_a["action_id"] = "ACTION6"
+    train_a["control_label"] = "dominant_group:time_phase"
+    train_a["action_context"] = [0.6, 1.0, 0.4375, 0.46875, 0.125, 1.0, 1.0, 1.0]
+    train_a["potential_family_names"] = ["time_phase.repeated_effect_size"]
+    train_a["potential_family_vector"] = [0.25]
+    train_a["signed_outcome_y"] = -1.0
+
+    train_b = copy.deepcopy(train_a)
+    train_b["source_condition_artifact"] = "family_b"
+    train_b["source_artifact_path"] = "family_b/ka59.jsonl"
+    train_b["signed_outcome_y"] = 1.0
+
+    heldout = copy.deepcopy(train_a)
+    heldout["source_condition_artifact"] = "family_c"
+    heldout["source_artifact_path"] = "family_c/ka59.jsonl"
+    heldout["signed_outcome_y"] = 0.0
+
+    not_matching = copy.deepcopy(train_a)
+    not_matching["source_condition_artifact"] = "family_d"
+    not_matching["action_context"][2] = 0.953125
+
+    assert action6_time_phase_geometry_key(train_a) == "ACTION6|dominant_group:time_phase|x:28|y:30"
+    assert action6_time_phase_geometry_key(not_matching) == "ACTION6|dominant_group:time_phase|x:61|y:30"
+
+    train_examples = [calibration_example(record) for record in (train_a, train_b, not_matching)]
+    heldout_examples = [calibration_example(heldout)]
+
+    train_pairs = branch_consistency_pairs(train_examples)
+    transductive_pairs = branch_consistency_pairs(train_examples, heldout=heldout_examples, include_heldout=True)
+
+    assert [(pair.left_split, pair.left_index, pair.right_split, pair.right_index) for pair in train_pairs] == [
+        ("train", 0, "train", 1),
+    ]
+    assert [(pair.left_split, pair.left_index, pair.right_split, pair.right_index) for pair in transductive_pairs] == [
+        ("train", 0, "train", 1),
+        ("train", 0, "heldout", 0),
+        ("train", 1, "heldout", 0),
+    ]
 
 
 def test_records_with_temporal_context_adds_prior_only_loop_features():
