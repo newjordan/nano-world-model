@@ -2,6 +2,69 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V029 V033 Heldout Action-Candidate Branch Choice
+
+Artifacts:
+
+- `experiments/2026-05-05_chronometric_planner_branch_score_v029_v033_heldout_action_candidates/`
+- `experiments/2026-05-05_chronometric_branch_selection_v029_v033_heldout_action_candidates/`
+
+Condition:
+
+- manifest:
+  `experiments/2026-05-05_arc_bridge_manifest_v011_nonlocal_second_family/arc_bridge_manifest.jsonl`
+- source predictions:
+  `experiments/2026-05-05_chronometric_calibration_v011_nonlocal_second_family_v033_holdout_cpu/predictions.jsonl`
+- source calibration heldout family:
+  `experiments/2026-05-05_v033_post_progress_nonlocal_replay/CONDITION.md`
+- scorer surface: `score_chronometric_branch_or_score_branch`
+- scorer implementation: `ChronometricContortionLayer.score_branch`
+- library scope: `time_phase_translation_stasis_loop`
+- fallback scope: `time_phase_translation_potential`
+- selector group fields: `split`, `task_id`, `frame_hash`, `t`
+- selector score policy: `library_or_calibration`
+- selection uses target labels: `False`
+- metrics use target labels: `True`
+- training data promoted: `False`
+- clean run conditions: `git_dirty=False`
+
+Verification:
+
+- `python scripts/score_chronometric_planner_branches.py --run-label chronometric_planner_branch_score_v029_v033_heldout_action_candidates --manifest experiments/2026-05-05_arc_bridge_manifest_v011_nonlocal_second_family/arc_bridge_manifest.jsonl --predictions experiments/2026-05-05_chronometric_calibration_v011_nonlocal_second_family_v033_holdout_cpu/predictions.jsonl --out-dir experiments/2026-05-05_chronometric_planner_branch_score_v029_v033_heldout_action_candidates --blend 1.0 --min-records 1 --library-scope time_phase_translation_stasis_loop --fallback-scope time_phase_translation_potential --seed 20260505 --device cpu --hidden-size 32 --frames 4 --batch-size 512 --potential-families 16`
+- `python scripts/select_chronometric_branches.py --run-label chronometric_branch_selection_v029_v033_heldout_action_candidates --input experiments/2026-05-05_chronometric_planner_branch_score_v029_v033_heldout_action_candidates/planner_scores.jsonl --out-dir experiments/2026-05-05_chronometric_branch_selection_v029_v033_heldout_action_candidates --group-fields split task_id frame_hash t --score-policy library_or_calibration --min-group-size 2`
+
+Planner-Score Metrics:
+
+- records scored: `6932`
+- library entries: `515`
+- planner-applied records: `6096`
+- heldout records: `3112`
+- heldout planner-applied records: `2937`
+- heldout unapplied records: `175`
+- heldout applied target signed-Y MAE: `1.1456821457561199e-09`
+
+Selection Metrics:
+
+- candidate records: `6932`
+- candidate records by split: train `3820`, heldout `3112`
+- groups: `1608`
+- selectable groups: `891`
+- selectable groups by split: train `712`, heldout `179`
+- selected records: `891`
+- heldout selected records: `179`
+- heldout branch-library-applied selected records: `168`
+- heldout oracle signed-best match rate: `1.0`
+- heldout mean selected target signed-Y: `-0.009034567039106146`
+- heldout progress-positive selected records: `1`
+
+Decision:
+
+V029 closes the V028 data-shape blocker by using a recorded heldout family
+that actually has same-state action alternatives. The selector made heldout
+branch choices without target labels and matched the signed-Y oracle under the
+recorded diagnostic metric. The next useful work is full planner/CEM wiring,
+not another posthoc selection variant.
+
 ## V028 Chronometric Branch Selection Smoke
 
 Artifacts:

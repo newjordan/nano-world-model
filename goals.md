@@ -14,10 +14,10 @@ signals, phase/time features, and bounded branch calibration heads.
 
 ## Current Research Target
 
-Build a heldout branch-choice surface. V027 proves branch scores flow through
-the NanoWM-compatible chronometric scoring API, and V028 proves deterministic
-selection works when multi-action state groups exist. The current blocker is
-data shape: V015 heldout rows have no multi-action groups under the state key.
+Wire branch choice into the real planner path. V027 proves branch scores flow
+through the NanoWM-compatible chronometric scoring API, V028 proves
+deterministic selection works when multi-action state groups exist, and V029
+validates heldout branch choice on the V033 nonlocal candidate surface.
 
 ## Hard Boundaries
 
@@ -118,6 +118,29 @@ targets are used only for diagnostics.
 The selector works on available multi-action groups, but those groups are all
 train-side in this manifest. The next useful research step is a heldout/action
 candidate manifest, not more selector tuning on V015.
+
+V029 heldout action-candidate branch selection:
+
+- planner scores:
+  `experiments/2026-05-05_chronometric_planner_branch_score_v029_v033_heldout_action_candidates/`
+- selector artifact:
+  `experiments/2026-05-05_chronometric_branch_selection_v029_v033_heldout_action_candidates/`
+
+V029 reuses the recorded V011/V033 nonlocal heldout family because it contains
+real same-state action alternatives. It scores those rows through the V027
+planner-facing scorer, then selects branches with the V028 selector.
+
+- candidate records: `6932`
+- heldout candidate records: `3112`
+- selectable groups: `891`
+- heldout selectable groups: `179`
+- heldout selected records: `179`
+- heldout oracle signed-best match rate: `1.0`
+- heldout progress-positive selected records: `1`
+
+This closes the heldout branch-choice blocker for a recorded candidate surface.
+The next step should wire this objective into fuller planner/CEM flow rather
+than adding another posthoc selector variant.
 
 ## Checkpoint History
 
@@ -391,3 +414,14 @@ V028 consumed V027 scores in deterministic branch selection:
 
 The next bottleneck is not the selector. It is a heldout data surface that
 contains real action alternatives for the same state.
+
+V029 found and used that heldout data surface in the existing V011/V033
+nonlocal family:
+
+- scored `6932` V011 rows through the planner-facing scorer.
+- applied the branch-library path to `2937` heldout rows.
+- selected `179` heldout multi-action groups.
+- heldout oracle signed-best match rate was `1.0`.
+
+This makes the next engineering target explicit: consume chronometric branch
+selection inside the fuller planner path.
