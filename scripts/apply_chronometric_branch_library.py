@@ -123,11 +123,7 @@ def apply_library(args: argparse.Namespace) -> dict[str, Any]:
         "min_records": args.min_records,
         "library_scope": args.library_scope,
         "fallback_scope": args.fallback_scope,
-        "fallback_source_field": (
-            "potential_family_vector.transition.changed_cells"
-            if args.fallback_scope == "dominant_translation_potential"
-            else None
-        ),
+        "fallback_source_field": _fallback_source_field(args.fallback_scope),
         "library_key_strategy": "action_control_grid_coordinate_or_changed_cells",
         "library_source_split": "train",
         "library_source_field": "target_signed_y",
@@ -187,6 +183,19 @@ def _adjust_prediction(
     output["branch_library_signed_y"] = entry.signed_y_mean if entry is not None else None
     output["branch_library_blend"] = blend if entry is not None else 0.0
     return output
+
+
+def _fallback_source_field(fallback_scope: str) -> str | None:
+    if fallback_scope == "dominant_translation_potential":
+        return "potential_family_vector.transition.changed_cells"
+    if fallback_scope == "dominant_time_phase_potential":
+        return "potential_family_vector.time_phase.repeated_effect_size+transition.changed_cells"
+    if fallback_scope == "time_phase_translation_potential":
+        return (
+            "potential_family_vector.time_phase.repeated_effect_size+"
+            "transition.changed_cells;transition.changed_cells"
+        )
+    return None
 
 
 def _write_jsonl(path: Path, records: list[dict[str, Any]]) -> None:

@@ -16,7 +16,9 @@ BRANCH_LIBRARY_SCOPES = (
 )
 BRANCH_LIBRARY_FALLBACK_SCOPES = (
     "none",
+    "dominant_time_phase_potential",
     "dominant_translation_potential",
+    "time_phase_translation_potential",
 )
 GRID_CELL_COUNT = 4096
 
@@ -133,19 +135,43 @@ def blend_branch_library_signed_y(
 def branch_library_fallback_entry(row: dict[str, Any], *, fallback_scope: str) -> BranchLibraryEntry | None:
     if fallback_scope == "none":
         return None
+    if fallback_scope == "dominant_time_phase_potential":
+        return _dominant_time_phase_fallback_entry(row)
     if fallback_scope == "dominant_translation_potential":
-        key = dominant_translation_grid_key(row)
-        if key is None:
-            return None
-        signed_y = _family_lookup(row).get("transition.changed_cells", 0.0)
-        if signed_y <= 0.0:
-            return None
-        return BranchLibraryEntry(
-            key=f"fallback:dominant_translation_potential|{key}",
-            records=0,
-            signed_y_mean=signed_y,
-        )
+        return _dominant_translation_fallback_entry(row)
+    if fallback_scope == "time_phase_translation_potential":
+        return _dominant_time_phase_fallback_entry(row) or _dominant_translation_fallback_entry(row)
     raise ValueError(f"unknown branch library fallback scope: {fallback_scope}")
+
+
+def _dominant_time_phase_fallback_entry(row: dict[str, Any]) -> BranchLibraryEntry | None:
+    key = dominant_time_phase_grid_key(row)
+    if key is None:
+        return None
+    family = _family_lookup(row)
+    time_phase = family.get("time_phase.repeated_effect_size", 0.0)
+    if time_phase <= 0.0:
+        return None
+    signed_y = time_phase + family.get("transition.changed_cells", 0.0)
+    return BranchLibraryEntry(
+        key=f"fallback:dominant_time_phase_potential|{key}",
+        records=0,
+        signed_y_mean=signed_y,
+    )
+
+
+def _dominant_translation_fallback_entry(row: dict[str, Any]) -> BranchLibraryEntry | None:
+    key = dominant_translation_grid_key(row)
+    if key is None:
+        return None
+    signed_y = _family_lookup(row).get("transition.changed_cells", 0.0)
+    if signed_y <= 0.0:
+        return None
+    return BranchLibraryEntry(
+        key=f"fallback:dominant_translation_potential|{key}",
+        records=0,
+        signed_y_mean=signed_y,
+    )
 
 
 def _action_control_grid_key(row: dict[str, Any], control_label: str, *, grid_scale: int) -> str:

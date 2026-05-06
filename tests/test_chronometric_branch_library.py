@@ -128,3 +128,48 @@ def test_translation_potential_fallback_uses_safe_observed_potential():
     assert fallback_entry is not None
     assert fallback_entry.records == 0
     assert fallback_entry.key.startswith("fallback:dominant_translation_potential|")
+
+
+def test_time_phase_translation_fallback_uses_safe_observed_potentials():
+    time_phase = _row("heldout", 0.0, 0.0, 0.0, -0.25)
+    time_phase.update(
+        {
+            "action_id": "ACTION1",
+            "control_label": "dominant_group:time_phase",
+            "action_context": [0.1, 0.0, 0.0, 0.0, 0.0029296875, 0.0, 0.25, 1.0],
+            "changed_cells": 12,
+            "potential_family_names": ["transition.changed_cells", "time_phase.repeated_effect_size"],
+            "potential_family_vector": [0.0029296875, 0.25],
+        }
+    )
+    translation = _row("heldout", 0.0, 0.0, 0.0, -0.25)
+    translation.update(
+        {
+            "action_id": "ACTION5",
+            "control_label": "dominant_group:translation",
+            "action_context": [0.5, 0.0, 0.0, 0.0, 0.0234375, 0.0, 0.0, 1.0],
+            "changed_cells": 96,
+            "potential_family_names": ["transition.changed_cells"],
+            "potential_family_vector": [0.0234375],
+        }
+    )
+
+    time_phase_adjusted, time_phase_entry = blend_branch_library_signed_y(
+        time_phase,
+        {},
+        blend=1.0,
+        fallback_scope="time_phase_translation_potential",
+    )
+    translation_adjusted, translation_entry = blend_branch_library_signed_y(
+        translation,
+        {},
+        blend=1.0,
+        fallback_scope="time_phase_translation_potential",
+    )
+
+    assert time_phase_adjusted == 0.2529296875
+    assert time_phase_entry is not None
+    assert time_phase_entry.key.startswith("fallback:dominant_time_phase_potential|")
+    assert translation_adjusted == 0.0234375
+    assert translation_entry is not None
+    assert translation_entry.key.startswith("fallback:dominant_translation_potential|")
