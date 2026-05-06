@@ -12,7 +12,9 @@ BRANCH_LIBRARY_SCOPES = (
     "action6_time_phase",
     "dominant_time_phase",
     "dominant_translation",
+    "dominant_stasis_loop",
     "time_phase_translation",
+    "time_phase_translation_stasis_loop",
 )
 BRANCH_LIBRARY_FALLBACK_SCOPES = (
     "none",
@@ -75,8 +77,16 @@ def branch_library_key(row: dict[str, Any], *, scope: str) -> str | None:
         return dominant_time_phase_grid_key(row)
     if scope == "dominant_translation":
         return dominant_translation_grid_key(row)
+    if scope == "dominant_stasis_loop":
+        return dominant_stasis_loop_grid_key(row)
     if scope == "time_phase_translation":
         return dominant_time_phase_grid_key(row) or dominant_translation_grid_key(row)
+    if scope == "time_phase_translation_stasis_loop":
+        return (
+            dominant_time_phase_grid_key(row)
+            or dominant_translation_grid_key(row)
+            or dominant_stasis_loop_grid_key(row)
+        )
     raise ValueError(f"unknown branch library scope: {scope}")
 
 
@@ -85,6 +95,7 @@ def branch_library_candidate_keys(row: dict[str, Any]) -> list[str]:
         action6_time_phase_geometry_key(row),
         dominant_time_phase_grid_key(row),
         dominant_translation_grid_key(row),
+        dominant_stasis_loop_grid_key(row),
     ]
     unique: list[str] = []
     for key in keys:
@@ -107,6 +118,13 @@ def dominant_translation_grid_key(row: dict[str, Any], *, grid_scale: int = 64) 
     if _family_lookup(row).get("transition.changed_cells", 0.0) <= 0.0:
         return None
     return _action_control_grid_key(row, "dominant_group:translation", grid_scale=grid_scale)
+
+
+def dominant_stasis_loop_grid_key(row: dict[str, Any]) -> str | None:
+    if str(row.get("control_label", "")) != "dominant_group:stasis_loop":
+        return None
+    action_id = str(row.get("action_id", "")).upper()
+    return f"{action_id}|dominant_group:stasis_loop|t:{_time_step(row)}|changed:{_changed_cells(row)}"
 
 
 def blend_branch_library_signed_y(
@@ -191,6 +209,13 @@ def _changed_cells(row: dict[str, Any]) -> int:
         return int(round(float(changed)))
     action_context = row.get("action_context")
     return int(round(_sequence_number(action_context, 4) * GRID_CELL_COUNT))
+
+
+def _time_step(row: dict[str, Any]) -> int:
+    value = row.get("t")
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return int(round(float(value)))
+    return 0
 
 
 def _family_lookup(row: dict[str, Any]) -> dict[str, float]:

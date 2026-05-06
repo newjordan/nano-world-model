@@ -11,6 +11,7 @@ from chronometric_branch_library import (  # noqa: E402
     blend_branch_library_signed_y,
     build_action6_time_phase_branch_library,
     build_chronometric_branch_library,
+    dominant_stasis_loop_grid_key,
     dominant_time_phase_grid_key,
     dominant_translation_grid_key,
 )
@@ -173,3 +174,34 @@ def test_time_phase_translation_fallback_uses_safe_observed_potentials():
     assert translation_adjusted == 0.0234375
     assert translation_entry is not None
     assert translation_entry.key.startswith("fallback:dominant_translation_potential|")
+
+
+def test_stasis_loop_scope_keeps_temporal_phases_separate():
+    early = _row("train", 0.0, 0.0, -0.5, -0.25)
+    early.update(
+        {
+            "action_id": "ACTION6",
+            "control_label": "dominant_group:stasis_loop",
+            "t": 2,
+            "action_context": [0.6, 1.0, 0.4375, 0.46875, 0.000244140625, 0.0, -0.5, -1.0],
+            "changed_cells": 1,
+            "potential_family_names": ["transition.changed_cells", "time_phase.repeated_effect_size"],
+            "potential_family_vector": [0.000244140625, 0.25],
+        }
+    )
+    late = copy.deepcopy(early)
+    late.update({"t": 3, "target_signed_y": -1.0, "pred_signed_y": -0.25})
+    heldout = copy.deepcopy(early)
+    heldout.update({"split": "heldout", "target_signed_y": 0.0, "pred_signed_y": -0.1})
+
+    library = build_chronometric_branch_library(
+        [early, late, heldout],
+        scope="time_phase_translation_stasis_loop",
+    )
+    adjusted, entry = blend_branch_library_signed_y(heldout, library, blend=1.0)
+
+    assert dominant_stasis_loop_grid_key(early) == "ACTION6|dominant_group:stasis_loop|t:2|changed:1"
+    assert dominant_stasis_loop_grid_key(late) == "ACTION6|dominant_group:stasis_loop|t:3|changed:1"
+    assert adjusted == -0.5
+    assert entry is not None
+    assert entry.key == "ACTION6|dominant_group:stasis_loop|t:2|changed:1"
