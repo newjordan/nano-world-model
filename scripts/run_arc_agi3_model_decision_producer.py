@@ -139,6 +139,7 @@ def write_model_decision_artifacts(
     reset_obs: Any,
     candidate_packets: list[dict[str, Any]],
     condition: dict[str, Any],
+    prior_post_action_mlp_updates: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     if not candidate_packets:
         raise RuntimeError("no candidate actions were available at reset")
@@ -181,6 +182,7 @@ def write_model_decision_artifacts(
         candidate_packets=candidate_packets,
         world_state=world_state,
         game_knowledge_ref=game_knowledge_ref,
+        prior_post_action_mlp_updates=prior_post_action_mlp_updates,
     )
     _write_json(paths["mlp_consultation"], mlp_consultation)
     mlp_consultation_ref = model_flow_ref(paths["mlp_consultation"])
@@ -445,21 +447,35 @@ def build_mlp_consultation_artifact(
     candidate_packets: list[dict[str, Any]],
     world_state: dict[str, Any],
     game_knowledge_ref: dict[str, str],
+    prior_post_action_mlp_updates: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     frame_sha = str(world_state["frame"].get("latest_frame_sha256") or state_id)
     anchor_count = int(world_state["ray_map"]["anchor_count"])
     ray_count = int(world_state["ray_map"]["ray_count"])
     cell_total = max(int(world_state["grid_stats"]["cell_total"]), 1)
+    prior_updates = [dict(row) for row in prior_post_action_mlp_updates or []]
+    feedback_context_sha = stable_json_sha256(prior_updates) if prior_updates else None
     priors = []
     for index, packet in enumerate(candidate_packets):
         action_val = int(packet["action_value"])
-        mlp_prior = stable_unit_float(f"{frame_sha}:{action_val}:mlp-consult")
+        base_prior = stable_unit_float(f"{frame_sha}:{action_val}:mlp-consult")
+        feedback_prior = (
+            None
+            if feedback_context_sha is None
+            else stable_unit_float(f"{feedback_context_sha}:{frame_sha}:{action_val}:mlp-feedback")
+        )
+        mlp_prior = base_prior if feedback_prior is None else (0.75 * base_prior) + (0.25 * feedback_prior)
         priors.append(
             {
                 "action_name": packet["action_name"],
                 "action_value": action_val,
                 "candidate_index": index,
                 "mlp_prior": round(mlp_prior, 6),
+                "prior_components": {
+                    "base_prior": round(base_prior, 6),
+                    "post_action_feedback_prior": None if feedback_prior is None else round(feedback_prior, 6),
+                    "post_action_feedback_weight": 0.0 if feedback_prior is None else 0.25,
+                },
                 "action_embedding_context": {
                     "surface": CHRONOMETRIC_GAME_KNOWLEDGE_BACKBONE,
                     "frame_sha256": frame_sha,
@@ -474,6 +490,7 @@ def build_mlp_consultation_artifact(
                     "fallback_enabled": True,
                     "scope": "arc_agi3_live_loop_action_context",
                     "lookup_key": f"ls20|action:{action_val}|labels:{len(world_state['grid_stats']['labels'])}",
+                    "post_action_update_context_sha256": feedback_context_sha,
                 },
             }
         )
@@ -488,6 +505,9 @@ def build_mlp_consultation_artifact(
         "score_surface": CHRONOMETRIC_GAME_KNOWLEDGE_SCORE_SURFACE,
         "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
         "chronometric_game_knowledge_sha256": game_knowledge_ref["sha256"],
+        "prior_post_action_update_candidates": prior_updates,
+        "post_action_update_candidate_context_count": len(prior_updates),
+        "post_action_update_candidate_context_sha256": feedback_context_sha,
         "candidate_priors": priors,
         "consulted_before_branch_simulation": True,
         "drives_branch_simulation": True,
@@ -838,6 +858,13 @@ def build_model_decision(
             "backbone_surface": mlp_consultation["backbone_surface"],
             "calibration_surface": mlp_consultation["calibration_surface"],
             "score_surface": mlp_consultation["score_surface"],
+            "prior_post_action_update_candidates": mlp_consultation["prior_post_action_update_candidates"],
+            "post_action_update_candidate_context_count": mlp_consultation[
+                "post_action_update_candidate_context_count"
+            ],
+            "post_action_update_candidate_context_sha256": mlp_consultation[
+                "post_action_update_candidate_context_sha256"
+            ],
             "candidate_priors": mlp_consultation["candidate_priors"],
             "consulted_before_branch_simulation": True,
             "drives_branch_simulation": True,
@@ -1006,6 +1033,9 @@ def summarize_producer(
         "mlp_consultation": model_decision["mlp_consultation"]["artifact"],
         "mlp_consultation_sha256": model_decision["mlp_consultation"]["sha256"],
         "mlp_candidate_priors": len(model_decision["mlp_consultation"]["candidate_priors"]),
+        "mlp_post_action_update_context_count": model_decision["mlp_consultation"][
+            "post_action_update_candidate_context_count"
+        ],
         "branch_simulation_artifact": model_decision["standard_model_flow"]["branch_simulation_artifact"],
         "selected_branch_id": branch_simulation["selected_branch_id"],
         "selected_action": f"{selected['action_name']}:{selected['action_value']}",
@@ -1068,6 +1098,7 @@ def format_results(metrics: dict[str, Any]) -> str:
         f"- chronometric score surface: `{metrics['chronometric_game_knowledge_score_surface']}`",
         f"- MLP consultation: `{metrics['mlp_consultation']}`",
         f"- MLP candidate priors: `{metrics['mlp_candidate_priors']}`",
+        f"- MLP post-action update context count: `{metrics['mlp_post_action_update_context_count']}`",
         f"- Nemo3 invoked: `{metrics['nemo3_invoked']}`",
         f"- Nemo3 confirmation mode: `{metrics['nemo3_confirmation_mode']}`",
         f"- external Nemo3 model invoked: `{metrics['nemo3_external_model_invoked']}`",
@@ -1166,6 +1197,11 @@ def decision_identifier(run_label: str, state_id: str, action_value: int) -> str
 def stable_unit_float(value: str) -> float:
     raw = hashlib.sha256(value.encode("utf-8")).hexdigest()[:12]
     return int(raw, 16) / float(0xFFFFFFFFFFFF)
+
+
+def stable_json_sha256(value: Any) -> str:
+    payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def nemo_response_for(*, args: argparse.Namespace, packet: dict[str, Any], stage: str) -> dict[str, Any]:

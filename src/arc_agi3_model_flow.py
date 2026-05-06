@@ -4,8 +4,9 @@ The ARC environment wrapper is an actuator. It does not own policy. A real
 non-I/O ARC step must be driven by a ModelDecision emitted by the Nemo3/world
 model flow:
 
-observation -> 3D/world state -> chronometric game knowledge -> internal branch
-simulation -> trust checks -> ModelDecision artifact -> actuator step
+observation -> 3D/world state -> chronometric game knowledge -> MLP
+consultation -> internal branch simulation -> trust checks -> ModelDecision
+artifact -> actuator step
 """
 
 from __future__ import annotations
@@ -148,6 +149,13 @@ def actuator_reasoning_from_model_decision(decision: dict[str, Any]) -> dict[str
         "mlp_consultation": _dict(decision.get("mlp_consultation")).get("artifact"),
         "mlp_consultation_sha256": _dict(decision.get("mlp_consultation")).get("sha256"),
         "mlp_consultation_surface": _dict(decision.get("mlp_consultation")).get("calibration_surface"),
+        "mlp_post_action_update_context_count": _dict(decision.get("mlp_consultation")).get(
+            "post_action_update_candidate_context_count",
+            0,
+        ),
+        "mlp_post_action_update_context_sha256": _dict(decision.get("mlp_consultation")).get(
+            "post_action_update_candidate_context_sha256"
+        ),
         "internal_thinking_lock": _dict(decision.get("internal_thinking_lock")).get("artifact"),
         "internal_thinking_sha256": _dict(decision.get("internal_thinking_lock")).get("sha256"),
         "model_decision_artifact": _dict(decision.get("standard_model_flow")).get("model_decision_artifact"),

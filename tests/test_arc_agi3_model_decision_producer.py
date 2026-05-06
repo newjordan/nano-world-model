@@ -103,7 +103,7 @@ def _condition(module, selected_game):
     }
 
 
-def _produce(module, tmp_path, *, threshold=0.0):
+def _produce(module, tmp_path, *, threshold=0.0, prior_update_refs=None):
     env = FakeEnv()
     obs = FakeObs()
     selected_game = {"game_id": "ls20-9607627b", "name": "ls20", "title": "LS20"}
@@ -123,6 +123,7 @@ def _produce(module, tmp_path, *, threshold=0.0):
         reset_obs=obs,
         candidate_packets=packets,
         condition=_condition(module, selected_game),
+        prior_post_action_mlp_updates=prior_update_refs,
     )
     return env, metrics, json.loads((tmp_path / "model_decision.json").read_text(encoding="utf-8"))
 
@@ -172,6 +173,27 @@ def test_ambiguous_branch_selection_creates_interim_nemo_confirmation(tmp_path):
     assert decision["internal_thinking_lock"]["open_question_ids"] == ["branch_selection_gap"]
     assert decision["nemo3"]["interim_confirmations"][0]["question_id"] == "branch_selection_gap"
     module.require_standard_model_decision(decision, available_action_values=[1, 2, 3])
+
+
+def test_mlp_consultation_can_consume_prior_post_action_update_candidate(tmp_path):
+    module = _load_module()
+    prior_update = {
+        "artifact": "experiments/run/step_000/post_action_mlp_update.json",
+        "sha256": "f" * 64,
+        "source_step_index": 0,
+        "update_mode": "candidate-only",
+        "mlp_weights_updated": False,
+        "training_data_promoted": False,
+    }
+
+    _env, metrics, decision = _produce(module, tmp_path, prior_update_refs=[prior_update])
+    consultation = decision["mlp_consultation"]
+
+    assert metrics["mlp_post_action_update_context_count"] == 1
+    assert consultation["post_action_update_candidate_context_count"] == 1
+    assert consultation["prior_post_action_update_candidates"] == [prior_update]
+    assert consultation["post_action_update_candidate_context_sha256"]
+    assert all("prior_components" in row for row in consultation["candidate_priors"])
 
 
 def test_parse_nemo_json_response_accepts_plain_or_fenced_json():
