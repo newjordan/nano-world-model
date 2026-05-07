@@ -7,6 +7,7 @@ any real actuator step is taken.
 
 from __future__ import annotations
 
+import hashlib
 import heapq
 import time
 from dataclasses import dataclass
@@ -400,6 +401,8 @@ class Ls20FullGamePlanResult:
     matched_known_plan: bool
     current_signature: str
     level_summaries: list[dict[str, Any]]
+    simulation_rounds: list[dict[str, Any]]
+    simulation_trace: list[dict[str, Any]]
 
 
 class Ls20SourceWorldModel:
@@ -929,6 +932,8 @@ def solve_ls20_from_current_game(game: Any) -> Ls20FullGamePlanResult:
             matched_known_plan=False,
             current_signature="unavailable",
             level_summaries=[],
+            simulation_rounds=[],
+            simulation_trace=[],
         )
 
     live_model = Ls20SourceWorldModel(game)
@@ -953,11 +958,20 @@ def solve_ls20_from_current_game(game: Any) -> Ls20FullGamePlanResult:
             matched_known_plan=False,
             current_signature=_format_signature(live_key),
             level_summaries=list(verification["level_summaries"]),
+            simulation_rounds=[],
+            simulation_trace=[],
         )
 
     remaining = list(LS20_RESET_FULL_PLAN[prefix_index:])
     level_index = int(getattr(game, "level_index", 0))
     levels_already_completed = level_index
+    simulation = _build_remaining_simulation_review(
+        game_class=game_class,
+        live_model=live_model,
+        live_state=live_state,
+        current_prefix_index=prefix_index,
+        level_completion_steps=list(verification["level_completion_steps"]),
+    )
     return Ls20FullGamePlanResult(
         supported=True,
         solved=bool(remaining),
@@ -975,7 +989,118 @@ def solve_ls20_from_current_game(game: Any) -> Ls20FullGamePlanResult:
         matched_known_plan=True,
         current_signature=_format_signature(live_key),
         level_summaries=list(verification["level_summaries"]),
+        simulation_rounds=simulation["rounds"],
+        simulation_trace=simulation["trace"],
     )
+
+
+def _build_remaining_simulation_review(
+    *,
+    game_class: Any,
+    live_model: Ls20SourceWorldModel,
+    live_state: Ls20State,
+    current_prefix_index: int,
+    level_completion_steps: list[int],
+) -> dict[str, list[dict[str, Any]]]:
+    level_starts = [0, *level_completion_steps[:-1]]
+    trace: list[dict[str, Any]] = []
+    rounds: list[dict[str, Any]] = []
+    for level_index, (level_start, level_end) in enumerate(zip(level_starts, level_completion_steps, strict=True)):
+        if level_end <= current_prefix_index:
+            continue
+        round_global_start = max(current_prefix_index, level_start)
+        if level_index == live_model.level_index and current_prefix_index >= level_start:
+            model = live_model
+            state = live_state
+        else:
+            game = game_class()
+            game.set_level(level_index)
+            model = Ls20SourceWorldModel(game)
+            state = model.start_state(game)
+        round_trace_start = len(trace)
+        for global_step in range(round_global_start, level_end):
+            action_value = int(LS20_RESET_FULL_PLAN[global_step])
+            before = state
+            next_state, reason = model.transition(state, action_value)
+            if next_state is None:
+                trace.append(
+                    {
+                        "review_step_index": len(trace),
+                        "global_step_before": global_step,
+                        "global_step_after": global_step + 1,
+                        "round_index": level_index,
+                        "round_step_index": global_step - level_start,
+                        "action_value": action_value,
+                        "action_name": f"ACTION{action_value}",
+                        "transition_reason": reason,
+                        "transition_supported": False,
+                        "state_before": _state_to_review(model, before),
+                        "state_after": None,
+                        "round_completed_after_step": False,
+                        "win_after_step": False,
+                    }
+                )
+                break
+            row = {
+                "review_step_index": len(trace),
+                "global_step_before": global_step,
+                "global_step_after": global_step + 1,
+                "round_index": level_index,
+                "round_step_index": global_step - level_start,
+                "action_value": action_value,
+                "action_name": f"ACTION{action_value}",
+                "transition_reason": reason,
+                "transition_supported": True,
+                "state_before": _state_to_review(model, before),
+                "state_after": _state_to_review(model, next_state),
+                "round_completed_after_step": global_step + 1 == level_end and all(next_state[5]),
+                "win_after_step": global_step + 1 == len(LS20_RESET_FULL_PLAN),
+            }
+            trace.append(row)
+            state = next_state
+        round_frames = trace[round_trace_start:]
+        rounds.append(
+            {
+                "round_index": level_index,
+                "global_step_start": round_global_start,
+                "global_step_end": level_end,
+                "round_step_start": round_global_start - level_start,
+                "round_step_end": level_end - level_start,
+                "frame_start_index": round_trace_start,
+                "frame_count": len(round_frames),
+                "action_values": [int(row["action_value"]) for row in round_frames],
+                "action_names": [str(row["action_name"]) for row in round_frames],
+                "start_state": round_frames[0]["state_before"] if round_frames else _state_to_review(model, state),
+                "final_state": round_frames[-1]["state_after"] if round_frames else _state_to_review(model, state),
+                "round_completed_in_review": bool(
+                    round_frames and round_frames[-1].get("round_completed_after_step") is True
+                ),
+                "win_after_round": bool(round_frames and round_frames[-1].get("win_after_step") is True),
+            }
+        )
+    return {"rounds": rounds, "trace": trace}
+
+
+def _state_to_review(model: Ls20SourceWorldModel, state: Ls20State) -> dict[str, Any]:
+    x, y, shape, color, rotation, goals_done, bonus_mask, steps, lives, switch_positions, mover_dirs = state
+    return {
+        "position_3d": [x, y, 0],
+        "grid_position_3d": [round(x / 5.0, 3), round(y / 5.0, 3), 0.0],
+        "shape_color_rotation": [shape, color, rotation],
+        "goals_completed": sum(1 for done in goals_done if done),
+        "goal_count": len(goals_done),
+        "goal_mask": [bool(done) for done in goals_done],
+        "remaining_bonus_count": sum(1 for index in range(len(model.bonuses)) if bonus_mask & (1 << index)),
+        "steps_remaining": steps,
+        "lives": lives,
+        "switch_positions_3d": [[x_pos, y_pos, 0] for x_pos, y_pos in switch_positions],
+        "moving_switch_dirs": [int(value) for value in mover_dirs],
+        "signature_sha256": _state_signature_sha256(model, state),
+    }
+
+
+def _state_signature_sha256(model: Ls20SourceWorldModel, state: Ls20State) -> str:
+    return hashlib.sha256(repr(_state_signature_key(model, state)).encode("utf-8")).hexdigest()
 
 
 def _verify_known_reset_plan(game_class: Any) -> dict[str, Any]:

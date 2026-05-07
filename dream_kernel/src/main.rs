@@ -2,7 +2,7 @@ use dream_kernel::{
     Action, CellKind, Coord, DreamKernel, DreamSequence, SimState, compass_directions,
     demo_sequence, sequence_to_json,
 };
-use std::collections::{BTreeMap, HashSet, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, HashSet, VecDeque};
 use std::path::PathBuf;
 
 fn main() {
@@ -117,7 +117,7 @@ fn arc_grid_scout_usage() -> &'static str {
 }
 
 fn ls20_plan_verify_usage() -> &'static str {
-    "ls20-plan-verify --manifest PATH --summary-out PATH"
+    "ls20-plan-verify --manifest PATH --summary-out PATH [--review-out PATH]"
 }
 
 fn solve_map_args(args: &[String]) -> Result<SolveMapArgs, String> {
@@ -243,6 +243,38 @@ struct ArcGridScoutArgs {
 struct Ls20PlanVerifyArgs {
     manifest_path: PathBuf,
     summary_out: PathBuf,
+    review_out: Option<PathBuf>,
+}
+
+#[derive(Clone, Debug)]
+struct Ls20SimulationTraceRow {
+    review_step_index: usize,
+    global_step_before: usize,
+    global_step_after: usize,
+    round_index: i32,
+    round_step_index: usize,
+    action_value: i32,
+    action_name: String,
+    x_before: i32,
+    y_before: i32,
+    z_before: i32,
+    x_after: i32,
+    y_after: i32,
+    z_after: i32,
+    shape_before: i32,
+    color_before: i32,
+    rotation_before: i32,
+    shape_after: i32,
+    color_after: i32,
+    rotation_after: i32,
+    goals_completed_after: i32,
+    goal_count: i32,
+    steps_remaining_after: i32,
+    lives_after: i32,
+    transition_reason: String,
+    round_completed_after_step: bool,
+    win_after_step: bool,
+    state_after_sha256: String,
 }
 
 fn arc_grid_scout_args(args: &[String]) -> Result<ArcGridScoutArgs, String> {
@@ -313,6 +345,7 @@ fn arc_grid_scout_args(args: &[String]) -> Result<ArcGridScoutArgs, String> {
 fn ls20_plan_verify_args(args: &[String]) -> Result<Ls20PlanVerifyArgs, String> {
     let mut manifest_path = None;
     let mut summary_out = None;
+    let mut review_out = None;
     let mut index = 0usize;
     while index < args.len() {
         let flag = args[index].as_str();
@@ -322,6 +355,7 @@ fn ls20_plan_verify_args(args: &[String]) -> Result<Ls20PlanVerifyArgs, String> 
         match flag {
             "--manifest" => manifest_path = Some(PathBuf::from(value)),
             "--summary-out" => summary_out = Some(PathBuf::from(value)),
+            "--review-out" => review_out = Some(PathBuf::from(value)),
             other => return Err(format!("unknown ls20-plan-verify flag: {other}")),
         }
         index += 2;
@@ -329,6 +363,7 @@ fn ls20_plan_verify_args(args: &[String]) -> Result<Ls20PlanVerifyArgs, String> 
     Ok(Ls20PlanVerifyArgs {
         manifest_path: manifest_path.ok_or_else(|| "missing --manifest".to_string())?,
         summary_out: summary_out.ok_or_else(|| "missing --summary-out".to_string())?,
+        review_out,
     })
 }
 
@@ -490,8 +525,35 @@ fn ls20_plan_verify(args: Ls20PlanVerifyArgs) -> Result<(), String> {
     )?;
     let win_levels = parse_i32(manifest_value(&manifest, "win_levels")?, "win_levels")?;
     let final_state = manifest_value(&manifest, "final_state")?.to_string();
+    let source_simulation_trace_artifact = manifest
+        .get("source_simulation_trace_artifact")
+        .map(String::as_str);
+    let source_simulation_trace_sha256 = manifest
+        .get("source_simulation_trace_sha256")
+        .map(String::as_str);
+    let simulation_trace_tsv = manifest.get("simulation_trace_tsv").map(String::as_str);
+    let expected_trace_rows = manifest
+        .get("simulation_trace_rows")
+        .map(|value| parse_usize(value, "simulation_trace_rows"))
+        .transpose()?;
+    let (trace_rows, trace_read_failure) = match simulation_trace_tsv {
+        Some(path_value) => {
+            let path = resolve_manifest_path(&args.manifest_path, path_value);
+            match read_ls20_simulation_trace_tsv(&path) {
+                Ok(rows) => (rows, None),
+                Err(error) => (
+                    Vec::new(),
+                    Some(format!("simulation_trace_read_failed:{error}")),
+                ),
+            }
+        }
+        None => (Vec::new(), Some("missing_simulation_trace_tsv".to_string())),
+    };
 
     let mut failures = Vec::new();
+    if let Some(error) = trace_read_failure {
+        failures.push(error);
+    }
     if game != "ls20" {
         failures.push(format!("unsupported_game_{game}"));
     }
@@ -554,6 +616,55 @@ fn ls20_plan_verify(args: Ls20PlanVerifyArgs) -> Result<(), String> {
     if !matched_known_plan {
         failures.push("current_state_not_matched_to_source_plan".to_string());
     }
+    if manifest_solved && trace_rows.is_empty() {
+        failures.push("missing_simulation_trace_rows".to_string());
+    }
+    if let Some(expected) = expected_trace_rows {
+        if trace_rows.len() != expected {
+            failures.push("simulation_trace_rows_count_mismatch".to_string());
+        }
+    }
+    if manifest_solved && trace_rows.len() != planned_actions.len() {
+        failures.push("simulation_trace_rows_do_not_match_planned_rollout_steps".to_string());
+    }
+    if let Some(first_row) = trace_rows.first() {
+        if first_row.global_step_before != current_prefix_index {
+            failures.push("simulation_trace_first_step_does_not_match_current_prefix".to_string());
+        }
+    }
+    if let Some(last_row) = trace_rows.last() {
+        if manifest_solved && last_row.global_step_after != total_plan_steps {
+            failures.push("simulation_trace_last_step_does_not_match_total_plan".to_string());
+        }
+        if manifest_solved && !last_row.win_after_step {
+            failures.push("simulation_trace_final_frame_not_win".to_string());
+        }
+    }
+    for (index, action_value) in planned_actions.iter().enumerate() {
+        let Some(row) = trace_rows.get(index) else {
+            break;
+        };
+        if row.review_step_index != index {
+            failures.push("simulation_trace_review_step_index_mismatch".to_string());
+        }
+        if row.action_value != *action_value {
+            failures.push("simulation_trace_action_sequence_mismatch".to_string());
+        }
+        if row.global_step_before + 1 != row.global_step_after {
+            failures.push("simulation_trace_global_step_not_contiguous".to_string());
+        }
+        if index > 0 && row.global_step_before != trace_rows[index - 1].global_step_after {
+            failures.push("simulation_trace_has_gap".to_string());
+        }
+        let completion_expected = completion_steps
+            .iter()
+            .any(|step| *step == row.global_step_after as i32);
+        if row.round_completed_after_step != completion_expected {
+            failures.push("simulation_trace_completion_flag_mismatch".to_string());
+        }
+    }
+    failures.sort();
+    failures.dedup();
 
     let supported = failures.is_empty();
     let solved = supported && manifest_solved;
@@ -585,8 +696,42 @@ fn ls20_plan_verify(args: Ls20PlanVerifyArgs) -> Result<(), String> {
         })
         .collect::<Vec<_>>()
         .join(",");
+    let simulation_review_schema = "dream_kernel.ls20_3d_simulation_review.v001";
+    if let Some(review_out) = &args.review_out {
+        if let Some(parent) = review_out.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|error| format!("create {}: {error}", parent.display()))?;
+        }
+        let review_json = ls20_simulation_review_json(
+            simulation_review_schema,
+            &state_id,
+            &game,
+            &grid_sha256,
+            supported,
+            solved,
+            &support_reason,
+            current_prefix_index,
+            total_plan_steps,
+            levels_completed_start,
+            final_levels_completed,
+            win_levels,
+            &final_state,
+            source_simulation_trace_artifact,
+            source_simulation_trace_sha256,
+            simulation_trace_tsv,
+            &completion_steps,
+            &trace_rows,
+        );
+        std::fs::write(review_out, format!("{review_json}\n"))
+            .map_err(|error| format!("write {}: {error}", review_out.display()))?;
+    }
+    let simulation_review_artifact = args
+        .review_out
+        .as_ref()
+        .map(|path| path.display().to_string());
+    let simulation_review_round_count = ls20_trace_round_count(&trace_rows);
     let summary = format!(
-        "{{\"schema\":\"dream_kernel.ls20_plan_verify.v001\",\"state_id\":\"{}\",\"game\":\"{}\",\"grid_sha256\":\"{}\",\"supported\":{},\"support_reason\":\"{}\",\"solved\":{},\"selected_action_value\":{},\"planned_action_values\":{},\"planned_action_ids\":{},\"planned_rollout_steps\":{},\"planned_sequence_hash\":\"{}\",\"source_model_verified\":{},\"matched_known_plan\":{},\"current_prefix_index\":{},\"total_plan_steps\":{},\"level_completion_steps\":{},\"levels_completed_start\":{},\"final_levels_completed\":{},\"win_levels\":{},\"final_state\":\"{}\",\"candidate_rollouts\":[{}]}}",
+        "{{\"schema\":\"dream_kernel.ls20_plan_verify.v001\",\"state_id\":\"{}\",\"game\":\"{}\",\"grid_sha256\":\"{}\",\"supported\":{},\"support_reason\":\"{}\",\"solved\":{},\"selected_action_value\":{},\"planned_action_values\":{},\"planned_action_ids\":{},\"planned_rollout_steps\":{},\"planned_sequence_hash\":\"{}\",\"source_model_verified\":{},\"matched_known_plan\":{},\"current_prefix_index\":{},\"total_plan_steps\":{},\"level_completion_steps\":{},\"levels_completed_start\":{},\"final_levels_completed\":{},\"win_levels\":{},\"final_state\":\"{}\",\"simulation_review_schema\":\"{}\",\"simulation_review_artifact\":{},\"simulation_review_frame_count\":{},\"simulation_review_round_count\":{},\"source_simulation_trace_artifact\":{},\"source_simulation_trace_sha256\":{},\"simulation_trace_tsv\":{},\"candidate_rollouts\":[{}]}}",
         json_escape(&state_id),
         json_escape(&game),
         json_escape(&grid_sha256),
@@ -607,6 +752,13 @@ fn ls20_plan_verify(args: Ls20PlanVerifyArgs) -> Result<(), String> {
         final_levels_completed,
         win_levels,
         json_escape(&final_state),
+        json_escape(simulation_review_schema),
+        string_option_to_json(simulation_review_artifact.as_deref()),
+        trace_rows.len(),
+        simulation_review_round_count,
+        string_option_to_json(source_simulation_trace_artifact),
+        string_option_to_json(source_simulation_trace_sha256),
+        string_option_to_json(simulation_trace_tsv),
         candidate_rows
     );
     std::fs::write(&args.summary_out, format!("{summary}\n"))
@@ -863,6 +1015,110 @@ fn manifest_value<'a>(
         .ok_or_else(|| format!("manifest missing {key}"))
 }
 
+fn resolve_manifest_path(manifest_path: &PathBuf, value: &str) -> PathBuf {
+    let path = PathBuf::from(value);
+    if path.is_absolute() || path.exists() {
+        return path;
+    }
+    if let Some(parent) = manifest_path.parent() {
+        let sibling = parent.join(value);
+        if sibling.exists() {
+            return sibling;
+        }
+    }
+    path
+}
+
+fn read_ls20_simulation_trace_tsv(path: &PathBuf) -> Result<Vec<Ls20SimulationTraceRow>, String> {
+    let text = std::fs::read_to_string(path)
+        .map_err(|error| format!("read {}: {error}", path.display()))?;
+    let mut lines = text.lines();
+    let Some(header) = lines.next() else {
+        return Err(format!("{} did not contain a header", path.display()));
+    };
+    let columns = header.split('\t').collect::<Vec<_>>();
+    let index = |name: &str| {
+        columns
+            .iter()
+            .position(|column| *column == name)
+            .ok_or_else(|| format!("{} missing column {name}", path.display()))
+    };
+    let review_step_index = index("review_step_index")?;
+    let global_step_before = index("global_step_before")?;
+    let global_step_after = index("global_step_after")?;
+    let round_index = index("round_index")?;
+    let round_step_index = index("round_step_index")?;
+    let action_value = index("action_value")?;
+    let action_name = index("action_name")?;
+    let x_before = index("x_before")?;
+    let y_before = index("y_before")?;
+    let z_before = index("z_before")?;
+    let x_after = index("x_after")?;
+    let y_after = index("y_after")?;
+    let z_after = index("z_after")?;
+    let shape_before = index("shape_before")?;
+    let color_before = index("color_before")?;
+    let rotation_before = index("rotation_before")?;
+    let shape_after = index("shape_after")?;
+    let color_after = index("color_after")?;
+    let rotation_after = index("rotation_after")?;
+    let goals_completed_after = index("goals_completed_after")?;
+    let goal_count = index("goal_count")?;
+    let steps_remaining_after = index("steps_remaining_after")?;
+    let lives_after = index("lives_after")?;
+    let transition_reason = index("transition_reason")?;
+    let round_completed_after_step = index("round_completed_after_step")?;
+    let win_after_step = index("win_after_step")?;
+    let state_after_sha256 = index("state_after_sha256")?;
+    let mut rows = Vec::new();
+    for (line_index, line) in lines.enumerate() {
+        if line.trim().is_empty() {
+            continue;
+        }
+        let cells = line.split('\t').collect::<Vec<_>>();
+        let get = |column: usize| {
+            cells.get(column).copied().ok_or_else(|| {
+                format!(
+                    "{} line {} missing column {}",
+                    path.display(),
+                    line_index + 2,
+                    column
+                )
+            })
+        };
+        rows.push(Ls20SimulationTraceRow {
+            review_step_index: parse_usize(get(review_step_index)?, "review_step_index")?,
+            global_step_before: parse_usize(get(global_step_before)?, "global_step_before")?,
+            global_step_after: parse_usize(get(global_step_after)?, "global_step_after")?,
+            round_index: parse_i32(get(round_index)?, "round_index")?,
+            round_step_index: parse_usize(get(round_step_index)?, "round_step_index")?,
+            action_value: parse_i32(get(action_value)?, "action_value")?,
+            action_name: get(action_name)?.to_string(),
+            x_before: parse_i32(get(x_before)?, "x_before")?,
+            y_before: parse_i32(get(y_before)?, "y_before")?,
+            z_before: parse_i32(get(z_before)?, "z_before")?,
+            x_after: parse_i32(get(x_after)?, "x_after")?,
+            y_after: parse_i32(get(y_after)?, "y_after")?,
+            z_after: parse_i32(get(z_after)?, "z_after")?,
+            shape_before: parse_i32(get(shape_before)?, "shape_before")?,
+            color_before: parse_i32(get(color_before)?, "color_before")?,
+            rotation_before: parse_i32(get(rotation_before)?, "rotation_before")?,
+            shape_after: parse_i32(get(shape_after)?, "shape_after")?,
+            color_after: parse_i32(get(color_after)?, "color_after")?,
+            rotation_after: parse_i32(get(rotation_after)?, "rotation_after")?,
+            goals_completed_after: parse_i32(get(goals_completed_after)?, "goals_completed_after")?,
+            goal_count: parse_i32(get(goal_count)?, "goal_count")?,
+            steps_remaining_after: parse_i32(get(steps_remaining_after)?, "steps_remaining_after")?,
+            lives_after: parse_i32(get(lives_after)?, "lives_after")?,
+            transition_reason: get(transition_reason)?.to_string(),
+            round_completed_after_step: parse_bool(get(round_completed_after_step)?)?,
+            win_after_step: parse_bool(get(win_after_step)?)?,
+            state_after_sha256: get(state_after_sha256)?.to_string(),
+        });
+    }
+    Ok(rows)
+}
+
 fn parse_bool(value: &str) -> Result<bool, String> {
     match value {
         "true" => Ok(true),
@@ -928,6 +1184,161 @@ fn ls20_candidate_rollout_json(
         number_to_json(if next_completes_level { 1.0 } else { 0.0 }),
         on_plan
     )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn ls20_simulation_review_json(
+    schema: &str,
+    state_id: &str,
+    game: &str,
+    grid_sha256: &str,
+    supported: bool,
+    solved: bool,
+    support_reason: &str,
+    current_prefix_index: usize,
+    total_plan_steps: usize,
+    levels_completed_start: i32,
+    final_levels_completed: i32,
+    win_levels: i32,
+    final_state: &str,
+    source_simulation_trace_artifact: Option<&str>,
+    source_simulation_trace_sha256: Option<&str>,
+    simulation_trace_tsv: Option<&str>,
+    completion_steps: &[i32],
+    rows: &[Ls20SimulationTraceRow],
+) -> String {
+    format!(
+        "{{\"schema\":\"{}\",\"state_id\":\"{}\",\"game\":\"{}\",\"grid_sha256\":\"{}\",\"review_scope\":\"remaining_plan_from_current_state\",\"projection_basis\":\"arc_frame_label_grid_3d_heightmap_with_ls20_state_channels\",\"supported\":{},\"solved\":{},\"support_reason\":\"{}\",\"current_prefix_index\":{},\"total_plan_steps\":{},\"levels_completed_start\":{},\"final_levels_completed\":{},\"win_levels\":{},\"final_state\":\"{}\",\"source_simulation_trace_artifact\":{},\"source_simulation_trace_sha256\":{},\"simulation_trace_tsv\":{},\"level_completion_steps\":{},\"round_count\":{},\"frame_count\":{},\"rounds\":{},\"frames\":{},\"completion_frames\":{}}}",
+        json_escape(schema),
+        json_escape(state_id),
+        json_escape(game),
+        json_escape(grid_sha256),
+        supported,
+        solved,
+        json_escape(support_reason),
+        current_prefix_index,
+        total_plan_steps,
+        levels_completed_start,
+        final_levels_completed,
+        win_levels,
+        json_escape(final_state),
+        string_option_to_json(source_simulation_trace_artifact),
+        string_option_to_json(source_simulation_trace_sha256),
+        string_option_to_json(simulation_trace_tsv),
+        i32_vec_to_json(completion_steps),
+        ls20_trace_round_count(rows),
+        rows.len(),
+        ls20_trace_rounds_to_json(rows),
+        ls20_trace_frames_to_json(rows),
+        ls20_completion_frames_to_json(rows)
+    )
+}
+
+fn ls20_trace_round_count(rows: &[Ls20SimulationTraceRow]) -> usize {
+    rows.iter()
+        .map(|row| row.round_index)
+        .collect::<BTreeSet<_>>()
+        .len()
+}
+
+fn ls20_trace_rounds_to_json(rows: &[Ls20SimulationTraceRow]) -> String {
+    let mut rounds = BTreeMap::<i32, Vec<&Ls20SimulationTraceRow>>::new();
+    for row in rows {
+        rounds.entry(row.round_index).or_default().push(row);
+    }
+    format!(
+        "[{}]",
+        rounds
+            .iter()
+            .map(|(round_index, rows)| ls20_trace_round_to_json(*round_index, rows))
+            .collect::<Vec<_>>()
+            .join(",")
+    )
+}
+
+fn ls20_trace_round_to_json(round_index: i32, rows: &[&Ls20SimulationTraceRow]) -> String {
+    let Some(first) = rows.first().copied() else {
+        return "{}".to_string();
+    };
+    let Some(last) = rows.last().copied() else {
+        return "{}".to_string();
+    };
+    let action_values = rows.iter().map(|row| row.action_value).collect::<Vec<_>>();
+    let action_names = rows
+        .iter()
+        .map(|row| row.action_name.clone())
+        .collect::<Vec<_>>();
+    format!(
+        "{{\"round_index\":{},\"global_step_start\":{},\"global_step_end\":{},\"round_step_start\":{},\"round_step_end\":{},\"frame_start_index\":{},\"frame_count\":{},\"action_values\":{},\"action_names\":{},\"start_position_3d\":{},\"final_position_3d\":{},\"final_shape_color_rotation\":{},\"goals_completed_after\":{},\"goal_count\":{},\"round_completed_in_review\":{},\"win_after_round\":{},\"final_transition_reason\":\"{}\",\"final_state_sha256\":\"{}\"}}",
+        round_index,
+        first.global_step_before,
+        last.global_step_after,
+        first.round_step_index,
+        last.round_step_index + 1,
+        first.review_step_index,
+        rows.len(),
+        i32_vec_to_json(&action_values),
+        string_vec_to_json(&action_names),
+        coord_values_to_json(first.x_before, first.y_before, first.z_before),
+        coord_values_to_json(last.x_after, last.y_after, last.z_after),
+        i32_vec_to_json(&[last.shape_after, last.color_after, last.rotation_after]),
+        last.goals_completed_after,
+        last.goal_count,
+        last.round_completed_after_step,
+        last.win_after_step,
+        json_escape(&last.transition_reason),
+        json_escape(&last.state_after_sha256)
+    )
+}
+
+fn ls20_trace_frames_to_json(rows: &[Ls20SimulationTraceRow]) -> String {
+    format!(
+        "[{}]",
+        rows.iter()
+            .map(ls20_trace_frame_to_json)
+            .collect::<Vec<_>>()
+            .join(",")
+    )
+}
+
+fn ls20_completion_frames_to_json(rows: &[Ls20SimulationTraceRow]) -> String {
+    format!(
+        "[{}]",
+        rows.iter()
+            .filter(|row| row.round_completed_after_step || row.win_after_step)
+            .map(ls20_trace_frame_to_json)
+            .collect::<Vec<_>>()
+            .join(",")
+    )
+}
+
+fn ls20_trace_frame_to_json(row: &Ls20SimulationTraceRow) -> String {
+    format!(
+        "{{\"review_step_index\":{},\"global_step_before\":{},\"global_step_after\":{},\"round_index\":{},\"round_step_index\":{},\"action_value\":{},\"action_name\":\"{}\",\"transition_reason\":\"{}\",\"state_before\":{{\"position_3d\":{},\"shape_color_rotation\":{}}},\"state_after\":{{\"position_3d\":{},\"shape_color_rotation\":{},\"goals_completed\":{},\"goal_count\":{},\"steps_remaining\":{},\"lives\":{},\"signature_sha256\":\"{}\"}},\"round_completed_after_step\":{},\"win_after_step\":{}}}",
+        row.review_step_index,
+        row.global_step_before,
+        row.global_step_after,
+        row.round_index,
+        row.round_step_index,
+        row.action_value,
+        json_escape(&row.action_name),
+        json_escape(&row.transition_reason),
+        coord_values_to_json(row.x_before, row.y_before, row.z_before),
+        i32_vec_to_json(&[row.shape_before, row.color_before, row.rotation_before]),
+        coord_values_to_json(row.x_after, row.y_after, row.z_after),
+        i32_vec_to_json(&[row.shape_after, row.color_after, row.rotation_after]),
+        row.goals_completed_after,
+        row.goal_count,
+        row.steps_remaining_after,
+        row.lives_after,
+        json_escape(&row.state_after_sha256),
+        row.round_completed_after_step,
+        row.win_after_step
+    )
+}
+
+fn coord_values_to_json(x: i32, y: i32, z: i32) -> String {
+    format!("[{x},{y},{z}]")
 }
 
 fn fnv1a64_i32s(values: &[i32]) -> u64 {

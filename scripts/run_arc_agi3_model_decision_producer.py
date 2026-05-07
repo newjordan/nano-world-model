@@ -80,6 +80,9 @@ BRANCH_SIMULATION_SCHEMA = "arc_agi3.branch_simulation.v001"
 TRUST_CHECKS_SCHEMA = "arc_agi3.trust_checks.v001"
 DREAM_KERNEL_ARC_GRID_SCOUT_SCHEMA = "dream_kernel.arc_grid_scout.v001"
 DREAM_KERNEL_LS20_PLAN_VERIFY_SCHEMA = "dream_kernel.ls20_plan_verify.v001"
+LS20_SOURCE_SIMULATION_TRACE_SCHEMA = "arc_agi3.ls20_source_world_model_simulation_trace.v001"
+LS20_SOURCE_SIMULATION_TRACE_TSV_SCHEMA = "arc_agi3.ls20_source_world_model_simulation_trace_tsv.v001"
+DREAM_KERNEL_LS20_SIMULATION_REVIEW_SCHEMA = "dream_kernel.ls20_3d_simulation_review.v001"
 LS20_INTERNAL_WORLD_MODEL_SCHEMA = "arc_agi3.ls20_source_world_model_plan.v001"
 LOCAL_NEMO_MODE = "contract-local"
 LIVE_NEMO_MODE = "live-relay"
@@ -331,8 +334,11 @@ def artifact_paths(out_dir: Path) -> dict[str, Path]:
         "internal_forward_rollout_grid": out_dir / "internal_forward_rollout_grid.txt",
         "dream_kernel_arc_grid_scout": out_dir / "dream_kernel_arc_grid_scout.json",
         "ls20_internal_world_model": out_dir / "ls20_internal_world_model.json",
+        "ls20_source_simulation_trace": out_dir / "ls20_source_simulation_trace.json",
+        "ls20_source_simulation_trace_tsv": out_dir / "ls20_source_simulation_trace.tsv",
         "ls20_plan_manifest": out_dir / "ls20_plan_manifest.txt",
         "dream_kernel_ls20_plan_verify": out_dir / "dream_kernel_ls20_plan_verify.json",
+        "dream_kernel_ls20_simulation_review": out_dir / "dream_kernel_ls20_simulation_review.json",
         "branch_simulation": out_dir / "branch_simulation.json",
         "trust_checks": out_dir / "trust_checks.json",
         "internal_thinking": out_dir / "internal_thinking_lock.json",
@@ -718,6 +724,9 @@ def build_ls20_source_world_model_rollout(
         "planned_action_values": planned_action_values,
         "planned_action_ids": action_ids,
         "level_summaries": plan_result.level_summaries,
+        "simulation_trace_schema": LS20_SOURCE_SIMULATION_TRACE_SCHEMA,
+        "simulation_trace_rows": len(plan_result.simulation_trace),
+        "simulation_round_count": len(plan_result.simulation_rounds),
         "candidate_action_values": [int(packet["action_value"]) for packet in candidate_packets],
         "preferred_action_value": preferred_action_value,
         "actuator_steps_executed": 0,
@@ -725,6 +734,20 @@ def build_ls20_source_world_model_rollout(
         "arc_solve_claim": False,
     }
     _write_json(paths["ls20_internal_world_model"], source_artifact)
+    simulation_trace_artifact = build_ls20_source_simulation_trace_artifact(
+        state_id=state_id,
+        selected_game=selected_game,
+        source_artifact_path=paths["ls20_internal_world_model"],
+        plan_result=plan_result,
+    )
+    _write_json(paths["ls20_source_simulation_trace"], simulation_trace_artifact)
+    write_ls20_simulation_trace_tsv(
+        paths["ls20_source_simulation_trace_tsv"],
+        state_id=state_id,
+        selected_game=selected_game,
+        source_trace_artifact_path=paths["ls20_source_simulation_trace"],
+        plan_result=plan_result,
+    )
 
     write_ls20_plan_manifest(
         paths["ls20_plan_manifest"],
@@ -733,12 +756,15 @@ def build_ls20_source_world_model_rollout(
         world_state=world_state,
         plan_result=plan_result,
         source_artifact_path=paths["ls20_internal_world_model"],
+        source_simulation_trace_path=paths["ls20_source_simulation_trace"],
+        source_simulation_trace_tsv_path=paths["ls20_source_simulation_trace_tsv"],
         candidate_packets=candidate_packets,
     )
     kernel_summary = run_dream_kernel_ls20_plan_verify(
         args=args,
         manifest_path=paths["ls20_plan_manifest"],
         summary_path=paths["dream_kernel_ls20_plan_verify"],
+        review_path=paths["dream_kernel_ls20_simulation_review"],
     )
     candidate_rollouts = normalize_kernel_candidate_rollouts(
         kernel_summary=kernel_summary,
@@ -778,6 +804,15 @@ def build_ls20_source_world_model_rollout(
         "grid_sha256": world_state["grid_stats"]["grid_sha256"],
         "ls20_source_world_model_artifact": _repo_rel(paths["ls20_internal_world_model"]),
         "ls20_source_world_model_sha256": _sha256(paths["ls20_internal_world_model"]),
+        "ls20_source_simulation_trace_artifact": _repo_rel(paths["ls20_source_simulation_trace"]),
+        "ls20_source_simulation_trace_sha256": _sha256(paths["ls20_source_simulation_trace"]),
+        "ls20_source_simulation_trace_tsv_artifact": _repo_rel(paths["ls20_source_simulation_trace_tsv"]),
+        "ls20_source_simulation_trace_tsv_sha256": _sha256(paths["ls20_source_simulation_trace_tsv"]),
+        "kernel_simulation_review_artifact": _repo_rel(paths["dream_kernel_ls20_simulation_review"]),
+        "kernel_simulation_review_sha256": _sha256(paths["dream_kernel_ls20_simulation_review"]),
+        "kernel_simulation_review_schema": kernel_summary.get("simulation_review_schema"),
+        "kernel_simulation_review_round_count": kernel_summary.get("simulation_review_round_count"),
+        "kernel_simulation_review_frame_count": kernel_summary.get("simulation_review_frame_count"),
         "ls20_plan_manifest_artifact": _repo_rel(paths["ls20_plan_manifest"]),
         "ls20_plan_manifest_sha256": _sha256(paths["ls20_plan_manifest"]),
         "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
@@ -820,6 +855,144 @@ def write_kernel_grid_text(path: Path, grid: list[list[int]] | tuple[tuple[int, 
     path.write_text("\n".join(rows) + "\n", encoding="utf-8")
 
 
+def build_ls20_source_simulation_trace_artifact(
+    *,
+    state_id: str,
+    selected_game: dict[str, Any],
+    source_artifact_path: Path,
+    plan_result: Any,
+) -> dict[str, Any]:
+    return {
+        "schema": LS20_SOURCE_SIMULATION_TRACE_SCHEMA,
+        "created_at_utc": now_iso(),
+        "state_id": state_id,
+        "game_name": selected_game["name"],
+        "review_scope": "remaining_plan_from_current_state",
+        "projection_basis": "arc_frame_label_grid_3d_heightmap_with_ls20_state_channels",
+        "source_world_model_artifact": _repo_rel(source_artifact_path),
+        "source_world_model_sha256": _sha256(source_artifact_path),
+        "supported": bool(plan_result.supported),
+        "solved": bool(plan_result.solved),
+        "current_prefix_index": int(plan_result.current_prefix_index),
+        "total_plan_steps": int(plan_result.total_plan_steps),
+        "levels_completed_start": int(plan_result.levels_completed_start),
+        "final_levels_completed": int(plan_result.final_levels_completed),
+        "win_levels": int(plan_result.win_levels),
+        "round_count": len(plan_result.simulation_rounds),
+        "frame_count": len(plan_result.simulation_trace),
+        "rounds": plan_result.simulation_rounds,
+        "frames": plan_result.simulation_trace,
+        "training_data_promoted": False,
+        "arc_solve_claim": False,
+    }
+
+
+def write_ls20_simulation_trace_tsv(
+    path: Path,
+    *,
+    state_id: str,
+    selected_game: dict[str, Any],
+    source_trace_artifact_path: Path,
+    plan_result: Any,
+) -> None:
+    columns = [
+        "schema",
+        "state_id",
+        "game",
+        "source_trace_artifact",
+        "source_trace_sha256",
+        "review_step_index",
+        "global_step_before",
+        "global_step_after",
+        "round_index",
+        "round_step_index",
+        "action_value",
+        "action_name",
+        "x_before",
+        "y_before",
+        "z_before",
+        "x_after",
+        "y_after",
+        "z_after",
+        "shape_before",
+        "color_before",
+        "rotation_before",
+        "shape_after",
+        "color_after",
+        "rotation_after",
+        "goals_completed_after",
+        "goal_count",
+        "steps_remaining_after",
+        "lives_after",
+        "transition_reason",
+        "round_completed_after_step",
+        "win_after_step",
+        "state_after_sha256",
+    ]
+    source_trace_artifact = _repo_rel(source_trace_artifact_path)
+    source_trace_sha256 = _sha256(source_trace_artifact_path)
+    rows = ["\t".join(columns)]
+    for frame in plan_result.simulation_trace:
+        before = frame.get("state_before") or {}
+        after = frame.get("state_after") or {}
+        before_pos = _list_or_default(before.get("position_3d"), [0, 0, 0], 3)
+        after_pos = _list_or_default(after.get("position_3d"), [0, 0, 0], 3)
+        before_scr = _list_or_default(before.get("shape_color_rotation"), [0, 0, 0], 3)
+        after_scr = _list_or_default(after.get("shape_color_rotation"), [0, 0, 0], 3)
+        values = [
+            LS20_SOURCE_SIMULATION_TRACE_TSV_SCHEMA,
+            state_id,
+            selected_game["name"],
+            source_trace_artifact,
+            source_trace_sha256,
+            frame.get("review_step_index"),
+            frame.get("global_step_before"),
+            frame.get("global_step_after"),
+            frame.get("round_index"),
+            frame.get("round_step_index"),
+            frame.get("action_value"),
+            frame.get("action_name"),
+            before_pos[0],
+            before_pos[1],
+            before_pos[2],
+            after_pos[0],
+            after_pos[1],
+            after_pos[2],
+            before_scr[0],
+            before_scr[1],
+            before_scr[2],
+            after_scr[0],
+            after_scr[1],
+            after_scr[2],
+            after.get("goals_completed", 0),
+            after.get("goal_count", 0),
+            after.get("steps_remaining", 0),
+            after.get("lives", 0),
+            frame.get("transition_reason"),
+            frame.get("round_completed_after_step"),
+            frame.get("win_after_step"),
+            after.get("signature_sha256", ""),
+        ]
+        rows.append("\t".join(_tsv_cell(value) for value in values))
+    path.write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+
+def _list_or_default(value: Any, default: list[Any], length: int) -> list[Any]:
+    if isinstance(value, list) and len(value) >= length:
+        return value[:length]
+    return default
+
+
+def _tsv_cell(value: Any) -> str:
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    if value is None:
+        return ""
+    return str(value).replace("\t", " ").replace("\n", " ")
+
+
 def write_ls20_plan_manifest(
     path: Path,
     *,
@@ -828,6 +1001,8 @@ def write_ls20_plan_manifest(
     world_state: dict[str, Any],
     plan_result: Any,
     source_artifact_path: Path,
+    source_simulation_trace_path: Path,
+    source_simulation_trace_tsv_path: Path,
     candidate_packets: list[dict[str, Any]],
 ) -> None:
     candidate_action_values = [int(packet["action_value"]) for packet in candidate_packets]
@@ -840,6 +1015,12 @@ def write_ls20_plan_manifest(
         "grid_sha256": str(world_state["grid_stats"]["grid_sha256"]),
         "source_model_artifact": _repo_rel(source_artifact_path),
         "source_model_sha256": _sha256(source_artifact_path),
+        "source_simulation_trace_artifact": _repo_rel(source_simulation_trace_path),
+        "source_simulation_trace_sha256": _sha256(source_simulation_trace_path),
+        "simulation_trace_tsv": _repo_rel(source_simulation_trace_tsv_path),
+        "simulation_trace_tsv_sha256": _sha256(source_simulation_trace_tsv_path),
+        "simulation_trace_rows": str(len(plan_result.simulation_trace)),
+        "simulation_round_count": str(len(plan_result.simulation_rounds)),
         "supported": str(bool(plan_result.supported)).lower(),
         "solved": str(bool(plan_result.solved)).lower(),
         "source_model_verified": str(bool(plan_result.source_model_verified)).lower(),
@@ -868,6 +1049,7 @@ def run_dream_kernel_ls20_plan_verify(
     args: argparse.Namespace,
     manifest_path: Path,
     summary_path: Path,
+    review_path: Path,
 ) -> dict[str, Any]:
     cmd = [
         "cargo",
@@ -881,6 +1063,8 @@ def run_dream_kernel_ls20_plan_verify(
         str(manifest_path),
         "--summary-out",
         str(summary_path),
+        "--review-out",
+        str(review_path),
     ]
     completed = subprocess.run(
         cmd,
