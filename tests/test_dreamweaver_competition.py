@@ -34,6 +34,9 @@ def _kaggle_config(**overrides):
         "one_make_per_environment": True,
         "scorecard_reads_during_run": False,
         "secret_sources": [],
+        "secret_scan_clean": True,
+        "package_secret_findings": [],
+        "package_external_network_markers": [],
         "package_includes_requirements": True,
         "open_source_ready": True,
         "implementation_status": "implemented",
@@ -59,6 +62,9 @@ def test_online_api_scorecard_lane_is_valid_but_not_prize_eligible():
             "one_make_per_environment": False,
             "scorecard_reads_during_run": False,
             "secret_sources": ["ARC_API_KEY"],
+            "secret_scan_clean": True,
+            "package_secret_findings": [],
+            "package_external_network_markers": [],
             "package_includes_requirements": False,
             "open_source_ready": False,
             "implementation_status": "implemented",
@@ -86,6 +92,22 @@ def test_kaggle_config_with_external_api_fails_closed():
     assert "cannot require internet access" in failures
     assert "cannot use external/API confirmation backends" in failures
     assert "must not depend on API-key secret sources" in failures
+
+
+def test_kaggle_config_with_secret_or_network_scan_findings_fails_closed():
+    manifest = evaluate_competition_config(
+        _kaggle_config(
+            secret_scan_clean=False,
+            package_secret_findings=[{"path": ".env", "line": 1, "kind": "secret_filename"}],
+            package_external_network_markers=["main.py:10:https://"],
+        )
+    )
+
+    assert manifest["kaggle_prize_eligible"] is False
+    failures = " ".join(manifest["failures"])
+    assert "clean secret scan" in failures
+    assert "must not contain secret findings" in failures
+    assert "must not contain external network markers" in failures
 
 
 def test_kaggle_config_with_mirror_or_source_solver_fails_closed():
@@ -151,6 +173,46 @@ def test_scorecard_metrics_config_keeps_online_proof_non_prize(tmp_path):
     assert manifest["uses_source_env_solver"] is True
 
 
+def test_prize_runner_metrics_require_package_scan_before_prize_eligible(tmp_path):
+    from dreamweaver_competition import config_from_prize_runner_metrics
+
+    metrics_path = tmp_path / "metrics.json"
+    metrics_path.write_text(
+        json.dumps(
+            {
+                "model_name": "Dreamweaver",
+                "scorecard_id": "scorecard-001",
+                "offline_mirror_used": False,
+                "source_env_solver_used": False,
+                "single_scorecard": True,
+                "all_environment_runner": True,
+                "one_make_per_environment": True,
+                "scorecard_reads_during_run": False,
+                "scorecard_final_available": True,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    no_scan_manifest = evaluate_competition_config(config_from_prize_runner_metrics(metrics_path))
+    scan_manifest = evaluate_competition_config(
+        config_from_prize_runner_metrics(
+            metrics_path,
+            package_scan={
+                "secret_scan_clean": True,
+                "secret_findings": [],
+                "external_network_markers": [],
+                "package_includes_requirements": True,
+                "open_source_ready": True,
+            },
+        )
+    )
+
+    assert no_scan_manifest["kaggle_prize_eligible"] is False
+    assert "clean secret scan" in " ".join(no_scan_manifest["failures"])
+    assert scan_manifest["kaggle_prize_eligible"] is True
+
+
 def test_manifest_cli_writes_online_scorecard_manifest(tmp_path):
     metrics_path = tmp_path / "metrics.json"
     out_path = tmp_path / "manifest.json"
@@ -190,3 +252,19 @@ def test_manifest_cli_writes_online_scorecard_manifest(tmp_path):
     assert manifest["schema"] == "dreamweaver.arc_agi3_competition_preflight.v001"
     assert manifest["target_lane"] == TARGET_ONLINE_COMMUNITY
     assert manifest["kaggle_prize_eligible"] is False
+
+
+def test_scan_package_tree_finds_secret_files_values_and_network_markers(tmp_path):
+    from dreamweaver_competition import scan_package_tree
+
+    package = tmp_path / "pkg"
+    package.mkdir()
+    (package / ".env").write_text("ARC_API_KEY=secret\n", encoding="utf-8")
+    (package / "main.py").write_text('import requests\nURL = "https://example.invalid"\n', encoding="utf-8")
+    (package / "scorecard.json").write_text('{"api_key": "not-redacted"}\n', encoding="utf-8")
+
+    scan = scan_package_tree(package)
+
+    assert scan["secret_scan_clean"] is False
+    assert {finding["kind"] for finding in scan["secret_findings"]} == {"secret_filename", "api_key_json_value"}
+    assert any("https://" in marker for marker in scan["external_network_markers"])

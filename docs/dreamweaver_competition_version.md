@@ -99,3 +99,55 @@ requires internet, uses an offline mirror, uses the LS20 source-env solver, runs
 only one game, opens more than one scorecard, calls `make` more than once per
 environment, reads inflight scorecard state, depends on API-key secrets, lacks
 requirements, or is not open-source ready.
+
+## No-Submit Safety Rule
+
+Do not submit, upload, or publish a Kaggle package unless:
+
+- `kaggle_prize_eligible` is `true` in the manifest.
+- `package_audit.secret_scan_clean` is `true`.
+- `package_audit.secret_findings` is empty.
+- `package_audit.external_network_markers` is empty.
+
+The current saved LS20 scorecard proof remains local ONLINE/community evidence.
+It is not a Kaggle prize submission.
+
+## Prize Runner Mechanics
+
+The no-internet mechanics runner is now split from the ONLINE scout:
+
+- `src/dreamweaver_prize_runner.py`
+- `scripts/run_dreamweaver_kaggle_prize_dryrun.py`
+- `tests/test_dreamweaver_prize_runner.py`
+
+It enforces:
+
+- one scorecard;
+- all available environments;
+- one `make` per environment;
+- no inflight `get_scorecard`;
+- local confirmation only;
+- no offline mirror;
+- no source-env solver;
+- fail-closed blocking for complex actions that lack required `data`.
+
+Latest local mechanics dry-run:
+
+- run dir:
+  `experiments/2026-05-07_dreamweaver_kaggle_prize_offline_mechanics_dryrun_v004/`
+- operation mode: `OFFLINE` mechanics dry-run, not official submission
+- available games: `11`
+- all environments attempted: `true`
+- one `make` per environment: `true`
+- scorecard reads during run: `false`
+- external API used: `false`
+- source-env solver used: `false`
+- offline mirror used: `false`
+- actions executed: `9`
+- blocked before invalid action data on `ft09` and `tn36`
+
+The corresponding preflight manifest against the whole `src/` tree is still
+not prize eligible because that broad tree includes network-capable utilities
+and is not a minimal Kaggle package:
+
+- `experiments/2026-05-07_dreamweaver_kaggle_prize_offline_mechanics_dryrun_v004/prize_preflight_manifest_src_scan.json`

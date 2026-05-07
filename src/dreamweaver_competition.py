@@ -9,6 +9,7 @@ submission.
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path
@@ -49,8 +50,43 @@ REQUIRED_FIELDS = (
     "one_make_per_environment",
     "scorecard_reads_during_run",
     "secret_sources",
+    "secret_scan_clean",
+    "package_external_network_markers",
     "package_includes_requirements",
     "open_source_ready",
+)
+
+SECRET_ASSIGNMENT_RE = re.compile(r"\b(?:ARC_API_KEY|AGENTOPS_API_KEY|OPENAI_API_KEY|NEMO_API_KEY)\s*=\s*(.+)")
+API_KEY_JSON_RE = re.compile(r'"api_key"\s*:\s*(".*?"|null|true|false|[0-9.]+)', re.IGNORECASE)
+SAFE_SECRET_VALUES = {"", "redacted", "none", "null", "your_api_key_here", "test-key", "file-key", "new-file-key"}
+TEXT_FILE_SUFFIXES = {
+    "",
+    ".cfg",
+    ".css",
+    ".html",
+    ".ini",
+    ".json",
+    ".jsonl",
+    ".lock",
+    ".md",
+    ".py",
+    ".rs",
+    ".sh",
+    ".toml",
+    ".txt",
+    ".yaml",
+    ".yml",
+}
+NETWORK_MARKERS = (
+    "https://",
+    "http://",
+    "requests.",
+    "urlopen(",
+    "urllib.request",
+    "openai",
+    "openrouter",
+    "NEMO_RELAY_URL",
+    "ARC_BASE_URL",
 )
 
 
@@ -78,6 +114,9 @@ def evaluate_competition_config(config: Mapping[str, Any]) -> dict[str, Any]:
     package_includes_requirements = _bool(cfg.get("package_includes_requirements"))
     open_source_ready = _bool(cfg.get("open_source_ready"))
     implementation_status = str(cfg.get("implementation_status", "implemented")).strip().lower()
+    secret_scan_clean = _bool(cfg.get("secret_scan_clean"))
+    package_secret_findings = _list_of_dicts(cfg.get("package_secret_findings"))
+    package_external_network_markers = _string_list(cfg.get("package_external_network_markers"))
 
     if target_lane and target_lane not in ALLOWED_TARGET_LANES:
         failures.append(f"target_lane must be one of {sorted(ALLOWED_TARGET_LANES)}")
@@ -114,6 +153,12 @@ def evaluate_competition_config(config: Mapping[str, Any]) -> dict[str, Any]:
             failures.append("Kaggle prize lane cannot read inflight scorecard state")
         if api_secret_sources:
             failures.append("Kaggle prize package must not depend on API-key secret sources")
+        if not secret_scan_clean:
+            failures.append("Kaggle prize package must pass a clean secret scan")
+        if package_secret_findings:
+            failures.append("Kaggle prize package must not contain secret findings")
+        if package_external_network_markers:
+            failures.append("Kaggle prize package must not contain external network markers")
         if not package_includes_requirements:
             failures.append("Kaggle prize package must include reproducible requirements")
         if not open_source_ready:
@@ -158,6 +203,11 @@ def evaluate_competition_config(config: Mapping[str, Any]) -> dict[str, Any]:
         "one_make_per_environment": one_make_per_environment,
         "scorecard_reads_during_run": scorecard_reads_during_run,
         "secret_sources": [_redact_secret_source(item) for item in secret_sources],
+        "package_audit": {
+            "secret_scan_clean": secret_scan_clean,
+            "secret_findings": package_secret_findings,
+            "external_network_markers": package_external_network_markers,
+        },
         "package_includes_requirements": package_includes_requirements,
         "open_source_ready": open_source_ready,
         "implementation_status": implementation_status,
@@ -197,6 +247,9 @@ def config_from_online_scorecard_metrics(metrics_path: Path) -> dict[str, Any]:
         "one_make_per_environment": False,
         "scorecard_reads_during_run": False,
         "secret_sources": [condition.get("arc_api_key_source", "unknown")],
+        "secret_scan_clean": True,
+        "package_secret_findings": [],
+        "package_external_network_markers": [],
         "package_includes_requirements": False,
         "open_source_ready": False,
         "implementation_status": "implemented",
@@ -229,6 +282,9 @@ def kaggle_prize_template() -> dict[str, Any]:
         "one_make_per_environment": True,
         "scorecard_reads_during_run": False,
         "secret_sources": [],
+        "secret_scan_clean": False,
+        "package_secret_findings": [],
+        "package_external_network_markers": [],
         "package_includes_requirements": True,
         "open_source_ready": True,
         "implementation_status": "template",
@@ -237,6 +293,78 @@ def kaggle_prize_template() -> dict[str, Any]:
         "scorecard_id": "",
         "scorecard_operation_mode": "",
         "official_arc_solve_claim": False,
+    }
+
+
+def config_from_prize_runner_metrics(metrics_path: Path, *, package_scan: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """Build a Kaggle-lane preflight config from no-internet prize-runner metrics."""
+
+    metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+    scan = dict(package_scan or {})
+    return {
+        "model_name": metrics.get("model_name", "Dreamweaver"),
+        "target_lane": TARGET_KAGGLE_PRIZE,
+        "operation_mode": "COMPETITION",
+        "internet_allowed": False,
+        "confirmation_backend_kind": "deterministic",
+        "confirmation_backend_url": "",
+        "confirmation_backend_model": "dreamweaver-local-confirmation",
+        "uses_offline_mirror": metrics.get("offline_mirror_used") is True,
+        "uses_source_env_solver": metrics.get("source_env_solver_used") is True,
+        "single_scorecard": metrics.get("single_scorecard") is True,
+        "all_environment_runner": metrics.get("all_environment_runner") is True,
+        "one_make_per_environment": metrics.get("one_make_per_environment") is True,
+        "scorecard_reads_during_run": metrics.get("scorecard_reads_during_run") is True,
+        "secret_sources": [],
+        "secret_scan_clean": scan.get("secret_scan_clean", False),
+        "package_secret_findings": scan.get("secret_findings", []),
+        "package_external_network_markers": scan.get("external_network_markers", []),
+        "package_includes_requirements": scan.get("package_includes_requirements", False),
+        "open_source_ready": scan.get("open_source_ready", False),
+        "implementation_status": "implemented",
+        "scorecard_proof_saved": metrics.get("scorecard_final_available") is True,
+        "scorecard_proof_path": str(metrics_path.parent),
+        "scorecard_id": metrics.get("scorecard_id", ""),
+        "scorecard_operation_mode": "COMPETITION",
+        "official_arc_solve_claim": False,
+    }
+
+
+def scan_package_tree(root: Path) -> dict[str, Any]:
+    """Scan a proposed package tree for secrets and external network markers."""
+
+    secret_findings: list[dict[str, Any]] = []
+    network_markers: list[str] = []
+    scanned_files = 0
+    for path in sorted(root.rglob("*")):
+        if path.is_dir():
+            continue
+        rel = path.relative_to(root).as_posix()
+        if path.name.startswith(".env") or path.suffix in {".pem", ".key"}:
+            secret_findings.append({"path": rel, "line": 0, "kind": "secret_filename"})
+            continue
+        if path.suffix not in TEXT_FILE_SUFFIXES:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        scanned_files += 1
+        for line_no, line in enumerate(text.splitlines(), start=1):
+            secret_kind = _secret_line_kind(line)
+            if secret_kind:
+                secret_findings.append({"path": rel, "line": line_no, "kind": secret_kind})
+            for marker in NETWORK_MARKERS:
+                if marker in line:
+                    network_markers.append(f"{rel}:{line_no}:{marker}")
+    return {
+        "schema": "dreamweaver.package_secret_network_scan.v001",
+        "created_at_utc": _now_iso(),
+        "root": str(root),
+        "scanned_files": scanned_files,
+        "secret_scan_clean": not secret_findings,
+        "secret_findings": secret_findings,
+        "external_network_markers": sorted(set(network_markers)),
     }
 
 
@@ -270,6 +398,20 @@ def _redact_secret_source(value: str) -> str:
     return value
 
 
+def _secret_line_kind(line: str) -> str | None:
+    assignment = SECRET_ASSIGNMENT_RE.search(line)
+    if assignment:
+        raw_value = assignment.group(1).strip().strip("'\"")
+        if raw_value.lower() not in SAFE_SECRET_VALUES and not raw_value.startswith("<"):
+            return "secret_assignment"
+    json_match = API_KEY_JSON_RE.search(line)
+    if json_match:
+        raw_value = json_match.group(1).strip().strip("'\"")
+        if raw_value.lower() not in SAFE_SECRET_VALUES:
+            return "api_key_json_value"
+    return None
+
+
 def _string_list(value: Any) -> list[str]:
     if value is None:
         return []
@@ -278,6 +420,12 @@ def _string_list(value: Any) -> list[str]:
     if isinstance(value, list | tuple):
         return [str(item) for item in value if str(item)]
     return [str(value)]
+
+
+def _list_of_dicts(value: Any) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+    return [dict(item) for item in value if isinstance(item, dict)]
 
 
 def _bool(value: Any) -> bool:
