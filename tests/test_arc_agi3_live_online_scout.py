@@ -81,6 +81,18 @@ def test_compact_live_reasoning_keeps_world_model_and_nemo_confirmation_refs():
     assert reasoning["nemo3_supplied_action"] is False
 
 
+def test_scorecard_payload_redacts_api_key():
+    module = _load_module()
+
+    payload = module.scorecard_payload(
+        {"score": 1.0, "api_key": "secret-key", "card_id": "scorecard-001"},
+        "scorecard-001",
+    )
+
+    assert payload["api_key"] == "REDACTED"
+    assert payload["scorecard_id"] == "scorecard-001"
+
+
 def test_compiled_replay_includes_3d_simulation_round_review(tmp_path):
     module = _load_module()
     review_path = tmp_path / "dream_kernel_ls20_simulation_review.json"

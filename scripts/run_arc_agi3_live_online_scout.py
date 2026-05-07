@@ -448,6 +448,7 @@ def scorecard_payload(scorecard: Any | None, scorecard_id: str) -> dict[str, Any
         payload = dict(scorecard)
         payload.setdefault("scorecard_id", scorecard_id)
         payload.setdefault("available", False)
+        redact_scorecard_payload(payload)
         return payload
     if hasattr(scorecard, "model_dump"):
         payload = scorecard.model_dump(mode="json")
@@ -457,7 +458,13 @@ def scorecard_payload(scorecard: Any | None, scorecard_id: str) -> dict[str, Any
         payload = {"repr": repr(scorecard)}
     payload["scorecard_id"] = scorecard_id
     payload["available"] = True
+    redact_scorecard_payload(payload)
     return payload
+
+
+def redact_scorecard_payload(payload: dict[str, Any]) -> None:
+    if "api_key" in payload:
+        payload["api_key"] = "REDACTED"
 
 
 def mirror_matches(live_obs: Any, mirror_obs: Any) -> bool:

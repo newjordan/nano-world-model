@@ -2,6 +2,38 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V001 Dreamweaver ARC-AGI-3 ONLINE Scorecard Solve
+
+Artifacts:
+
+- `experiments/2026-05-07_dreamweaver_arc_agi3_online_scorecard_v001_ls20/`
+- `packages/dreamweaver_scorecard_v001_ls20/`
+- `packages/dreamweaver_scorecard_v001_ls20_proof_bundle.tar.gz`
+
+Status:
+
+- Dreamweaver completed a real ARC-AGI-3 `ONLINE` scorecard/replay run on
+  `ls20-9607627b`
+- scorecard id: `2b9edcf3-69e6-48c0-9df2-4fb0428a19c5`
+- score: `100.0`
+- levels completed: `7 / 7`
+- actions submitted: `311`
+- final state: `WIN`
+- stop reason: `online_solved_after_step`
+- valid live online scout: `True`
+- mirror sync valid: `True`
+- live Nemo confirmations: `311`
+- scorecard closed cleanly
+- scorecard API key fields redacted before packaging
+- this is an `ONLINE` scorecard proof, not a Kaggle prize submission
+
+Decision:
+
+Dreamweaver is now proven to solve `ls20` through the real online scorecard
+path. The next build target is a competition-safe harness split into
+provider-backed online/community mode and self-contained no-internet Kaggle
+mode.
+
 ## V061 Dreamweaver ARC-AGI-3 Live Online Harness
 
 Artifacts:
