@@ -17,20 +17,46 @@ community/unverified results.
 This is the lane used by
 `dreamweaver_arc_agi3_online_scorecard_v001_ls20`.
 
+Saved proof bundle:
+
+- `packages/dreamweaver_scorecard_v001_ls20/`
+- `packages/dreamweaver_scorecard_v001_ls20_proof_bundle.tar.gz`
+- scorecard id: `2b9edcf3-69e6-48c0-9df2-4fb0428a19c5`
+- result: `100.0`, `7 / 7` levels, `311` actions, final state `WIN`
+- official ARC solve claim: `false` because this was `ONLINE`, not Kaggle
+  `COMPETITION`
+
 ## Kaggle Prize Lane
 
 This lane is for the designated ARC Prize 2026 Kaggle competition package.
 
 - ARC mode: `COMPETITION`.
 - Internet: not available during evaluation.
-- Nemo backend: must be local, bundled, or replaced by a deterministic/local
-  confirmation module.
+- Nemo backend: external APIs are not prize-eligible; confirmation must be
+  local, bundled, or replaced by a deterministic/local confirmation module.
 - Environments: the harness must handle all provided competition environments
   under the single-scorecard constraints.
 - Hidden tasks: the agent must infer from observations; do not depend on local
   hidden environment source code.
 - Reproducibility: all code and methods must be open sourced for prize
   eligibility.
+
+Run the executable gate before treating any package as Kaggle-prize ready:
+
+```bash
+python scripts/build_dreamweaver_competition_manifest.py \
+  --config path/to/dreamweaver_competition_config.json \
+  --out path/to/dreamweaver_competition_manifest.json \
+  --require-kaggle-eligible
+```
+
+The saved ONLINE proof can be classified without claiming prize eligibility:
+
+```bash
+python scripts/build_dreamweaver_competition_manifest.py \
+  --from-online-scorecard-metrics packages/dreamweaver_scorecard_v001_ls20/metrics.json \
+  --out packages/dreamweaver_scorecard_v001_ls20/competition_preflight_manifest.json
+```
 
 ## Required Refactor
 
@@ -61,3 +87,15 @@ Not yet ready:
 - non-`ls20` general policy coverage.
 - removal/replacement of source-env-dependent LS20 mirror logic for hidden
   evaluation.
+
+Executable guard now in place:
+
+- `src/dreamweaver_competition.py`
+- `scripts/build_dreamweaver_competition_manifest.py`
+- `tests/test_dreamweaver_competition.py`
+
+The guard fails closed for Kaggle if a config uses an external API backend,
+requires internet, uses an offline mirror, uses the LS20 source-env solver, runs
+only one game, opens more than one scorecard, calls `make` more than once per
+environment, reads inflight scorecard state, depends on API-key secrets, lacks
+requirements, or is not open-source ready.

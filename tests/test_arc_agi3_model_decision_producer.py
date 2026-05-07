@@ -81,7 +81,7 @@ class FakeObs:
         self.frame = [FakeFrame()]
 
 
-def _args(module, *, threshold=0.0):
+def _args(module, *, threshold=0.0, allow_source_env_solver=True):
     return SimpleNamespace(
         run_label="test_model_decision_v047",
         branch_ambiguity_gap_threshold=threshold,
@@ -95,6 +95,7 @@ def _args(module, *, threshold=0.0):
         arc_grid_goal_label=3,
         arc_grid_wall_labels="2,4",
         arc_grid_hazard_labels="",
+        allow_source_env_solver=allow_source_env_solver,
     )
 
 
@@ -114,8 +115,10 @@ def _condition(module, selected_game):
     }
 
 
-def _produce(module, tmp_path, *, threshold=0.0, prior_update_refs=None):
+def _produce(module, tmp_path, *, threshold=0.0, prior_update_refs=None, allow_source_env_solver=True):
     env = FakeEnv()
+    if not allow_source_env_solver:
+        env._game = object()
     obs = FakeObs()
     selected_game = {"game_id": "ls20-9607627b", "name": "ls20", "title": "LS20"}
     packets = module.candidate_action_packets(
@@ -126,7 +129,7 @@ def _produce(module, tmp_path, *, threshold=0.0, prior_update_refs=None):
         max_actions=3,
     )
     metrics = module.write_model_decision_artifacts(
-        args=_args(module, threshold=threshold),
+        args=_args(module, threshold=threshold, allow_source_env_solver=allow_source_env_solver),
         out_dir=tmp_path,
         games=[selected_game],
         selected_game=selected_game,
@@ -211,6 +214,20 @@ def test_mlp_consultation_can_consume_prior_post_action_update_candidate(tmp_pat
     assert consultation["prior_post_action_update_candidates"] == [prior_update]
     assert consultation["post_action_update_candidate_context_sha256"]
     assert all("prior_components" in row for row in consultation["candidate_priors"])
+
+
+def test_source_env_solver_can_be_disabled_for_competition_gate(monkeypatch, tmp_path):
+    module = _load_module()
+
+    def fail_if_called(_game):
+        raise AssertionError("source-env solver must not run when disabled")
+
+    monkeypatch.setattr(module, "solve_ls20_from_current_game", fail_if_called)
+    env, metrics, decision = _produce(module, tmp_path, allow_source_env_solver=False)
+
+    assert metrics["valid_standard_model_decision"] is True
+    assert decision["internal_forward_rollout"]["kernel_surface"] == module.DREAM_KERNEL_ARC_GRID_SCOUT_SCHEMA
+    assert env.step_called is False
 
 
 def test_parse_nemo_json_response_accepts_plain_or_fenced_json():

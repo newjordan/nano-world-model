@@ -1035,6 +1035,7 @@ def decision_args_for(args: argparse.Namespace, *, run_label: str) -> argparse.N
         arc_grid_goal_label=args.arc_grid_goal_label,
         arc_grid_wall_labels=args.arc_grid_wall_labels,
         arc_grid_hazard_labels=args.arc_grid_hazard_labels,
+        allow_source_env_solver=True,
     )
 
 

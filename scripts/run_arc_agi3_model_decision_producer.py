@@ -690,6 +690,8 @@ def build_ls20_source_world_model_rollout(
     game_knowledge_ref: dict[str, str],
     mlp_consultation_ref: dict[str, str],
 ) -> dict[str, Any] | None:
+    if not getattr(args, "allow_source_env_solver", True):
+        return None
     if selected_game.get("name") != "ls20" or not hasattr(env, "_game"):
         return None
 
@@ -1741,6 +1743,7 @@ def condition_payload(
             "operation_mode": args.operation_mode,
             "game": args.game,
             "max_candidate_actions": args.max_candidate_actions,
+            "allow_source_env_solver": getattr(args, "allow_source_env_solver", True),
             "branch_ambiguity_gap_threshold": args.branch_ambiguity_gap_threshold,
             "internal_rollout_max_steps": args.internal_rollout_max_steps,
             "arc_grid_agent_label": args.arc_grid_agent_label,
@@ -2138,6 +2141,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--arc-grid-goal-label", type=int, default=None)
     parser.add_argument("--arc-grid-wall-labels", default="")
     parser.add_argument("--arc-grid-hazard-labels", default="")
+    parser.add_argument("--allow-source-env-solver", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--nemo-mode", choices=(LOCAL_NEMO_MODE, LIVE_NEMO_MODE), default=LOCAL_NEMO_MODE)
     parser.add_argument("--nemo-relay-url", default=os.environ.get("NEMO_RELAY_URL", "http://127.0.0.1:8000/v1/responses"))
     parser.add_argument("--nemo-model", default=os.environ.get("NEMO_RELAY_MODEL", "nemotron_3_nano_omni"))
