@@ -2,6 +2,38 @@
 
 Status: rolling result ledger. Newest result first.
 
+## V061 Dreamweaver ARC-AGI-3 Live Online Harness
+
+Artifacts:
+
+- `scripts/run_arc_agi3_live_online_scout.py`
+- `tests/test_arc_agi3_live_online_scout.py`
+
+Status:
+
+- named the integrated ARC world-model agent `Dreamweaver`
+- added a guarded `ONLINE`/`COMPETITION` runner with explicit
+  `--confirm-online-actions`
+- runner loads `ARC_API_KEY` from `/home/frosty40/world_model_1/.env.arc`
+  without printing or committing the key
+- every real ARC action must be backed by a fresh standard ModelDecision
+- every ModelDecision runs through the offline source-world mirror, mandatory
+  3D dream-kernel simulation review, internal thinking lock, MLP consultation,
+  and final Nemo confirmation before actuation
+- live actuator submits exactly one action per loop with compact reasoning
+  metadata and scorecard id
+- post-action observation, mirror sync, candidate-only MLP update, scorecard
+  state, watch snapshots, and replay artifacts are recorded
+- compiled replay includes per-step dream-kernel round/frame simulation review
+  data for later review/showoff
+- no online or competition action has been launched by this setup entry
+
+Verification:
+
+- `/home/frosty40/world_model_1/.venv/bin/python -m py_compile scripts/run_arc_agi3_live_online_scout.py`
+- `python -m pytest tests/test_arc_agi3_model_flow.py tests/test_arc_agi3_model_decision_producer.py tests/test_arc_agi3_model_step.py tests/test_arc_agi3_model_solve_scout.py tests/test_arc_agi3_live_online_scout.py -q`
+- result: `26 passed`
+
 ## V054/V055 ARC-AGI-3 Standard Model Solve Scouts
 
 Artifacts:
