@@ -1,0 +1,28 @@
+{
+  "actuator_steps_executed": 0,
+  "ambiguity_detected": false,
+  "arc_solve_claim": false,
+  "branch_simulation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v059_ls20_source_plan_live_nemo_full_311/steps/310_model_decision/branch_simulation.json",
+  "branch_simulation_sha256": "fd804ffedfd908b401cae65898677ebe030094b3fbe4210a5cc3436f04a02db3",
+  "created_at_utc": "2026-05-07T00:59:39.450816+00:00",
+  "created_before_actuator_step": true,
+  "drives_selected_action": true,
+  "internal_forward_rollout_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v059_ls20_source_plan_live_nemo_full_311/steps/310_model_decision/internal_forward_rollout.json",
+  "internal_forward_rollout_sha256": "731fa9d9428b9ca38cec288b17b602e67214ac78484e9fa4f244a19110226b64",
+  "kernel_supported": true,
+  "lock_reason": "internal forward rollout solved before actuator use",
+  "locked": true,
+  "nemo3_interim_confirmations": [],
+  "open_question_ids": [],
+  "planned_action_values": [
+    2
+  ],
+  "schema": "arc_agi3.internal_thinking_lock.v001",
+  "selected_action_name": "ACTION2",
+  "selected_action_source": "world_model_internal_thinking",
+  "selected_action_value": 2,
+  "selected_branch_id": "ls20:observation:not_finished:f91b51fb-9b23-4464-a17a-447956363c88:action:2",
+  "solves_before_first_step": true,
+  "state_id": "ls20:observation:not_finished:f91b51fb-9b23-4464-a17a-447956363c88",
+  "training_data_promoted": false
+}

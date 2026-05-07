@@ -1,0 +1,85 @@
+{
+  "arc_solve_claim": false,
+  "candidate_update": {
+    "append_to_branch_library_candidate_buffer": true,
+    "apply_to_weights_now": false,
+    "features": {
+      "action_value": 2,
+      "after_frame_sha256": "5434728f566109af3cb17c8d502dd2bff67dbb6aff18d19ea200a69f0542ff70",
+      "before_frame_sha256": "0e34d926c27366fde00f3e96510467643cc64f9b2e8f850d7183c754836d8ea0",
+      "frame_changed": true
+    },
+    "kind": "chronometric_calibration_mlp_transition_candidate",
+    "requires_review_or_promotion": true,
+    "targets": {
+      "frame_changed": true,
+      "level_delta": 0
+    }
+  },
+  "chronometric_game_knowledge_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/299_model_decision/chronometric_game_knowledge.json",
+  "chronometric_game_knowledge_sha256": "bf2481cb84c5325caf30529e403d1ec24f133b19d35ffa28ff0cd5f941ff6c64",
+  "created_at_utc": "2026-05-07T00:11:11.104801+00:00",
+  "decision_id": "arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local_step_299_decision:8be3c14e401db2ba",
+  "heldout_labels_used": false,
+  "mlp_consultation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/299_model_decision/mlp_consultation.json",
+  "mlp_consultation_sha256": "ac04011a189c0737c0328ab874e3b8b856b95c6105e25fab3193ea31bc5a12fd",
+  "mlp_weights_updated": false,
+  "online_submission": false,
+  "online_update_requires_promotion_condition": true,
+  "post_action_calibration_label": {
+    "direct_outcome_fields_are_post_action_only": true,
+    "frame_changed": true,
+    "level_delta": 0,
+    "next_state": "NOT_FINISHED",
+    "source": "post_action_observation_only"
+  },
+  "post_action_observation": {
+    "frame": {
+      "frame_stack_len": 1,
+      "latest_frame_max": 12,
+      "latest_frame_min": 1,
+      "latest_frame_sha256": "5434728f566109af3cb17c8d502dd2bff67dbb6aff18d19ea200a69f0542ff70",
+      "latest_frame_shape": [
+        64,
+        64
+      ]
+    },
+    "guid": "09801b97-c689-44f2-a3e3-7f2276f31514",
+    "levels_completed": 6,
+    "state": "NOT_FINISHED",
+    "win_levels": 7
+  },
+  "pre_action_observation": {
+    "frame": {
+      "frame_stack_len": 1,
+      "latest_frame_max": 12,
+      "latest_frame_min": 1,
+      "latest_frame_sha256": "0e34d926c27366fde00f3e96510467643cc64f9b2e8f850d7183c754836d8ea0",
+      "latest_frame_shape": [
+        64,
+        64
+      ]
+    },
+    "guid": "09801b97-c689-44f2-a3e3-7f2276f31514",
+    "levels_completed": 6,
+    "state": "NOT_FINISHED",
+    "win_levels": 7
+  },
+  "promotion_condition_satisfied": false,
+  "run_label": "arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local_step_299_actuator",
+  "schema": "arc_agi3.post_action_mlp_update_candidate.v001",
+  "score_surface": "NanoWM.score_chronometric_branch",
+  "scorecard_submission": false,
+  "selected_action": {
+    "action_data": null,
+    "action_name": "ACTION2",
+    "action_value": 2,
+    "source": "world_model_internal_thinking"
+  },
+  "source_model_decision_id": "arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local_step_299_decision:8be3c14e401db2ba",
+  "state_id": "ls20:observation:not_finished:09801b97-c689-44f2-a3e3-7f2276f31514",
+  "target_surface": "ChronometricCalibrationMLP+branch_library_fallback",
+  "training_data_promoted": false,
+  "update_candidate_written": true,
+  "update_mode": "candidate-only"
+}

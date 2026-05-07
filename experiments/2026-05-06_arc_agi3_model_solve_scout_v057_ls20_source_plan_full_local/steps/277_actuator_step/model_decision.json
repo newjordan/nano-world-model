@@ -1,0 +1,2631 @@
+{
+  "actuator_steps_executed": 0,
+  "arc_solve_claim": false,
+  "chronometric_game_knowledge": {
+    "action_embedding_context_linked": true,
+    "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/chronometric_game_knowledge.json",
+    "backbone_surface": "nanowm_action_conditioned_transformer",
+    "branch_library_linked": true,
+    "calibration_mlp_linked": true,
+    "calibration_surface": "ChronometricCalibrationMLP+branch_library_fallback",
+    "created_before_internal_branch_simulation": true,
+    "drives_branch_simulation": true,
+    "heldout_labels_used": false,
+    "knowledge_domains": [
+      "basic_movement",
+      "known_interactions",
+      "branch_value_calibration"
+    ],
+    "online_update_requires_promotion_condition": true,
+    "schema": "chronometric.game_knowledge_link.v001",
+    "score_surface": "NanoWM.score_chronometric_branch",
+    "sha256": "c93a3af0422d318bd13418fa297b6a4f48413bc3276f7a831e4ec2c198fe73e4",
+    "swiglu_backbone_linked": true,
+    "updates_from_post_action_calibration_only": true
+  },
+  "created_at_utc": "2026-05-07T00:11:03.261532+00:00",
+  "decision_id": "arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local_step_277_decision:6a082a0dec84921a",
+  "internal_forward_rollout": {
+    "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/internal_forward_rollout.json",
+    "candidate_count": 4,
+    "candidate_rollout_refs": [
+      {
+        "action_name": "ACTION1",
+        "action_value": 1,
+        "kernel_supported": true,
+        "predicted_level_delta": 0,
+        "predicted_next_frame_sha256": null,
+        "predicted_next_state": "NOT_FINISHED",
+        "predicted_solved": false,
+        "predicted_solved_by_plan": false,
+        "prediction_supported": false,
+        "rollout_steps": 0
+      },
+      {
+        "action_name": "ACTION2",
+        "action_value": 2,
+        "kernel_supported": true,
+        "predicted_level_delta": 0,
+        "predicted_next_frame_sha256": null,
+        "predicted_next_state": "NOT_FINISHED",
+        "predicted_solved": false,
+        "predicted_solved_by_plan": false,
+        "prediction_supported": false,
+        "rollout_steps": 0
+      },
+      {
+        "action_name": "ACTION3",
+        "action_value": 3,
+        "kernel_supported": true,
+        "predicted_level_delta": 0,
+        "predicted_next_frame_sha256": null,
+        "predicted_next_state": "NOT_FINISHED",
+        "predicted_solved": false,
+        "predicted_solved_by_plan": false,
+        "prediction_supported": false,
+        "rollout_steps": 0
+      },
+      {
+        "action_name": "ACTION4",
+        "action_value": 4,
+        "kernel_supported": true,
+        "predicted_level_delta": 0,
+        "predicted_next_frame_sha256": "fnv1a64:03fd706cce8b9466:next:278",
+        "predicted_next_state": "NOT_FINISHED",
+        "predicted_solved": false,
+        "predicted_solved_by_plan": true,
+        "prediction_supported": true,
+        "rollout_steps": 34
+      }
+    ],
+    "created_before_actuator_step": true,
+    "kernel_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/dream_kernel_ls20_plan_verify.json",
+    "kernel_sha256": "b6d3e3d8b8c7d6448556a1d3d78da221d98101858b3b109fdbde371372cc91f1",
+    "kernel_support_reason": "ls20_source_plan_manifest_verified",
+    "kernel_support_required_for_actuator": true,
+    "kernel_supported": true,
+    "kernel_surface": "dream_kernel.ls20_plan_verify.v001",
+    "planned_action_ids": [
+      "ACTION4",
+      "ACTION2",
+      "ACTION1",
+      "ACTION3",
+      "ACTION1",
+      "ACTION1",
+      "ACTION1",
+      "ACTION4",
+      "ACTION4",
+      "ACTION4",
+      "ACTION4",
+      "ACTION1",
+      "ACTION4",
+      "ACTION4",
+      "ACTION1",
+      "ACTION4",
+      "ACTION4",
+      "ACTION1",
+      "ACTION1",
+      "ACTION1",
+      "ACTION1",
+      "ACTION4",
+      "ACTION2",
+      "ACTION3",
+      "ACTION2",
+      "ACTION2",
+      "ACTION2",
+      "ACTION3",
+      "ACTION3",
+      "ACTION1",
+      "ACTION2",
+      "ACTION2",
+      "ACTION2",
+      "ACTION2"
+    ],
+    "planned_action_values": [
+      4,
+      2,
+      1,
+      3,
+      1,
+      1,
+      1,
+      4,
+      4,
+      4,
+      4,
+      1,
+      4,
+      4,
+      1,
+      4,
+      4,
+      1,
+      1,
+      1,
+      1,
+      4,
+      2,
+      3,
+      2,
+      2,
+      2,
+      3,
+      3,
+      1,
+      2,
+      2,
+      2,
+      2
+    ],
+    "planned_rollout_steps": 34,
+    "planned_sequence_hash": "fnv1a64:03fd706cce8b9466",
+    "preferred_action_value": 4,
+    "rollout_surface": "arc_agi3_pre_action_internal_forward_rollout_v057_ls20_source_world_model",
+    "schema": "arc_agi3.internal_forward_rollout.v001",
+    "selected_candidate_prediction": {
+      "action_name": "ACTION4",
+      "action_value": 4,
+      "confidence": 1.0,
+      "imagined_signed_y": 1.958687,
+      "kernel_supported": true,
+      "observed_after_action": null,
+      "post_action_calibration": false,
+      "predicted_level_delta": 0,
+      "predicted_next_frame_sha256": "fnv1a64:03fd706cce8b9466:next:278",
+      "predicted_next_state": "NOT_FINISHED",
+      "predicted_solved": false,
+      "predicted_solved_by_plan": true,
+      "prediction_supported": true,
+      "rollout_reason": "ls20_source_plan_manifest_verified",
+      "rollout_steps": 34
+    },
+    "sha256": "870fa49c9e50df29ba672fc87d1e45a51ff9cc87e67a000fe92446907a85f70a",
+    "solves_before_first_step": true
+  },
+  "internal_thinking_lock": {
+    "ambiguity_detected": false,
+    "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/internal_thinking_lock.json",
+    "created_before_actuator_step": true,
+    "drives_selected_action": true,
+    "kernel_supported": true,
+    "locked": true,
+    "open_question_ids": [],
+    "planned_action_values": [
+      4,
+      2,
+      1,
+      3,
+      1,
+      1,
+      1,
+      4,
+      4,
+      4,
+      4,
+      1,
+      4,
+      4,
+      1,
+      4,
+      4,
+      1,
+      1,
+      1,
+      1,
+      4,
+      2,
+      3,
+      2,
+      2,
+      2,
+      3,
+      3,
+      1,
+      2,
+      2,
+      2,
+      2
+    ],
+    "schema": "arc_agi3.internal_thinking_lock.v001",
+    "selected_action_value": 4,
+    "sha256": "c7e9f5f38eb180558d50ffa123ca67965c955f8f7b51bcd154d86bd6f81f27a1",
+    "solves_before_first_step": true
+  },
+  "mlp_consultation": {
+    "action_embedding_context_linked": true,
+    "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/mlp_consultation.json",
+    "backbone_surface": "nanowm_action_conditioned_transformer",
+    "branch_library_context_linked": true,
+    "calibration_mlp_linked": true,
+    "calibration_surface": "ChronometricCalibrationMLP+branch_library_fallback",
+    "candidate_priors": [
+      {
+        "action_embedding_context": {
+          "frame_sha256": "1a37112b19bc7147032117989e7d80e3e1eaf18826f7c15a790873681da5edcb",
+          "nonzero_cell_ratio": 0.999023,
+          "object_anchor_count": 4092,
+          "ray_count": 32736,
+          "surface": "nanowm_action_conditioned_transformer"
+        },
+        "action_name": "ACTION1",
+        "action_value": 1,
+        "branch_library_context": {
+          "fallback_enabled": true,
+          "lookup_key": "ls20|action:1|labels:9",
+          "post_action_update_context_sha256": "24da7cafd496638569894d3ab9924c04a343d214056e34da3b3fda54bf9c2c67",
+          "scope": "arc_agi3_live_loop_action_context"
+        },
+        "candidate_index": 0,
+        "mlp_prior": 0.94142,
+        "prior_components": {
+          "base_prior": 0.956992,
+          "post_action_feedback_prior": 0.894705,
+          "post_action_feedback_weight": 0.25
+        }
+      },
+      {
+        "action_embedding_context": {
+          "frame_sha256": "1a37112b19bc7147032117989e7d80e3e1eaf18826f7c15a790873681da5edcb",
+          "nonzero_cell_ratio": 0.999023,
+          "object_anchor_count": 4092,
+          "ray_count": 32736,
+          "surface": "nanowm_action_conditioned_transformer"
+        },
+        "action_name": "ACTION2",
+        "action_value": 2,
+        "branch_library_context": {
+          "fallback_enabled": true,
+          "lookup_key": "ls20|action:2|labels:9",
+          "post_action_update_context_sha256": "24da7cafd496638569894d3ab9924c04a343d214056e34da3b3fda54bf9c2c67",
+          "scope": "arc_agi3_live_loop_action_context"
+        },
+        "candidate_index": 1,
+        "mlp_prior": 0.143117,
+        "prior_components": {
+          "base_prior": 0.097473,
+          "post_action_feedback_prior": 0.280049,
+          "post_action_feedback_weight": 0.25
+        }
+      },
+      {
+        "action_embedding_context": {
+          "frame_sha256": "1a37112b19bc7147032117989e7d80e3e1eaf18826f7c15a790873681da5edcb",
+          "nonzero_cell_ratio": 0.999023,
+          "object_anchor_count": 4092,
+          "ray_count": 32736,
+          "surface": "nanowm_action_conditioned_transformer"
+        },
+        "action_name": "ACTION3",
+        "action_value": 3,
+        "branch_library_context": {
+          "fallback_enabled": true,
+          "lookup_key": "ls20|action:3|labels:9",
+          "post_action_update_context_sha256": "24da7cafd496638569894d3ab9924c04a343d214056e34da3b3fda54bf9c2c67",
+          "scope": "arc_agi3_live_loop_action_context"
+        },
+        "candidate_index": 2,
+        "mlp_prior": 0.594265,
+        "prior_components": {
+          "base_prior": 0.564361,
+          "post_action_feedback_prior": 0.683978,
+          "post_action_feedback_weight": 0.25
+        }
+      },
+      {
+        "action_embedding_context": {
+          "frame_sha256": "1a37112b19bc7147032117989e7d80e3e1eaf18826f7c15a790873681da5edcb",
+          "nonzero_cell_ratio": 0.999023,
+          "object_anchor_count": 4092,
+          "ray_count": 32736,
+          "surface": "nanowm_action_conditioned_transformer"
+        },
+        "action_name": "ACTION4",
+        "action_value": 4,
+        "branch_library_context": {
+          "fallback_enabled": true,
+          "lookup_key": "ls20|action:4|labels:9",
+          "post_action_update_context_sha256": "24da7cafd496638569894d3ab9924c04a343d214056e34da3b3fda54bf9c2c67",
+          "scope": "arc_agi3_live_loop_action_context"
+        },
+        "candidate_index": 3,
+        "mlp_prior": 0.593825,
+        "prior_components": {
+          "base_prior": 0.739909,
+          "post_action_feedback_prior": 0.155571,
+          "post_action_feedback_weight": 0.25
+        }
+      }
+    ],
+    "consulted_before_branch_simulation": true,
+    "drives_branch_simulation": true,
+    "heldout_labels_used": false,
+    "online_update_requires_promotion_condition": true,
+    "post_action_update_candidate_context_count": 277,
+    "post_action_update_candidate_context_sha256": "24da7cafd496638569894d3ab9924c04a343d214056e34da3b3fda54bf9c2c67",
+    "prior_post_action_update_candidates": [
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/000_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "49f3baa9d1acb1816558ddb37e8e79dccb4bb068cfe270e41b78bb10995c2a2c",
+        "source_step_index": 0,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/001_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a5eca8505366425525c2d717262c2a10a2b9794e1d0c2814e159df6f0d898d71",
+        "source_step_index": 1,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/002_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "8786aa3b005e6506ceeef7b732996e65989f636f4b13860220a733826671bc34",
+        "source_step_index": 2,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/003_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "86c11b5037e9796163243cf637bb3e568458621c798ada659a022fac2f440a6d",
+        "source_step_index": 3,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/004_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "6606e4a2112a7d7448b382e22e9beccb1ea81154a7c6190f0d0ebca12ea92afb",
+        "source_step_index": 4,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/005_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "b81fa3ed37f1f6bc60ab8087cfd1a393d23414c1d640834a9f2f2cd1dee505fd",
+        "source_step_index": 5,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/006_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "162214122f7d6bbccd123b97bfcbcd82c90a6c35d8de92cb2e1d18ba48aac2ea",
+        "source_step_index": 6,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/007_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0277abc91815c150239d3ac74ae11f4734cc35f097bbdd2161572250a7c78b11",
+        "source_step_index": 7,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/008_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "292f2a807cdcfb0281fdf0c9441923aba5becc18c1ba55bf16cae709324b4074",
+        "source_step_index": 8,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/009_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "5653c76e8d8569c97ed1d589a13447fa69b98f62cb2061ae42302953e135e981",
+        "source_step_index": 9,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/010_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "694ff23d5c93b708dda31c8cc365e812f9b275517e4e0b47358ed2d28facc14c",
+        "source_step_index": 10,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/011_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "1f88d050490a7be85a2af5b245868dd2cf5922c25e7d73071c0b65a25b0b2b1c",
+        "source_step_index": 11,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/012_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c16a28956725cbb358da82b8eeca545bf259b16d29e99c6ecc2f9aa925252a2d",
+        "source_step_index": 12,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/013_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a12c3e7384fcc9a5c5960d394f2a99665a47873a92d76f249c2f5581c719420e",
+        "source_step_index": 13,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/014_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "9bd8cc6f3cb062d1d2bfa98063b818fce4eef2a11aef1ab76bf4aa9d6baa3029",
+        "source_step_index": 14,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/015_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "4d67942dccbe2ea490f4d4b44ed57fda2aa426de87ddb8d60de3570c6eca0499",
+        "source_step_index": 15,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/016_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "ed0f6ab3f555ce5832d248384fe947812ac34b7fba985ac71c50885b534731a8",
+        "source_step_index": 16,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/017_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "de5962f810ad4bf9ae96780cc0d12cf34788c1eda5cfc031b06ec711329ad3b4",
+        "source_step_index": 17,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/018_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "7011caa28be3843da7ea37559dba0ff2126bb7e40f5f013855f1d9f2d261100a",
+        "source_step_index": 18,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/019_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "e02198edfd59c2524745288119521cb15d36dc5bae0b2db915c1250a7b7d6675",
+        "source_step_index": 19,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/020_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "446e12f74050a1fcf9f107c5a0c54d77e740490d8753cb12d24390cb0da39f6b",
+        "source_step_index": 20,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/021_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "e94c92949af5af9c2333b5c49a02976c6a503dbc6eb506af16fa840e07c05f98",
+        "source_step_index": 21,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/022_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "9814ec9dae44697a3d18a7c0dca7a9f2b1904695fc74dfce2491fe0f2eae0ff9",
+        "source_step_index": 22,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/023_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "75c216b20142690cbc78641417a59ee1875dff2ecfa8e4f170c8111da9229176",
+        "source_step_index": 23,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/024_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "484e74c827e787687a5dce94787ae666034b338d4078db814fec3a29f985dc6f",
+        "source_step_index": 24,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/025_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "9c6b47def106f736d1d9f3f39795140c7cf9d0a853f3beffbad0e5751f644f14",
+        "source_step_index": 25,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/026_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0db378c984a56cb7bcc5f2075b6b4c97c0accd7ef0bc05cd5fbfa46556e01f73",
+        "source_step_index": 26,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/027_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "868bf09c3259e271c88f41aa3b71d1ef8f558b3f8027b0e439aca9f292a6ff45",
+        "source_step_index": 27,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/028_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "bb1e424b49cfe387b1bbf37639086425a08c6386517e842dcd72f208ef680941",
+        "source_step_index": 28,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/029_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "6de77e4334378456993dd890cd421552852244f8c1e95ff114074059509d6a3f",
+        "source_step_index": 29,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/030_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "f1fcf120c0aa231672b47ffaab53d0f0a40e0aa83c47c3e72eca800f4e3d6d26",
+        "source_step_index": 30,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/031_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "f20e5b8487f4b52147162ff4a06aa8408a480d3d0412d41edd37b4b4aa044cde",
+        "source_step_index": 31,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/032_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2ae35fa3882529e6b255b4230ee11301452829d01557302c9e6952abb9d850db",
+        "source_step_index": 32,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/033_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a9f01804d9fbecba31203e62fd2812baaa8bdc8f8f0c60aade8596f475cb071f",
+        "source_step_index": 33,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/034_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "e6fe86a24c48c0b1b8bd42ca2cb9dc9ce4f469f74191d3adf98a569a862c2fa3",
+        "source_step_index": 34,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/035_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a93efdb12f7e18af5e483a7f685dbc2f3b827b7213e4b44aa6f10401b1a8a4bf",
+        "source_step_index": 35,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/036_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2375866bbd87b8e115de8b4fed34ad650ebc1f7eb0294be1c5fbe2b105e78717",
+        "source_step_index": 36,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/037_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "605679598d7ad5c1761eccf990f7879ff6a1f3022a624a04285cf860fb0d919a",
+        "source_step_index": 37,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/038_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c80dcb59c65a89257a182770c96cbcbdf5bc67b58b3cc3abc048e3f2d2ad579d",
+        "source_step_index": 38,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/039_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "804c426d8ac232b45de890c93752b9a8466317a01a77a18583133396f4ca6bac",
+        "source_step_index": 39,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/040_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "31d8cd4110ac0115b802997f79a4932a8a3a0fa3beed85582baf5462e5ba1cd2",
+        "source_step_index": 40,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/041_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "35a997e91b613060c1acc2a2ae6e2a9470c1bfc141134e56a27eb68063a9e806",
+        "source_step_index": 41,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/042_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a9e27604482a5ab2021d27e771e93d35c4c5feb1d805285245a1e78872f37fc3",
+        "source_step_index": 42,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/043_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "769354e9089efa785690a5dd25da16fe229f975be3b860eee9882bad01e95a2f",
+        "source_step_index": 43,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/044_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "e61fd470cdde21ec9f36c841bd077eaf74d7207bae8d23ac7557631881be20c6",
+        "source_step_index": 44,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/045_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "fbc05e4429f41c0528ece5fa283623f2955d98b46b485640a532dcf6980f06e1",
+        "source_step_index": 45,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/046_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "eba18d121b080dc7b8047f49fae10d013bb28dc9f28ccef113274214d7fb066d",
+        "source_step_index": 46,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/047_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "fd5dd4e661dcd8c19fd1ce044d135a6f3aee2490d865bdf924bc57767568cbcb",
+        "source_step_index": 47,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/048_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2421f64b0ea53cab911ab0345250635d60e8948894d8263eb49a1db69bb3cd88",
+        "source_step_index": 48,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/049_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d329e05f73714eb7e12856d44fcc8815e597ebe66641169a74987dd8ffd3394b",
+        "source_step_index": 49,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/050_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0939466a869493cf8446b440a9f384219e052a75a8a41d011198ea4d9bed34c1",
+        "source_step_index": 50,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/051_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "701dcceec62ed57e3e4f3298418db4e4bf140f62d09abd046dcd61bc9e9f9d73",
+        "source_step_index": 51,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/052_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "b1a5d92fa3b5ecf255598cd64ef80838649686d99562ef4a2bcd842a33d01c0f",
+        "source_step_index": 52,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/053_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "087c810459f1839de0a497ee1c1b1dbe0b2a3c765f4ea4b12ce2ed3faf234bc4",
+        "source_step_index": 53,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/054_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "91fa060e9c0851514c54d576d909ffe806a31df275d791d821df67f831c4aa06",
+        "source_step_index": 54,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/055_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "5bd49beeb5b97a579cba5d171b820268c77e62ce86b47745c436ce0d190550a4",
+        "source_step_index": 55,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/056_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a1f0d4efedb390ec9440bbab4744663334e9e03d41691c67ca0a0fc9dc0938b6",
+        "source_step_index": 56,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/057_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2ff3ad045423768024cbec6776e7f45cf465ee54405331565d4feddd7c57b766",
+        "source_step_index": 57,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/058_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "4a11e6acc4ffcb4e90ce9b737198d2c1bf3579534d53a176088987f0f46d82b8",
+        "source_step_index": 58,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/059_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "35effbebe6f6d6b9da42a6055df0213d08d4e9708f382b0519ca648919594794",
+        "source_step_index": 59,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/060_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "8dbecf0378df7aaa70a27e7490562322387c9da4395689fcb596a5331d6fda22",
+        "source_step_index": 60,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/061_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3126d15eddaa30d29a3245998a89e2cfa753d300f0139fc306f364fd2eaefdb0",
+        "source_step_index": 61,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/062_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c2feb9ea87e974470a3c948daf756261d4f00359edaec042eae7784d3c20dbd3",
+        "source_step_index": 62,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/063_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c093d9257a521c77ab7fb18f88d0319cbbb0f8b097a343e558809e6bbea2ec63",
+        "source_step_index": 63,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/064_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "1b07fcb65cd2d80bc82f6f3eaf7aeb394bd16e154a6d97aceeb704033dc432a5",
+        "source_step_index": 64,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/065_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3465a3f2d6178fb6c9eae27784068e6fdd78137546b62e49f31918757e1ef567",
+        "source_step_index": 65,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/066_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "aef00f15657b962c55dfe7fdc60f3b396bc5bc014aa49c2f0edcad2682940199",
+        "source_step_index": 66,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/067_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "9f4334d6609c57df2476a906b886011ff40b35ef4705949e007700dc59e124ee",
+        "source_step_index": 67,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/068_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "1e282c660fd72588559824767950d24f9bb1402f88a9dac98c654ab50b11d6dc",
+        "source_step_index": 68,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/069_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "40146ec6b98dea62226dabb1acd6a60d2760b36b72b2b9ba7ab467dccf78e765",
+        "source_step_index": 69,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/070_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2439820265087122bae8ea386f171ffa6ae64e2c6c973128bbbb865eed1e4418",
+        "source_step_index": 70,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/071_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "37cb937d5d4caf2a0d6fed25b737702307a822536817f8d499ce70bd3e49f734",
+        "source_step_index": 71,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/072_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "b006538eb8c1c8f54ff3afdd3acda3bb685beb55dade8d3fea275d443e6539d4",
+        "source_step_index": 72,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/073_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "748ad7ce84eef5468d61d6c93b893e7e5a8d64ada7e3305c339fd7bacb666844",
+        "source_step_index": 73,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/074_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "b8d0d2d412f44f9a47dd14e42af9d77675cdad639dc4ce8306d1d1cf0797c946",
+        "source_step_index": 74,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/075_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c6f08b79c23c1f3cd30ff03f9f838674a2ec1acb278529f835ff2786188877d0",
+        "source_step_index": 75,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/076_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "341307b4589ef0f48a48909c11ad7337799f7f6f1d5088c19e6c23d062913230",
+        "source_step_index": 76,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/077_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2e5d8a7e165c1f9915b14749c6c9a4073e7d78e680489b72fdb111023ad8d0a3",
+        "source_step_index": 77,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/078_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "e37a036b993d63bc6d793c63e101789464fdbc051351ec80142b34ef1b10b86e",
+        "source_step_index": 78,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/079_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "41906fb2e9049db8e4eaa69eb0c85d85b4aa99a011e308d152c47c82d397f8c4",
+        "source_step_index": 79,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/080_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "ff9d49b7f9fc621d0e0d9b4d2fac0aa10ea20617ec3577b7b72b2e8e9699b47b",
+        "source_step_index": 80,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/081_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "6745f3642a8155175408ef0444038856b768aefea6b08af1fd023fbac37a0ea8",
+        "source_step_index": 81,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/082_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d5398a99e3f0b65a4f17f7cf49c4393fabe44b65d27fdffe200080145e395e33",
+        "source_step_index": 82,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/083_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "97cfa1c524020c98732944c0fb39bdd63a83d8d64b48839edcc587482f857208",
+        "source_step_index": 83,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/084_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "47998afbca50d5ee510fcb62d5037b7a85b1698a9f274c9c1478e506a280ce0f",
+        "source_step_index": 84,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/085_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "8ca84f992061d20ae2fbafb51fdc15a02f3b26b48fa74a740d3cc40ec87ec340",
+        "source_step_index": 85,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/086_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0e42b0f87540593bfb2f4e5372734a3f3df3356d780d25f9b1e573fe608f7463",
+        "source_step_index": 86,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/087_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "93830a83208c77c821810e1e3df11d133bd1ead5ba87f4406edb2c9966af5bc5",
+        "source_step_index": 87,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/088_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3a65a1cc9924278192e3e0ea53e68e86773c56234a75c37e182908f3b75bd0e6",
+        "source_step_index": 88,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/089_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0c1c5ba73f14fc0d1cccefe95b5d4a4abbcd20175cc93942097999c114d3b5c6",
+        "source_step_index": 89,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/090_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "243a3c4f9f061978fdfcd442cf9ed4edcb82b1b76ec30880f4f562f828834706",
+        "source_step_index": 90,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/091_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "5bb1648b8eed7ac6fb5abfff704ed2b4a07d909ae949c6e66459144764a9fcd4",
+        "source_step_index": 91,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/092_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c60a367a9e854947fe0e90cddd93de73580ca8be69da773aca6530cbecd64503",
+        "source_step_index": 92,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/093_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "1f1b2eddb04990a41a36013e4ab4285763fb418ab52906a7ac9a74543b7a09f0",
+        "source_step_index": 93,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/094_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "51587d2bc8b9c1d84582913cc67ce4879baf2a49908e81019734c504376db7b3",
+        "source_step_index": 94,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/095_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "cdf8ae9a88f58138562c336619b3f1b15c7841518b1a3fcdadb45f65f1f9b4fc",
+        "source_step_index": 95,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/096_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a52e2081572d10230c0a51a0ae9d1da9f52051f0e4b51be8f0236847986bcc41",
+        "source_step_index": 96,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/097_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "4280e90a290580e7deb6185addd5d4a0a35a500a000518bcec46a094a8f6adba",
+        "source_step_index": 97,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/098_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3315f130bcda420eea9084005bdce8f5a23427d6d85a461cdca811ae8eb6dd7f",
+        "source_step_index": 98,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/099_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "e275c9426a0f0dd7851561acaa0c3f263d9760f8c1b314db426107bcba55978d",
+        "source_step_index": 99,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/100_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "f43802544647432b7621b41c60771758fcba946c244bb3f025ea5f0803ec29b7",
+        "source_step_index": 100,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/101_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "9e227d78c9e809843619dccc0f856553c412165915fb7a86564500256d4b5237",
+        "source_step_index": 101,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/102_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "79324a8b7a442f2bd51299c962812bfbfac03ecc73e9b9553633f47b74310ac5",
+        "source_step_index": 102,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/103_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3952f71f35e5482d0d702de455c67c02bc90314050efd23682a7b1729656509f",
+        "source_step_index": 103,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/104_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "392d1bde33d6770e63e3c60d0d9fe37d4cdc9b43c97253528e96b80043373e22",
+        "source_step_index": 104,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/105_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a784ee277bcad65e464658b6b625d60debbbdc02875a91ecafc0490f99f0cb40",
+        "source_step_index": 105,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/106_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "6089e5eee0be382568a0c91147004f1bd396a6c1740859e31374b5eb8e4e4ab5",
+        "source_step_index": 106,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/107_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "33a84460a05a86733a72783d3f42a1b2ff2c306121736a486887f44cf69c9140",
+        "source_step_index": 107,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/108_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "7d57257160821c7b48110171c6b56ca1b9ece83b5aa95387a886c6a18afff63c",
+        "source_step_index": 108,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/109_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "8938120d7c5c2316a3c1d4c7b7e62a3a7164c8b9ada50605a502edc66e9d04e9",
+        "source_step_index": 109,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/110_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a7071293d569c9d5b734f342cc9d730a17c6ec4b12111ed5fa6e33da4bdf5757",
+        "source_step_index": 110,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/111_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "b6ca416040739332b8b7dd4a4477bbb00ab13a5a72ee152971e6420dcd177213",
+        "source_step_index": 111,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/112_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2613c51dfdbea5bfe0cf163ecb14cdaa5618095487c3b4e13f3fca1c00224ce6",
+        "source_step_index": 112,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/113_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "721d6b5bb2625ab25d2cdbe8b7c331d6a33abf529c1c60205e58da43fa159c1f",
+        "source_step_index": 113,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/114_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "1296925255fc92162b6b36279fe34dc9c49e05efaecfd23941320f726cede450",
+        "source_step_index": 114,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/115_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "616b6da9fb379538811ed1aebff2119a9c6ddb91517a262ffbb23d7e0954961d",
+        "source_step_index": 115,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/116_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "725363fe5de7f36ebc384aeaa3d2c9554584a709225a6c14b479734515e0ec94",
+        "source_step_index": 116,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/117_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "e49031f13a6f77e9bbb583cba56363aa7e3f9e4af2a304a8d95bc4b67c3a9536",
+        "source_step_index": 117,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/118_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c409bc43f98f7d6568b38fbc4b464828f80e503ac539e29daa44e71db5e93534",
+        "source_step_index": 118,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/119_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "11d1e532655486f3aadd1dd7a7e1f57431f7debe58991ee8548cc23028759058",
+        "source_step_index": 119,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/120_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "cb383b365a40a928386bdff6437d6786a09ae4d64a9ba6899bf28eb3b9c48140",
+        "source_step_index": 120,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/121_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "6b29daa82098df62bcb09b019e723b1cdef1e306972c6b01111090982142984a",
+        "source_step_index": 121,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/122_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "cfa34b5994caabc67229735dc028ed643a564ad7d436665751fa97e774a3005b",
+        "source_step_index": 122,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/123_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2a944536060cb05995ef0095f4bab775ab682c64721b99daccc1dfe6c96b37bd",
+        "source_step_index": 123,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/124_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "b8cca1c029725c0b2a286f5d0954eefa3db2ab1dd22a3e0c105bead8f3c6947a",
+        "source_step_index": 124,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/125_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "6c3b697ab9334914517a7684e507bb87da0aa65fb2ea7fa67d0d55b1526815f5",
+        "source_step_index": 125,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/126_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a266aee26c9e81744a0b2724d6391e13fd727c4ad21aeb30bba5cb08c2fe6fc9",
+        "source_step_index": 126,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/127_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "82a9806e2046d30e472d8a164e23bdf9b70dff24ecc5d07931aa3638fc1f0d72",
+        "source_step_index": 127,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/128_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "33c578a8a222475c97af13ab9fdc4e35d56251cd2bafb06f9f7afdd260043966",
+        "source_step_index": 128,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/129_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0d769914de38eff81cbf8f649c07d30bc9f8ccdb3236ec793dc5fea75a0e9158",
+        "source_step_index": 129,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/130_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "58a8da2e7a60bf7ad1e01ccb9e65808f741087a6f4538ef131c784e058a0100d",
+        "source_step_index": 130,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/131_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "6f8949fca91e7393cef5f8c7d468286cbf70f9c61c1a5807c9c972932ae22039",
+        "source_step_index": 131,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/132_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "54f7c2ad9a01ab99dd557b302f8c616eb18360200f2fe462037bd5781e9ceb16",
+        "source_step_index": 132,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/133_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "bcd4e00dcc421a15dda116c75f22d9d7331bb546f119a13f6166fd8d96bb794e",
+        "source_step_index": 133,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/134_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "9f6b930838760fb1d88bea7e031d69b17e345ed1dd9479e2343e96f385844fa7",
+        "source_step_index": 134,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/135_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "1172bb95cee6d93ecd477bdc52d41d0cf4f907fbc223f67644db09cdb50ce9d7",
+        "source_step_index": 135,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/136_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2ba3125802586850d71f959d8d7ca4bef3bae6a10b05068962e7934450c694c9",
+        "source_step_index": 136,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/137_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3470ff3ac851f4cc79fe7f6fab1a0287570ac8333569fb17a104d74c78fd67e2",
+        "source_step_index": 137,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/138_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "388d2bde1ed946eb2c263da1ddf1becc53b0c8f8f4fff5bc5b7d269ccefc097f",
+        "source_step_index": 138,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/139_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "5793c25c5ebb3d489ea8203d825989061229293b28f25ace2815d18d02fe9706",
+        "source_step_index": 139,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/140_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "72ab4d55480061d84a6200e7d1e7259ce5abed9ca7279cc993d545282cff5752",
+        "source_step_index": 140,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/141_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2b29f92d97b1956d4775941366e4b462e53669be219debaab8149af9f2d990ac",
+        "source_step_index": 141,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/142_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "bfdfa5fdd72a580bda4df5b89e65fc251996721a525a8d1fc3c5f3e3ea828d10",
+        "source_step_index": 142,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/143_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "7334273aa12f2691d1e92734aa9da6882d3aea1c38b978135c6b419fef137647",
+        "source_step_index": 143,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/144_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "f1ef1349a3d450e3fe473ca68f14f51da10893dc5575cf5fcc9ce0a6481298fd",
+        "source_step_index": 144,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/145_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0b3e416349ab364a79599211026b32f4b14efa0857dc98749b124ec54bbce34a",
+        "source_step_index": 145,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/146_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "17904e97101f1ee2a49a126e2ff90d80ea752f37cd6b8f514e6a0c149799b42a",
+        "source_step_index": 146,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/147_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2804bd56e662281461714f0293f1aa91fbc5e40e571762765ec6e3bebef4442a",
+        "source_step_index": 147,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/148_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "8e248a1f902fb76c295e9c56d97a7b3d23d756f1a6128e49d0d99d599b8c0922",
+        "source_step_index": 148,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/149_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c7fa244ff30c136a1d8b7c6a005cb66477b9f5b186a94174441f1518694b4f7e",
+        "source_step_index": 149,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/150_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "ae3ab8a9ef21845be0995e5f9fcfeab72c83e9998b2c8026cf93118f2d2cc5af",
+        "source_step_index": 150,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/151_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "9ddfd18e747783418e09298874d799b99f2dcef9b4db39badfcdd002e5e08445",
+        "source_step_index": 151,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/152_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "6b22d7ceac3ec57b85097fe0b558419a50ca6f0242bfb774199078d80fc17a7a",
+        "source_step_index": 152,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/153_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3c4e05b81183a33eedf65435aec9785e160b1c5d84db8c146962af0c21c47ff7",
+        "source_step_index": 153,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/154_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0657ebcf4f0a20de2ebf02e6ee10c60e8f02e1ab24b4ecee075c39d4c0e31b94",
+        "source_step_index": 154,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/155_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "6ee26a3e88014341dc78a9223c1aff83e356d0d12165ad2bf349c146f8410547",
+        "source_step_index": 155,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/156_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "ce902182ae1819fed637364cdcb72da1f2f8a0392e3c5d2097e4ea663a5a84a4",
+        "source_step_index": 156,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/157_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "dc2fded06743376178b553ed5b67e3eb3544ffb523cdc13aa2fe611b676a86f5",
+        "source_step_index": 157,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/158_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3a28eb20eb9a199a88d67e266346fab3aaf9a95f2610e5f3dd4fe4d52843473a",
+        "source_step_index": 158,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/159_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d1516eec0d4ebec382ff10e4fe3d1b52995a4623375f408ba6fecd26bcf7362e",
+        "source_step_index": 159,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/160_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "df3f8e05f410c8ef1180f5a13b395f08b1c1729f058ce6f3e9b36eae5e514e12",
+        "source_step_index": 160,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/161_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "65727589133bd28eb2ba89e175bdbacc5972c9ab995f8122bc5d6b22147a2531",
+        "source_step_index": 161,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/162_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "38c4671b34fbcd4fefd9651184e8b45c404415b80a3f95ac3eabbebeecc4f211",
+        "source_step_index": 162,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/163_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "76ef00be179c92e56d36423c32dacf2d7fb3304e04f86e54f0eb68aa0d31a399",
+        "source_step_index": 163,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/164_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a335cdb793f06ddfc58c948f7a14a11504641bb8341a28e0f52a57627dcf204d",
+        "source_step_index": 164,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/165_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "dc53dbf151f524100e79a9cf417ec959a71c97119b7d4f1161e3d68deda01d6a",
+        "source_step_index": 165,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/166_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "1d141e42cda14a863de6e233488f8501ec91905493775fe93f711c812663e922",
+        "source_step_index": 166,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/167_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3f7345e28266da9acec9514f6e8e0ac365483501a477d5cc034d4f1da2b5d4ff",
+        "source_step_index": 167,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/168_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "74d9a31896f781aee6bd2daef4f5f618eded4f163d9d0c3b0ee7187f39fcb933",
+        "source_step_index": 168,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/169_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "65e250ac4ef5f276001dd8beb619a0f80331fc43fe1f4969beb2df3e5424bcce",
+        "source_step_index": 169,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/170_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d9c7c6fb6ad2eac0e4166a5b820aeea6124e48450d507048aac98a6b01cb734e",
+        "source_step_index": 170,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/171_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "f3547c52967214d0cbfd36f3cc43c6c6285cbfb64337f647f91df91b27ad5760",
+        "source_step_index": 171,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/172_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "ca0a7ffbbacae0590954c5877aad497b41a42890f02ace884c22971188d402d0",
+        "source_step_index": 172,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/173_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "db7603aa8597f6086b2dced1a13843aa8d7e8ec15c1b07a7b107737f664626b5",
+        "source_step_index": 173,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/174_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "ebddee377e93304c61342e8a336dbf41475ad20d9a0002e62190dfb185b81838",
+        "source_step_index": 174,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/175_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "8221575b6815c68137efc33f3867325c854113ecb35133ba30c38cbdbd5b837f",
+        "source_step_index": 175,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/176_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "69a8adfb1fd71c60d49b325c483aea4110ed755e07fb77a95b8a93fa4e45d55e",
+        "source_step_index": 176,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/177_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "faed408f7ccc5f783e2321d4311933e54ccaf0fb3d9192b1a647ec004d7d5a84",
+        "source_step_index": 177,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/178_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "291e8588ae703f3b05a95cb8f0d4a12a71b592bbbab510e6b81429e3078cd332",
+        "source_step_index": 178,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/179_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "e9d5d0b0538752ddc9abdb006b2d6d7ad2ee8d9bc5470791dd5504c763eeb89a",
+        "source_step_index": 179,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/180_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "824a825fdcc838fe6e476a6e8616e269ecf90793dd7820625b24bc0847689220",
+        "source_step_index": 180,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/181_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "017f54b5b52b339272185b6f5e36b3901cda64217f792803a4025b800e5d371a",
+        "source_step_index": 181,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/182_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2ce5bba2f17dc89cb560101cfd61e8e4a115472f7fa6a056ef7f90d1f39f3213",
+        "source_step_index": 182,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/183_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2a0c08303f57829b1a1787c17f7d25cc23f498461a608cc26503e4307803de2e",
+        "source_step_index": 183,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/184_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "435c64f64dcf055515455dbdfaf63506de6140662e1d579f7ac5d71ddc4effbe",
+        "source_step_index": 184,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/185_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "cbf501846a4c92759cc4d833fd2c1baee00a20a013c9f74b9d28574d0b4415fc",
+        "source_step_index": 185,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/186_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "062bb81e8c13837b671540e191c6f5aeee5cd01afaceaa20d8a1d07e5b94f93a",
+        "source_step_index": 186,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/187_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3ad42f1005e03efb487f1552bc7b75d918cb2b1c99ab80e4c0c54e08e25c1193",
+        "source_step_index": 187,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/188_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "270e1172424aa54a10b007263a7ad671235d6bf0db01972b05bd2d47cdc6715b",
+        "source_step_index": 188,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/189_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "4b4e743dfa825750a78c927b58bc61ce4bc72f29511262d247a7719a5ac2d094",
+        "source_step_index": 189,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/190_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "7f85166d0e00fbec276d84ff21d3c562cb5544e90f5a2fa7203b30d5c501150c",
+        "source_step_index": 190,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/191_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "01841e43c4c69f73e4732ce190d3cb272f1507403af71ea5c6e7314c73d9a9a8",
+        "source_step_index": 191,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/192_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "ee99d4858c54d1f8a6e7a036b865f1c0d93364a4d87687569fa3581fe7f68686",
+        "source_step_index": 192,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/193_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "1f2143d5785fe905becf6f3c094800222a9ed288170110d8f67768018e6be05e",
+        "source_step_index": 193,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/194_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "963b68e0452176c3f743b2de88c3eb60d7633702e60c080618bbca072ad13976",
+        "source_step_index": 194,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/195_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "7f9c554cb6688e0f39235a5c849268c62a6124c7b0c5243ff58fabb4894c0121",
+        "source_step_index": 195,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/196_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "040d8a6251dd4507205485469cddc630318b68129d2b04271dba74fb36450660",
+        "source_step_index": 196,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/197_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3394627a7331e550121c491c688ac01f100430935fab523728c224d050aa0bab",
+        "source_step_index": 197,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/198_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "4a01c4a29c9d2073c022081e7a9d923d68cc508106de8ccf7aed875b9d21a3e3",
+        "source_step_index": 198,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/199_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "1e3b6de9126da9a9e1e4f99bef07e685d77e4d8cd5d91086a17c3385cf670ab2",
+        "source_step_index": 199,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/200_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "789813bbfd4022883f644d309a19b55712b855a04e75549e6cc46db1e44e5f31",
+        "source_step_index": 200,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/201_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "496e797eedc8f84e0818655d9ff4732202d95ec4aad82eb158e19e869c6926a8",
+        "source_step_index": 201,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/202_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "7d051ac887e7a7c91230a80be2af5c84dccd8ca82ba32ab1028c2571fd82e19e",
+        "source_step_index": 202,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/203_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "4905849d45d13100304b21e37690117b0e59271eedf1990fd3468cd30b590954",
+        "source_step_index": 203,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/204_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "02b1cfc14b0fdd4d0914a594f10a8da18d41d6cfb57430629ccf812a6a150ba7",
+        "source_step_index": 204,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/205_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "56ce1f4ac21d552540309a1926b3ba68bf26bb8133f102e3e37ea2636c62b7e0",
+        "source_step_index": 205,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/206_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "726f8256c9b604e494032419c1d1cdc6f066b92cac983c511b818b837d9cfc8d",
+        "source_step_index": 206,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/207_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "61e8698705f5bf7a868b1d63e64d3359e410e596378af73bdca825284f5ce2e8",
+        "source_step_index": 207,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/208_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "28177a06f791c4b840e0b623d0037ff5aa67127fcfce815eef88616d97ae2d7a",
+        "source_step_index": 208,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/209_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "5b81be8174088ebd67c80fd179490d71aa33709ed0745d2e98eac748f935e9bf",
+        "source_step_index": 209,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/210_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "a162c7bece30b83bd6942b725cfff865344bf1469f13cba692727c8b0c3d64b8",
+        "source_step_index": 210,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/211_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "4f531dd8736048908e4e2d664751740e0bb8d6f69fa843d5733da4504de3fe0d",
+        "source_step_index": 211,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/212_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "1757fc9e8bce02b2f9fe0325d57a7b721cea6d514f05055b3b570aa03fac6527",
+        "source_step_index": 212,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/213_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "7d775ec0a9d262100f829bb34f058db3470580c53563b59a92f0e2d9e440d5bf",
+        "source_step_index": 213,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/214_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c820c850f0f9825034164a369fb640e2c89eceeb3f3c2231df44fcd186db63ca",
+        "source_step_index": 214,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/215_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "cec81a719d6d51649932722fdcca1256d90e0526110cbcecf9a941954dbbe54a",
+        "source_step_index": 215,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/216_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0ac6296a666e2098627f3b0ba566e6fe26741736d41ea4c9e5d2a1a353f52a98",
+        "source_step_index": 216,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/217_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "013e68b6e5b888834e053418d21e81bafd1f004e51c4c1c400dae3794be77ba5",
+        "source_step_index": 217,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/218_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "f2003efa3d0cf00229a72a1513159d263449a10975679f288769c5e30fda223e",
+        "source_step_index": 218,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/219_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d6f28b006cfc1a0fcd8932a9273245af69830ff071cabcda679cac7bf66550f6",
+        "source_step_index": 219,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/220_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "392ab45920ed8e1950b96e68a99f9be03f2682cb1b8cb1b2f0228a06fe57d6c6",
+        "source_step_index": 220,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/221_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d9d414a21dfb6a98573527122ded917a92f5b65140a414a7fab637c84a03b972",
+        "source_step_index": 221,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/222_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0847d5835177d097ade545fa5d2ddcbbc2ce0146ca99a69936044213c6f568bc",
+        "source_step_index": 222,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/223_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "aacded479ab3ec9339e01efd99df8ca5a8c1b9ae676a65b419f41da50f2ed919",
+        "source_step_index": 223,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/224_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c3255a82b45624cf87978d4de2381d4c4b82eac3ce78ed4429f5c0869055b4ce",
+        "source_step_index": 224,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/225_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "66e5824509bcb4826964ed0881bbf310f85a592298437c103d3ba2b80a84bcb0",
+        "source_step_index": 225,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/226_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2144f329bbe1cfa880365b0ecdede0911b26326ae9c8421f5fe12d29256bc2e1",
+        "source_step_index": 226,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/227_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "819bbab6aa445d3cdeee90b5820c744ffc5e98c2410e3ce3d81b1de48ea4c5d8",
+        "source_step_index": 227,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/228_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "15d8428d216b5b6c8ee4c220e4cebc0738477248596c9e37288a616a52522af8",
+        "source_step_index": 228,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/229_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c4c0d8de7d6c6cc163275bd9f91150086b8fd6abb24d1aa39fc7f6371a2692fe",
+        "source_step_index": 229,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/230_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d640eabc6e12e6828c9ea5633d360a53aa232e35d47d3a651101e2a2f5d10ae2",
+        "source_step_index": 230,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/231_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "930fe17649548252d485ff9ae2e77912dc0d4f40a85779f402ee287d54e33611",
+        "source_step_index": 231,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/232_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "4ff7680798ce2a72769353c5a280de1c4645e1ad6db08ff11c31878e21a88c93",
+        "source_step_index": 232,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/233_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "51e0da1ed611ed65ea04f1a7364c510c32cd875fc6d0b481439f0d9a64f6121c",
+        "source_step_index": 233,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/234_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "b7abb1b811337d07120ea1c87e74916fe87c8adf879b40cb94485355e7a94603",
+        "source_step_index": 234,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/235_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d6722122f15a5aa22e4f32a54f4f6f2d78fa25617731daf1a71b76968dce0da4",
+        "source_step_index": 235,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/236_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "973e5cd5c65f4993b601bc62f051008f38b7e36442544ac9a102a51c1466a4f4",
+        "source_step_index": 236,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/237_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0b836d30b6649372deb41e68d3825affe0ca528df0ecacb5f43edee1c63c1d00",
+        "source_step_index": 237,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/238_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "428ae9cbb23781551f531909e8f562f11fcfa2f72b323a09a517e42dc1c57272",
+        "source_step_index": 238,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/239_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "68c15affe67926a6af8f6191e1ddd9c8d6653c3d1497f0155f8aa72781f17ae4",
+        "source_step_index": 239,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/240_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2e201b5361fba0f121737c37b96f22fbd4eebffb46d877de7083985caf86ec16",
+        "source_step_index": 240,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/241_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "c5a71ec78e3f2a64a7f90e81266d5d1a8a35776386e7e3a1ad0118e1b0210082",
+        "source_step_index": 241,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/242_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "7402edca581455250bf1a915c8020b712db465ca05dbbc5c8f48c9f39c389107",
+        "source_step_index": 242,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/243_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "5dcf06ef6c6a131523c5d8b70892bfcb11dbd257ef52b19992576d370c10a578",
+        "source_step_index": 243,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/244_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d9a504b0aca7cde02470d434d7244731b2e45e1d096a4e869db5f93a9da9b23f",
+        "source_step_index": 244,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/245_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "cc4b427f0fabc65780cb5d43829e25f7e3f2c573da1e798443a0399ad61f24d2",
+        "source_step_index": 245,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/246_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2a12968decee51fcff0f8733f2a50b1a766c63c29b7f506953b89492efdb3340",
+        "source_step_index": 246,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/247_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "23473803a0611ffa3806ba1a02a2759c2bb5b4dbcee42c656707bc71ffe6c272",
+        "source_step_index": 247,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/248_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "aa515cff7360804ed4cdc6373369e7d7b8e35d7173180453f920f8e877efc54e",
+        "source_step_index": 248,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/249_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "2c1e1d09466aae637b1f3b558df348b46189e1b6220ff24f7293baff95aea7d3",
+        "source_step_index": 249,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/250_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "52412308502aff059e87f14fb8e07b70d4b3a886cd4e9141b669bcbc502526ab",
+        "source_step_index": 250,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/251_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "0189f365b07fedc7bfd7d4f04f153008e8c5019d28bf1438ab129d3c0f925e69",
+        "source_step_index": 251,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/252_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "4c064ef721218f3a2cb75a5015152cfa7a9dd8a8f33a741be8de7d5ec7d32adc",
+        "source_step_index": 252,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/253_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "be253c961c24d7113d2014d98b6bd19b165364aad216fb8609654aff6161b8fb",
+        "source_step_index": 253,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/254_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "789c9716cbcb76443333e0d288f20e4311b351e96198588c6c038d7d15374f96",
+        "source_step_index": 254,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/255_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "61c96a46aa0e53cdfee2b84a83426011bb53d156f0137036a901f0a52a478cbe",
+        "source_step_index": 255,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/256_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "62344ff63ff18fcf0135be1c698f74c734c7d21f6f5558af70d09f9fcaeac94a",
+        "source_step_index": 256,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/257_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "ffaa9a62f5a04f089e85ebe6fe759666a515369ffdeb408dfe3d262239872cc5",
+        "source_step_index": 257,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/258_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "22cb306ccd13958f1fab77c3db1026ffe4e0bebe2256b5e2cbe79da87c0c8a01",
+        "source_step_index": 258,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/259_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "80373d236ee682dcd38f72047e245057a677f3c2445d66cb351b8344909d573b",
+        "source_step_index": 259,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/260_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "429dad419f56b08583e9373b15864a2852530392a2f646f3833578abbca49c5b",
+        "source_step_index": 260,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/261_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d332057f58975fb141cc6f90a39cf4c2877414089df4410c865356364d3a4fc8",
+        "source_step_index": 261,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/262_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "19f05f7b23a764f851274b7cf50bac88c6c09790feab6c1a16424ccda32d7d50",
+        "source_step_index": 262,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/263_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "b41e225442075a2a3a4e3079d1e2af8a8da5614eced2ff475d0eb0382d1fd39e",
+        "source_step_index": 263,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/264_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "5c4ba4df53bca14d14ee858f4a72c411ffd75ef61f61ca433f084e3cc2113391",
+        "source_step_index": 264,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/265_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "ed2253c11a9fd1322308c042c0e6881e77b17dcce36dcc26ea73e9f6128e3423",
+        "source_step_index": 265,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/266_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3221b78bab6941cb53ff16a86c41d23d59501174b271188d511a616f266e818b",
+        "source_step_index": 266,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/267_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "5372a70a4678d7248c04312b13a841d10d88974ae56bcbe2297338c045226969",
+        "source_step_index": 267,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/268_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "36ae2eb0027a720a50b7581e9d184eae931e19acb1c35e8adfc5ff3d6e14336a",
+        "source_step_index": 268,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/269_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "aaa13123a2dc4022f6f95920b56ed6d059ae3bc592bf12f2d54798ece406e92d",
+        "source_step_index": 269,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/270_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3df142f3232a0cdde0ad84a65ffa272c614ef1911e83d513750da72dc1d8a4e1",
+        "source_step_index": 270,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/271_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "7377e621ded467e9f6dd967d9416c759cfff5aebb5b7a8a2657fba11fc57db3a",
+        "source_step_index": 271,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/272_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "d1c066a2ba262e2906c8d36681f0342042fb1b2873104a7c1713c9e16c1a8f50",
+        "source_step_index": 272,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/273_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "13ac1d81e1a1254358e010f231f057c04c63b4b0458d129772e70325d997db3b",
+        "source_step_index": 273,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/274_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "3b3453b6f2c0e7efe11368e60d20f80044d70f2d36a9a521c352bd9dd6291166",
+        "source_step_index": 274,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/275_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "70abacd1f6c00441b0f50c0df023b16841f3a7b124fa79c9977f76a1b16063df",
+        "source_step_index": 275,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      },
+      {
+        "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/276_actuator_step/post_action_mlp_update.json",
+        "mlp_weights_updated": false,
+        "sha256": "98d0f2b9727ffffeae59beabfee344b61c98c3d92afcc2e8e45f963972d509e5",
+        "source_step_index": 276,
+        "training_data_promoted": false,
+        "update_mode": "candidate-only"
+      }
+    ],
+    "schema": "arc_agi3.mlp_consultation.v001",
+    "score_surface": "NanoWM.score_chronometric_branch",
+    "sha256": "61ef5e2debf04d39c38360d939dc17a77329eeaaba41668e7f28e03f39b1c831",
+    "updates_from_post_action_only": true
+  },
+  "nemo3": {
+    "confirmation_mode": "contract-local",
+    "decision_delegated_to_nemo": false,
+    "external_nemo3_model_invoked": false,
+    "final_confirmation": {
+      "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/nemo3_final_confirmation.json",
+      "confirms_selected_action": true,
+      "created_after_internal_thinking_lock": true,
+      "created_before_actuator_step": true,
+      "nemo_supplied_action": false,
+      "schema": "arc_agi3.nemo3_final_confirmation.v001",
+      "selected_action_value": 4,
+      "sha256": "335476089008abf019d83c5a01eab621179e47139dd8075f906dc28af4d433ac"
+    },
+    "interim_confirmation_policy": {
+      "call_on_ambiguity_or_open_questions": true
+    },
+    "interim_confirmations": [],
+    "invoked": true,
+    "role": "confirmation_not_action_source"
+  },
+  "online_submission": false,
+  "schema": "arc_agi3.model_decision.v001",
+  "selected_action": {
+    "action_data": null,
+    "action_name": "ACTION4",
+    "action_value": 4,
+    "source": "world_model_internal_thinking"
+  },
+  "standard_model_flow": {
+    "branch_simulation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/branch_simulation.json",
+    "chronometric_game_knowledge_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/chronometric_game_knowledge.json",
+    "internal_forward_rollout_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/internal_forward_rollout.json",
+    "internal_thinking_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/internal_thinking_lock.json",
+    "mlp_consultation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/mlp_consultation.json",
+    "model_decision_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/model_decision.json",
+    "nemo3_final_confirmation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/nemo3_final_confirmation.json",
+    "observation_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/observation.json",
+    "sequence": [
+      "observation",
+      "world_state_3d",
+      "chronometric_game_knowledge",
+      "mlp_consultation",
+      "internal_forward_rollout",
+      "internal_branch_simulation",
+      "trust_checks",
+      "internal_thinking_lock",
+      "nemo3_final_confirmation",
+      "model_decision",
+      "actuator_step"
+    ],
+    "trust_checks_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/trust_checks.json",
+    "world_state_3d_artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/277_model_decision/world_state_3d.json"
+  },
+  "state_id": "ls20:observation:not_finished:09801b97-c689-44f2-a3e3-7f2276f31514",
+  "training_data_promoted": false,
+  "trust": {
+    "branch_selection_trusted": true,
+    "geometry_trusted": true,
+    "map_trusted": true,
+    "ray_trusted": true,
+    "temporal_trusted": true
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "action_embedding_context_linked": true,
+  "arc_solve_claim": false,
+  "backbone_surface": "nanowm_action_conditioned_transformer",
+  "branch_library_linked": true,
+  "calibration_mlp_linked": true,
+  "calibration_surface": "ChronometricCalibrationMLP+branch_library_fallback",
+  "created_at_utc": "2026-05-07T00:54:33.584421+00:00",
+  "created_before_internal_branch_simulation": true,
+  "drives_branch_simulation": true,
+  "game_name": "ls20",
+  "heldout_labels_used": false,
+  "knowledge_domains": [
+    "basic_movement",
+    "known_interactions",
+    "branch_value_calibration"
+  ],
+  "knowledge_packet": "arc_agi3_chronometric_game_knowledge_v047",
+  "object_anchor_count": 4088,
+  "online_update_requires_promotion_condition": true,
+  "ray_count": 32704,
+  "schema": "chronometric.game_knowledge_link.v001",
+  "score_surface": "NanoWM.score_chronometric_branch",
+  "state_id": "ls20:observation:not_finished:f91b51fb-9b23-4464-a17a-447956363c88",
+  "swiglu_backbone_linked": true,
+  "training_data_promoted": false,
+  "update_policy": {
+    "heldout_label_ingestion_requires_promotion": true,
+    "post_action_calibration_requires_artifact": true,
+    "pre_action_learning": false
+  },
+  "updates_from_post_action_calibration_only": true,
+  "world_state_surface": "chronometric_frame_grid_to_3d_world_state_v047"
+}

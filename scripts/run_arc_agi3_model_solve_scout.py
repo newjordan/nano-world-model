@@ -427,10 +427,16 @@ def summarize_loop(
         int(row["step_index"]) == 0 or int(row["mlp_post_action_update_context_count"]) > 0
         for row in trace_rows
     )
+    nemo_required_external = bool(condition.get("nemo_external_model_required"))
+    nemo_confirmation_valid = (
+        all(row["nemo3_external_model_invoked"] is True for row in trace_rows)
+        if nemo_required_external
+        else all("nemo3_external_model_invoked" in row for row in trace_rows)
+    )
     valid_steps = bool(
         all(row["valid_standard_model_decision"] is True for row in trace_rows)
         and all(row["valid_standard_model_flow_step"] is True for row in trace_rows)
-        and all(row["nemo3_external_model_invoked"] is True for row in trace_rows)
+        and nemo_confirmation_valid
         and all(row["mlp_weights_updated"] is False for row in trace_rows)
         and all(row["training_data_promoted"] is False for row in trace_rows)
     )
@@ -466,6 +472,8 @@ def summarize_loop(
         "selected_actions": [row["selected_action"] for row in trace_rows],
         "changed_frame_steps": sum(1 for row in trace_rows if row["frame_changed"] is True),
         "nemo3_external_model_invocations": sum(1 for row in trace_rows if row["nemo3_external_model_invoked"] is True),
+        "nemo3_confirmation_valid": nemo_confirmation_valid,
+        "nemo3_external_model_required": nemo_required_external,
         "mlp_weights_updated": False,
         "training_data_promoted": False,
         "arc_solve_claim": False,

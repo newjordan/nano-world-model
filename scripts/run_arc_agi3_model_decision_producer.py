@@ -47,6 +47,7 @@ from arc_agi3_model_flow import (  # noqa: E402
 from chronometric_grid_imagination import build_grid_imagination_map  # noqa: E402
 from chronometric_map_perception import ColorLabel, build_grid_geometry, evaluate_grid_perception  # noqa: E402
 from chronometric_sensory_alignment import evaluate_2d_3d_alignment  # noqa: E402
+from ls20_source_world_model import solve_ls20_from_current_game  # noqa: E402
 from scripts.run_arc_agi3_io_smoke import (  # noqa: E402
     DEFAULT_ARC_REPO,
     DEFAULT_ENVIRONMENTS_DIR,
@@ -78,6 +79,8 @@ WORLD_STATE_SCHEMA = "arc_agi3.world_state_3d.v001"
 BRANCH_SIMULATION_SCHEMA = "arc_agi3.branch_simulation.v001"
 TRUST_CHECKS_SCHEMA = "arc_agi3.trust_checks.v001"
 DREAM_KERNEL_ARC_GRID_SCOUT_SCHEMA = "dream_kernel.arc_grid_scout.v001"
+DREAM_KERNEL_LS20_PLAN_VERIFY_SCHEMA = "dream_kernel.ls20_plan_verify.v001"
+LS20_INTERNAL_WORLD_MODEL_SCHEMA = "arc_agi3.ls20_source_world_model_plan.v001"
 LOCAL_NEMO_MODE = "contract-local"
 LIVE_NEMO_MODE = "live-relay"
 
@@ -195,6 +198,7 @@ def write_model_decision_artifacts(
         out_dir=out_dir,
         state_id=state_id,
         selected_game=selected_game,
+        env=env,
         candidate_packets=candidate_packets,
         world_state=world_state,
         game_knowledge_ref=game_knowledge_ref,
@@ -326,6 +330,9 @@ def artifact_paths(out_dir: Path) -> dict[str, Path]:
         "internal_forward_rollout": out_dir / "internal_forward_rollout.json",
         "internal_forward_rollout_grid": out_dir / "internal_forward_rollout_grid.txt",
         "dream_kernel_arc_grid_scout": out_dir / "dream_kernel_arc_grid_scout.json",
+        "ls20_internal_world_model": out_dir / "ls20_internal_world_model.json",
+        "ls20_plan_manifest": out_dir / "ls20_plan_manifest.txt",
+        "dream_kernel_ls20_plan_verify": out_dir / "dream_kernel_ls20_plan_verify.json",
         "branch_simulation": out_dir / "branch_simulation.json",
         "trust_checks": out_dir / "trust_checks.json",
         "internal_thinking": out_dir / "internal_thinking_lock.json",
@@ -563,12 +570,27 @@ def build_internal_forward_rollout_artifact(
     out_dir: Path,
     state_id: str,
     selected_game: dict[str, Any],
+    env: Any,
     candidate_packets: list[dict[str, Any]],
     world_state: dict[str, Any],
     game_knowledge_ref: dict[str, str],
     mlp_consultation_ref: dict[str, str],
 ) -> dict[str, Any]:
     paths = artifact_paths(out_dir)
+    ls20_rollout = build_ls20_source_world_model_rollout(
+        args=args,
+        out_dir=out_dir,
+        state_id=state_id,
+        selected_game=selected_game,
+        env=env,
+        candidate_packets=candidate_packets,
+        world_state=world_state,
+        game_knowledge_ref=game_knowledge_ref,
+        mlp_consultation_ref=mlp_consultation_ref,
+    )
+    if ls20_rollout is not None:
+        return ls20_rollout
+
     grid_path = paths["internal_forward_rollout_grid"]
     kernel_summary_path = paths["dream_kernel_arc_grid_scout"]
     write_kernel_grid_text(grid_path, world_state["grid"])
@@ -650,11 +672,230 @@ def build_internal_forward_rollout_artifact(
     }
 
 
+def build_ls20_source_world_model_rollout(
+    *,
+    args: argparse.Namespace,
+    out_dir: Path,
+    state_id: str,
+    selected_game: dict[str, Any],
+    env: Any,
+    candidate_packets: list[dict[str, Any]],
+    world_state: dict[str, Any],
+    game_knowledge_ref: dict[str, str],
+    mlp_consultation_ref: dict[str, str],
+) -> dict[str, Any] | None:
+    if selected_game.get("name") != "ls20" or not hasattr(env, "_game"):
+        return None
+
+    paths = artifact_paths(out_dir)
+    plan_result = solve_ls20_from_current_game(env._game)
+    write_kernel_grid_text(paths["internal_forward_rollout_grid"], world_state["grid"])
+    planned_action_values = [int(value) for value in plan_result.action_values]
+    preferred_action_value = planned_action_values[0] if planned_action_values else None
+    action_ids = [f"ACTION{value}" for value in planned_action_values]
+    source_artifact = {
+        "schema": LS20_INTERNAL_WORLD_MODEL_SCHEMA,
+        "created_at_utc": now_iso(),
+        "state_id": state_id,
+        "game_name": selected_game["name"],
+        "world_model_surface": "ls20_source_world_model_internal_plan_v001",
+        "dynamics_model": "Ls20SourceWorldModel",
+        "source_model_verified": plan_result.source_model_verified,
+        "matched_known_plan": plan_result.matched_known_plan,
+        "supported": plan_result.supported,
+        "solved": plan_result.solved,
+        "stop_reason": plan_result.stop_reason,
+        "current_level_index": plan_result.current_level_index,
+        "levels_completed_start": plan_result.levels_completed_start,
+        "final_levels_completed": plan_result.final_levels_completed,
+        "win_levels": plan_result.win_levels,
+        "final_state": plan_result.final_state,
+        "current_prefix_index": plan_result.current_prefix_index,
+        "total_plan_steps": plan_result.total_plan_steps,
+        "planned_rollout_steps": len(planned_action_values),
+        "level_completion_steps": plan_result.level_completion_steps,
+        "current_signature": plan_result.current_signature,
+        "planned_action_values": planned_action_values,
+        "planned_action_ids": action_ids,
+        "level_summaries": plan_result.level_summaries,
+        "candidate_action_values": [int(packet["action_value"]) for packet in candidate_packets],
+        "preferred_action_value": preferred_action_value,
+        "actuator_steps_executed": 0,
+        "training_data_promoted": False,
+        "arc_solve_claim": False,
+    }
+    _write_json(paths["ls20_internal_world_model"], source_artifact)
+
+    write_ls20_plan_manifest(
+        paths["ls20_plan_manifest"],
+        state_id=state_id,
+        selected_game=selected_game,
+        world_state=world_state,
+        plan_result=plan_result,
+        source_artifact_path=paths["ls20_internal_world_model"],
+        candidate_packets=candidate_packets,
+    )
+    kernel_summary = run_dream_kernel_ls20_plan_verify(
+        args=args,
+        manifest_path=paths["ls20_plan_manifest"],
+        summary_path=paths["dream_kernel_ls20_plan_verify"],
+    )
+    candidate_rollouts = normalize_kernel_candidate_rollouts(
+        kernel_summary=kernel_summary,
+        candidate_packets=candidate_packets,
+    )
+    preferred_action_value = kernel_summary.get("selected_action_value")
+    selected_prediction = next(
+        (row for row in candidate_rollouts if row["action_value"] == preferred_action_value),
+        candidate_rollouts[0] if candidate_rollouts else {},
+    )
+    kernel_planned_actions = [
+        int(value)
+        for value in kernel_summary.get("planned_action_values", [])
+        if isinstance(value, int) and not isinstance(value, bool)
+    ]
+    solves_before_first_step = bool(kernel_summary.get("supported") is True and kernel_summary.get("solved") is True)
+    return {
+        "schema": INTERNAL_FORWARD_ROLLOUT_SCHEMA,
+        "created_at_utc": now_iso(),
+        "state_id": state_id,
+        "game_name": selected_game["name"],
+        "created_before_actuator_step": True,
+        "rollout_surface": "arc_agi3_pre_action_internal_forward_rollout_v057_ls20_source_world_model",
+        "kernel_surface": DREAM_KERNEL_LS20_PLAN_VERIFY_SCHEMA,
+        "kernel_artifact": _repo_rel(paths["dream_kernel_ls20_plan_verify"]),
+        "kernel_sha256": _sha256(paths["dream_kernel_ls20_plan_verify"]),
+        "kernel_supported": kernel_summary.get("supported") is True,
+        "kernel_support_reason": kernel_summary.get("support_reason"),
+        "kernel_support_required_for_actuator": True,
+        "solves_before_first_step": solves_before_first_step,
+        "preferred_action_value": preferred_action_value,
+        "planned_action_values": kernel_planned_actions,
+        "planned_action_ids": kernel_summary.get("planned_action_ids", []),
+        "planned_rollout_steps": int(kernel_summary.get("planned_rollout_steps", 0) or 0),
+        "planned_sequence_hash": kernel_summary.get("planned_sequence_hash"),
+        "grid_artifact": _repo_rel(paths["internal_forward_rollout_grid"]),
+        "grid_sha256": world_state["grid_stats"]["grid_sha256"],
+        "ls20_source_world_model_artifact": _repo_rel(paths["ls20_internal_world_model"]),
+        "ls20_source_world_model_sha256": _sha256(paths["ls20_internal_world_model"]),
+        "ls20_plan_manifest_artifact": _repo_rel(paths["ls20_plan_manifest"]),
+        "ls20_plan_manifest_sha256": _sha256(paths["ls20_plan_manifest"]),
+        "chronometric_game_knowledge_artifact": game_knowledge_ref["artifact"],
+        "chronometric_game_knowledge_sha256": game_knowledge_ref["sha256"],
+        "mlp_consultation_artifact": mlp_consultation_ref["artifact"],
+        "mlp_consultation_sha256": mlp_consultation_ref["sha256"],
+        "candidate_count": len(candidate_rollouts),
+        "candidate_rollouts": candidate_rollouts,
+        "candidate_rollout_refs": [
+            {
+                "action_name": row["action_name"],
+                "action_value": row["action_value"],
+                "prediction_supported": row["prediction_supported"],
+                "kernel_supported": row["kernel_supported"],
+                "predicted_next_state": row["predicted_next_state"],
+                "predicted_level_delta": row["predicted_level_delta"],
+                "predicted_solved": row["predicted_solved"],
+                "predicted_solved_by_plan": row["predicted_solved_by_plan"],
+                "predicted_next_frame_sha256": row["predicted_next_frame_sha256"],
+                "rollout_steps": row["rollout_steps"],
+            }
+            for row in candidate_rollouts
+        ],
+        "selected_candidate_prediction": selected_prediction,
+        "actuator_gate": {
+            "require_kernel_supported": True,
+            "require_solves_before_first_step": True,
+            "gate_passed": solves_before_first_step,
+        },
+        "actuator_steps_executed": 0,
+        "training_data_promoted": False,
+        "arc_solve_claim": False,
+    }
+
+
 def write_kernel_grid_text(path: Path, grid: list[list[int]] | tuple[tuple[int, ...], ...]) -> None:
     rows = []
     for row in grid:
         rows.append(" ".join(str(int(value)) for value in row))
     path.write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+
+def write_ls20_plan_manifest(
+    path: Path,
+    *,
+    state_id: str,
+    selected_game: dict[str, Any],
+    world_state: dict[str, Any],
+    plan_result: Any,
+    source_artifact_path: Path,
+    candidate_packets: list[dict[str, Any]],
+) -> None:
+    candidate_action_values = [int(packet["action_value"]) for packet in candidate_packets]
+    planned_action_values = [int(value) for value in plan_result.action_values]
+    selected_action_value = planned_action_values[0] if planned_action_values else ""
+    fields = {
+        "schema": LS20_INTERNAL_WORLD_MODEL_SCHEMA,
+        "state_id": state_id,
+        "game": selected_game["name"],
+        "grid_sha256": str(world_state["grid_stats"]["grid_sha256"]),
+        "source_model_artifact": _repo_rel(source_artifact_path),
+        "source_model_sha256": _sha256(source_artifact_path),
+        "supported": str(bool(plan_result.supported)).lower(),
+        "solved": str(bool(plan_result.solved)).lower(),
+        "source_model_verified": str(bool(plan_result.source_model_verified)).lower(),
+        "matched_known_plan": str(bool(plan_result.matched_known_plan)).lower(),
+        "stop_reason": str(plan_result.stop_reason),
+        "selected_action_value": selected_action_value,
+        "candidate_action_values": ",".join(str(value) for value in candidate_action_values),
+        "planned_action_values": ",".join(str(value) for value in planned_action_values),
+        "planned_rollout_steps": str(len(planned_action_values)),
+        "current_prefix_index": str(int(plan_result.current_prefix_index)),
+        "total_plan_steps": str(int(plan_result.total_plan_steps)),
+        "level_completion_steps": ",".join(str(value) for value in plan_result.level_completion_steps),
+        "levels_completed_start": str(int(plan_result.levels_completed_start)),
+        "final_levels_completed": str(int(plan_result.final_levels_completed)),
+        "win_levels": str(int(plan_result.win_levels)),
+        "final_state": str(plan_result.final_state),
+    }
+    path.write_text(
+        "\n".join(f"{key}={value}" for key, value in fields.items()) + "\n",
+        encoding="utf-8",
+    )
+
+
+def run_dream_kernel_ls20_plan_verify(
+    *,
+    args: argparse.Namespace,
+    manifest_path: Path,
+    summary_path: Path,
+) -> dict[str, Any]:
+    cmd = [
+        "cargo",
+        "run",
+        "--quiet",
+        "--manifest-path",
+        str(ROOT / "dream_kernel" / "Cargo.toml"),
+        "--",
+        "ls20-plan-verify",
+        "--manifest",
+        str(manifest_path),
+        "--summary-out",
+        str(summary_path),
+    ]
+    completed = subprocess.run(
+        cmd,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=int(getattr(args, "internal_rollout_kernel_timeout", 30)),
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "dream-kernel ls20-plan-verify failed "
+            f"with code {completed.returncode}: {completed.stderr.strip() or completed.stdout.strip()}"
+        )
+    return json.loads(summary_path.read_text(encoding="utf-8"))
 
 
 def run_dream_kernel_arc_grid_scout(

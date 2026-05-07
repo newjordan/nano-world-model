@@ -1,0 +1,82 @@
+{
+  "actuator_steps_executed": 0,
+  "arc_solve_claim": false,
+  "confirmation_mode": "contract-local",
+  "confirms_selected_action": true,
+  "created_after_internal_thinking_lock": true,
+  "created_at_utc": "2026-05-07T00:11:12.899479+00:00",
+  "created_before_actuator_step": true,
+  "decision_delegated_to_nemo": false,
+  "external_nemo3_model_invoked": false,
+  "model": "nemotron_3_nano_omni",
+  "nemo_supplied_action": false,
+  "packet": {
+    "branch_simulation": {
+      "candidate_count": 4,
+      "schema": "arc_agi3.branch_simulation.v001",
+      "score_surface": "NanoWM.score_chronometric_branch",
+      "selected_branch_id": "ls20:observation:not_finished:09801b97-c689-44f2-a3e3-7f2276f31514:action:3"
+    },
+    "instruction": "Confirm or reject this internally selected action and its internal rollout evidence. Do not provide a replacement action. Return compact JSON with confirms_selected_action, selected_action_value, nemo_supplied_action=false, and confidence.",
+    "internal_forward_rollout": {
+      "kernel_supported": true,
+      "kernel_surface": "dream_kernel.ls20_plan_verify.v001",
+      "planned_action_values": [
+        3,
+        3,
+        1,
+        2,
+        2,
+        2,
+        2
+      ],
+      "preferred_action_value": 3,
+      "schema": "arc_agi3.internal_forward_rollout.v001",
+      "solves_before_first_step": true
+    },
+    "internal_thinking_lock": {
+      "artifact": "experiments/2026-05-06_arc_agi3_model_solve_scout_v057_ls20_source_plan_full_local/steps/304_model_decision/internal_thinking_lock.json",
+      "sha256": "296f5d676eb72d1e5f21d475bce1b9370e548dc0f2adaf2543c62c6964d7f6cf"
+    },
+    "schema": "arc_agi3.nemo3_final_confirmation_packet.v001",
+    "selected_action_name": "ACTION3",
+    "selected_action_value": 3,
+    "selected_branch": {
+      "action_name": "ACTION3",
+      "action_value": 3,
+      "branch_id": "ls20:observation:not_finished:09801b97-c689-44f2-a3e3-7f2276f31514:action:3",
+      "score": 2.080093,
+      "score_components": {
+        "candidate_rank_prior": 0.5,
+        "internal_forward_transition_prior": 1.0,
+        "internal_solve_plan_prior": 1.0,
+        "mlp_prior": 0.38597,
+        "stable_action_context": 0.894317,
+        "world_structure_prior": 1.0
+      },
+      "score_surface": "NanoWM.score_chronometric_branch"
+    },
+    "state_id": "ls20:observation:not_finished:09801b97-c689-44f2-a3e3-7f2276f31514",
+    "trust_flags": {
+      "branch_selection_trusted": true,
+      "geometry_trusted": true,
+      "map_trusted": true,
+      "ray_trusted": true,
+      "temporal_trusted": true
+    }
+  },
+  "relay_url": null,
+  "response": {
+    "model": "nemotron_3_nano_omni",
+    "relay_error": null,
+    "relay_ok": true,
+    "relay_url": null,
+    "response_text": "{\"confidence\": 1.0, \"confirms_selected_action\": true, \"external_model_invoked\": false, \"mode\": \"contract-local\", \"nemo_supplied_action\": false, \"selected_action_value\": 3, \"stage\": \"final\"}"
+  },
+  "role": "confirmation_not_action_source",
+  "schema": "arc_agi3.nemo3_final_confirmation.v001",
+  "selected_action_name": "ACTION3",
+  "selected_action_value": 3,
+  "state_id": "ls20:observation:not_finished:09801b97-c689-44f2-a3e3-7f2276f31514",
+  "training_data_promoted": false
+}

@@ -1,0 +1,960 @@
+{
+  "actuator_steps_executed": 0,
+  "arc_solve_claim": false,
+  "candidate_action_values": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "created_at_utc": "2026-05-07T00:45:50.053318+00:00",
+  "current_level_index": 4,
+  "current_prefix_index": 144,
+  "current_signature": "(4, 44, 25, 4, 0, 0, (False,), ((15, 46, 'npxgalaybz'), (45, 6, 'npxgalaybz'), (10, 11, 'npxgalaybz')), 34, 3, ((19, 10), (14, 35), (29, 25)), (3,))",
+  "dynamics_model": "Ls20SourceWorldModel",
+  "final_levels_completed": 7,
+  "final_state": "WIN",
+  "game_name": "ls20",
+  "level_completion_steps": [
+    13,
+    58,
+    97,
+    140,
+    184,
+    258,
+    311
+  ],
+  "level_summaries": [
+    {
+      "bonuses": [],
+      "final_position": [
+        34,
+        10
+      ],
+      "final_shape_color_rotation": [
+        5,
+        1,
+        0
+      ],
+      "final_steps_remaining": 30,
+      "global_completion_step": 13,
+      "goal_count": 1,
+      "goals": [
+        {
+          "target_color": 1,
+          "target_rotation": 0,
+          "target_shape": 5,
+          "x": 34,
+          "y": 10
+        }
+      ],
+      "level_index": 0,
+      "plan_length": 13,
+      "pushers": [],
+      "start_position": [
+        34,
+        45
+      ],
+      "start_shape_color_rotation": [
+        5,
+        1,
+        3
+      ],
+      "switches": [
+        {
+          "kind": "rotation",
+          "name": "rhsxkxzdjz",
+          "x": 19,
+          "y": 30
+        }
+      ]
+    },
+    {
+      "bonuses": [
+        {
+          "name": "npxgalaybz",
+          "x": 15,
+          "y": 16
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 40,
+          "y": 51
+        }
+      ],
+      "final_position": [
+        14,
+        40
+      ],
+      "final_shape_color_rotation": [
+        5,
+        1,
+        3
+      ],
+      "final_steps_remaining": 32,
+      "global_completion_step": 58,
+      "goal_count": 1,
+      "goals": [
+        {
+          "target_color": 1,
+          "target_rotation": 3,
+          "target_shape": 5,
+          "x": 14,
+          "y": 40
+        }
+      ],
+      "level_index": 1,
+      "plan_length": 45,
+      "pushers": [],
+      "start_position": [
+        29,
+        40
+      ],
+      "start_shape_color_rotation": [
+        5,
+        1,
+        0
+      ],
+      "switches": [
+        {
+          "kind": "rotation",
+          "name": "rhsxkxzdjz",
+          "x": 49,
+          "y": 45
+        }
+      ]
+    },
+    {
+      "bonuses": [
+        {
+          "name": "npxgalaybz",
+          "x": 35,
+          "y": 16
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 20,
+          "y": 31
+        }
+      ],
+      "final_position": [
+        54,
+        50
+      ],
+      "final_shape_color_rotation": [
+        5,
+        1,
+        2
+      ],
+      "final_steps_remaining": 8,
+      "global_completion_step": 97,
+      "goal_count": 1,
+      "goals": [
+        {
+          "target_color": 1,
+          "target_rotation": 2,
+          "target_shape": 5,
+          "x": 54,
+          "y": 50
+        }
+      ],
+      "level_index": 2,
+      "plan_length": 39,
+      "pushers": [
+        {
+          "name": "kapcaakvb_b",
+          "x": 54,
+          "y": 4
+        },
+        {
+          "name": "yjgargdic_r",
+          "x": 8,
+          "y": 5
+        }
+      ],
+      "start_position": [
+        9,
+        45
+      ],
+      "start_shape_color_rotation": [
+        5,
+        0,
+        0
+      ],
+      "switches": [
+        {
+          "kind": "rotation",
+          "name": "rhsxkxzdjz",
+          "x": 49,
+          "y": 10
+        },
+        {
+          "kind": "color",
+          "name": "soyhouuebz",
+          "x": 29,
+          "y": 45
+        }
+      ]
+    },
+    {
+      "bonuses": [
+        {
+          "name": "npxgalaybz",
+          "x": 35,
+          "y": 51
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 20,
+          "y": 16
+        }
+      ],
+      "final_position": [
+        9,
+        5
+      ],
+      "final_shape_color_rotation": [
+        5,
+        1,
+        0
+      ],
+      "final_steps_remaining": 36,
+      "global_completion_step": 140,
+      "goal_count": 1,
+      "goals": [
+        {
+          "target_color": 1,
+          "target_rotation": 0,
+          "target_shape": 5,
+          "x": 9,
+          "y": 5
+        }
+      ],
+      "level_index": 3,
+      "plan_length": 43,
+      "pushers": [
+        {
+          "name": "kapcaakvb_b",
+          "x": 19,
+          "y": 34
+        },
+        {
+          "name": "kapcaakvb_b",
+          "x": 44,
+          "y": 19
+        },
+        {
+          "name": "lujfinsby_t",
+          "x": 39,
+          "y": 26
+        },
+        {
+          "name": "tihiodtoj_l",
+          "x": 45,
+          "y": 25
+        },
+        {
+          "name": "tihiodtoj_l",
+          "x": 25,
+          "y": 40
+        },
+        {
+          "name": "tihiodtoj_l",
+          "x": 45,
+          "y": 40
+        },
+        {
+          "name": "yjgargdic_r",
+          "x": 33,
+          "y": 20
+        },
+        {
+          "name": "yjgargdic_r",
+          "x": 8,
+          "y": 35
+        }
+      ],
+      "start_position": [
+        54,
+        5
+      ],
+      "start_shape_color_rotation": [
+        4,
+        2,
+        0
+      ],
+      "switches": [
+        {
+          "kind": "shape",
+          "name": "mkjdaccuuf",
+          "x": 24,
+          "y": 30
+        },
+        {
+          "kind": "color",
+          "name": "soyhouuebz",
+          "x": 34,
+          "y": 30
+        }
+      ]
+    },
+    {
+      "bonuses": [
+        {
+          "name": "npxgalaybz",
+          "x": 15,
+          "y": 46
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 45,
+          "y": 6
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 10,
+          "y": 11
+        }
+      ],
+      "final_position": [
+        54,
+        5
+      ],
+      "final_shape_color_rotation": [
+        0,
+        3,
+        2
+      ],
+      "final_steps_remaining": 2,
+      "global_completion_step": 184,
+      "goal_count": 1,
+      "goals": [
+        {
+          "target_color": 3,
+          "target_rotation": 2,
+          "target_shape": 0,
+          "x": 54,
+          "y": 5
+        }
+      ],
+      "level_index": 4,
+      "plan_length": 44,
+      "pushers": [
+        {
+          "name": "kapcaakvb_b",
+          "x": 34,
+          "y": 4
+        },
+        {
+          "name": "kapcaakvb_b",
+          "x": 49,
+          "y": 29
+        },
+        {
+          "name": "lujfinsby_t",
+          "x": 54,
+          "y": 51
+        },
+        {
+          "name": "lujfinsby_t",
+          "x": 39,
+          "y": 26
+        },
+        {
+          "name": "tihiodtoj_l",
+          "x": 55,
+          "y": 30
+        },
+        {
+          "name": "tihiodtoj_l",
+          "x": 20,
+          "y": 25
+        },
+        {
+          "name": "yjgargdic_r",
+          "x": 33,
+          "y": 20
+        },
+        {
+          "name": "yjgargdic_r",
+          "x": 43,
+          "y": 40
+        }
+      ],
+      "start_position": [
+        49,
+        40
+      ],
+      "start_shape_color_rotation": [
+        4,
+        0,
+        0
+      ],
+      "switches": [
+        {
+          "kind": "shape",
+          "name": "mkjdaccuuf",
+          "x": 19,
+          "y": 10
+        },
+        {
+          "kind": "rotation",
+          "name": "rhsxkxzdjz",
+          "x": 14,
+          "y": 35
+        },
+        {
+          "kind": "color",
+          "name": "soyhouuebz",
+          "x": 29,
+          "y": 25
+        }
+      ]
+    },
+    {
+      "bonuses": [
+        {
+          "name": "npxgalaybz",
+          "x": 40,
+          "y": 6
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 10,
+          "y": 46
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 10,
+          "y": 6
+        }
+      ],
+      "final_position": [
+        54,
+        50
+      ],
+      "final_shape_color_rotation": [
+        5,
+        1,
+        1
+      ],
+      "final_steps_remaining": 8,
+      "global_completion_step": 258,
+      "goal_count": 2,
+      "goals": [
+        {
+          "target_color": 1,
+          "target_rotation": 1,
+          "target_shape": 5,
+          "x": 54,
+          "y": 50
+        },
+        {
+          "target_color": 3,
+          "target_rotation": 2,
+          "target_shape": 0,
+          "x": 54,
+          "y": 35
+        }
+      ],
+      "level_index": 5,
+      "plan_length": 74,
+      "pushers": [
+        {
+          "name": "kapcaakvb_b",
+          "x": 49,
+          "y": 4
+        },
+        {
+          "name": "tihiodtoj_l",
+          "x": 50,
+          "y": 20
+        }
+      ],
+      "start_position": [
+        24,
+        50
+      ],
+      "start_shape_color_rotation": [
+        0,
+        2,
+        0
+      ],
+      "switches": [
+        {
+          "kind": "shape",
+          "name": "mkjdaccuuf",
+          "x": 14,
+          "y": 10
+        },
+        {
+          "kind": "rotation",
+          "name": "rhsxkxzdjz",
+          "x": 34,
+          "y": 40
+        },
+        {
+          "kind": "color",
+          "name": "soyhouuebz",
+          "x": 24,
+          "y": 30
+        }
+      ]
+    },
+    {
+      "bonuses": [
+        {
+          "name": "npxgalaybz",
+          "x": 30,
+          "y": 21
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 50,
+          "y": 6
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 15,
+          "y": 46
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 40,
+          "y": 6
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 55,
+          "y": 51
+        },
+        {
+          "name": "npxgalaybz",
+          "x": 10,
+          "y": 6
+        }
+      ],
+      "final_position": [
+        29,
+        50
+      ],
+      "final_shape_color_rotation": [
+        0,
+        3,
+        2
+      ],
+      "final_steps_remaining": -2,
+      "global_completion_step": 311,
+      "goal_count": 1,
+      "goals": [
+        {
+          "target_color": 3,
+          "target_rotation": 2,
+          "target_shape": 0,
+          "x": 29,
+          "y": 50
+        }
+      ],
+      "level_index": 6,
+      "plan_length": 53,
+      "pushers": [
+        {
+          "name": "kapcaakvb_b",
+          "x": 39,
+          "y": 19
+        },
+        {
+          "name": "lujfinsby_t",
+          "x": 34,
+          "y": 31
+        },
+        {
+          "name": "tihiodtoj_l",
+          "x": 40,
+          "y": 30
+        }
+      ],
+      "start_position": [
+        19,
+        15
+      ],
+      "start_shape_color_rotation": [
+        1,
+        0,
+        0
+      ],
+      "switches": [
+        {
+          "kind": "shape",
+          "name": "mkjdaccuuf",
+          "x": 19,
+          "y": 40
+        },
+        {
+          "kind": "rotation",
+          "name": "rhsxkxzdjz",
+          "x": 54,
+          "y": 10
+        },
+        {
+          "kind": "color",
+          "name": "soyhouuebz",
+          "x": 9,
+          "y": 40
+        }
+      ]
+    }
+  ],
+  "levels_completed_start": 4,
+  "matched_known_plan": true,
+  "planned_action_ids": [
+    "ACTION3",
+    "ACTION4",
+    "ACTION3",
+    "ACTION3",
+    "ACTION3",
+    "ACTION4",
+    "ACTION3",
+    "ACTION4",
+    "ACTION3",
+    "ACTION4",
+    "ACTION4",
+    "ACTION2",
+    "ACTION2",
+    "ACTION3",
+    "ACTION3",
+    "ACTION3",
+    "ACTION3",
+    "ACTION1",
+    "ACTION3",
+    "ACTION3",
+    "ACTION4",
+    "ACTION4",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION4",
+    "ACTION4",
+    "ACTION2",
+    "ACTION4",
+    "ACTION4",
+    "ACTION4",
+    "ACTION1",
+    "ACTION4",
+    "ACTION4",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION1",
+    "ACTION1",
+    "ACTION3",
+    "ACTION1",
+    "ACTION3",
+    "ACTION3",
+    "ACTION1",
+    "ACTION1",
+    "ACTION1",
+    "ACTION4",
+    "ACTION4",
+    "ACTION4",
+    "ACTION4",
+    "ACTION4",
+    "ACTION4",
+    "ACTION1",
+    "ACTION4",
+    "ACTION1",
+    "ACTION4",
+    "ACTION1",
+    "ACTION1",
+    "ACTION4",
+    "ACTION2",
+    "ACTION2",
+    "ACTION1",
+    "ACTION1",
+    "ACTION3",
+    "ACTION1",
+    "ACTION1",
+    "ACTION1",
+    "ACTION3",
+    "ACTION3",
+    "ACTION3",
+    "ACTION3",
+    "ACTION4",
+    "ACTION4",
+    "ACTION4",
+    "ACTION3",
+    "ACTION1",
+    "ACTION4",
+    "ACTION4",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION3",
+    "ACTION3",
+    "ACTION2",
+    "ACTION1",
+    "ACTION4",
+    "ACTION4",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION3",
+    "ACTION3",
+    "ACTION4",
+    "ACTION3",
+    "ACTION4",
+    "ACTION4",
+    "ACTION1",
+    "ACTION1",
+    "ACTION1",
+    "ACTION1",
+    "ACTION4",
+    "ACTION1",
+    "ACTION4",
+    "ACTION1",
+    "ACTION1",
+    "ACTION4",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION3",
+    "ACTION3",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION4",
+    "ACTION4",
+    "ACTION1",
+    "ACTION2",
+    "ACTION1",
+    "ACTION2",
+    "ACTION1",
+    "ACTION2",
+    "ACTION1",
+    "ACTION2",
+    "ACTION3",
+    "ACTION3",
+    "ACTION4",
+    "ACTION2",
+    "ACTION1",
+    "ACTION3",
+    "ACTION1",
+    "ACTION1",
+    "ACTION1",
+    "ACTION4",
+    "ACTION4",
+    "ACTION4",
+    "ACTION4",
+    "ACTION1",
+    "ACTION4",
+    "ACTION4",
+    "ACTION1",
+    "ACTION4",
+    "ACTION4",
+    "ACTION1",
+    "ACTION1",
+    "ACTION1",
+    "ACTION1",
+    "ACTION4",
+    "ACTION2",
+    "ACTION3",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION3",
+    "ACTION3",
+    "ACTION1",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2",
+    "ACTION2"
+  ],
+  "planned_action_values": [
+    3,
+    4,
+    3,
+    3,
+    3,
+    4,
+    3,
+    4,
+    3,
+    4,
+    4,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    1,
+    3,
+    3,
+    4,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    4,
+    4,
+    2,
+    4,
+    4,
+    4,
+    1,
+    4,
+    4,
+    2,
+    2,
+    2,
+    1,
+    1,
+    3,
+    1,
+    3,
+    3,
+    1,
+    1,
+    1,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    1,
+    4,
+    1,
+    4,
+    1,
+    1,
+    4,
+    2,
+    2,
+    1,
+    1,
+    3,
+    1,
+    1,
+    1,
+    3,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    3,
+    1,
+    4,
+    4,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    2,
+    1,
+    4,
+    4,
+    2,
+    2,
+    2,
+    3,
+    3,
+    4,
+    3,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    4,
+    1,
+    4,
+    1,
+    1,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    2,
+    2,
+    2,
+    2,
+    2,
+    4,
+    4,
+    1,
+    2,
+    1,
+    2,
+    1,
+    2,
+    1,
+    2,
+    3,
+    3,
+    4,
+    2,
+    1,
+    3,
+    1,
+    1,
+    1,
+    4,
+    4,
+    4,
+    4,
+    1,
+    4,
+    4,
+    1,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    4,
+    2,
+    3,
+    2,
+    2,
+    2,
+    3,
+    3,
+    1,
+    2,
+    2,
+    2,
+    2
+  ],
+  "planned_rollout_steps": 167,
+  "preferred_action_value": 3,
+  "schema": "arc_agi3.ls20_source_world_model_plan.v001",
+  "solved": true,
+  "source_model_verified": true,
+  "state_id": "ls20:observation:not_finished:f91b51fb-9b23-4464-a17a-447956363c88",
+  "stop_reason": "matched_verified_ls20_source_world_model_plan",
+  "supported": true,
+  "total_plan_steps": 311,
+  "training_data_promoted": false,
+  "win_levels": 7,
+  "world_model_surface": "ls20_source_world_model_internal_plan_v001"
+}

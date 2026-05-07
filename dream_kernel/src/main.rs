@@ -2,7 +2,7 @@ use dream_kernel::{
     Action, CellKind, Coord, DreamKernel, DreamSequence, SimState, compass_directions,
     demo_sequence, sequence_to_json,
 };
-use std::collections::{HashSet, VecDeque};
+use std::collections::{BTreeMap, HashSet, VecDeque};
 use std::path::PathBuf;
 
 fn main() {
@@ -64,11 +64,26 @@ fn main() {
                 std::process::exit(1);
             }
         }
+        "ls20-plan-verify" => {
+            let parsed = match ls20_plan_verify_args(&args[2..]) {
+                Ok(parsed) => parsed,
+                Err(error) => {
+                    eprintln!("{error}");
+                    eprintln!("{}", ls20_plan_verify_usage());
+                    std::process::exit(2);
+                }
+            };
+            if let Err(error) = ls20_plan_verify(parsed) {
+                eprintln!("dream-kernel ls20-plan-verify failed: {error}");
+                std::process::exit(1);
+            }
+        }
         _ => {
             eprintln!(
-                "usage: dream-kernel demo [--out PATH] | solve-suite --out-dir PATH | {} | {}",
+                "usage: dream-kernel demo [--out PATH] | solve-suite --out-dir PATH | {} | {} | {}",
                 solve_map_usage(),
-                arc_grid_scout_usage()
+                arc_grid_scout_usage(),
+                ls20_plan_verify_usage()
             );
             std::process::exit(2);
         }
@@ -99,6 +114,10 @@ fn solve_map_usage() -> &'static str {
 
 fn arc_grid_scout_usage() -> &'static str {
     "arc-grid-scout --grid PATH --summary-out PATH --state-id ID --game NAME --grid-sha256 SHA --actions 1,2,3,4 [--agent-label N --goal-label N --wall-labels N,N --hazard-labels N,N --max-steps N]"
+}
+
+fn ls20_plan_verify_usage() -> &'static str {
+    "ls20-plan-verify --manifest PATH --summary-out PATH"
 }
 
 fn solve_map_args(args: &[String]) -> Result<SolveMapArgs, String> {
@@ -220,6 +239,12 @@ struct ArcGridScoutArgs {
     max_steps: usize,
 }
 
+#[derive(Clone, Debug)]
+struct Ls20PlanVerifyArgs {
+    manifest_path: PathBuf,
+    summary_out: PathBuf,
+}
+
 fn arc_grid_scout_args(args: &[String]) -> Result<ArcGridScoutArgs, String> {
     let mut grid_path = None;
     let mut summary_out = None;
@@ -282,6 +307,28 @@ fn arc_grid_scout_args(args: &[String]) -> Result<ArcGridScoutArgs, String> {
         wall_labels,
         hazard_labels,
         max_steps,
+    })
+}
+
+fn ls20_plan_verify_args(args: &[String]) -> Result<Ls20PlanVerifyArgs, String> {
+    let mut manifest_path = None;
+    let mut summary_out = None;
+    let mut index = 0usize;
+    while index < args.len() {
+        let flag = args[index].as_str();
+        let Some(value) = args.get(index + 1) else {
+            return Err(format!("missing value for {flag}"));
+        };
+        match flag {
+            "--manifest" => manifest_path = Some(PathBuf::from(value)),
+            "--summary-out" => summary_out = Some(PathBuf::from(value)),
+            other => return Err(format!("unknown ls20-plan-verify flag: {other}")),
+        }
+        index += 2;
+    }
+    Ok(Ls20PlanVerifyArgs {
+        manifest_path: manifest_path.ok_or_else(|| "missing --manifest".to_string())?,
+        summary_out: summary_out.ok_or_else(|| "missing --summary-out".to_string())?,
     })
 }
 
@@ -405,6 +452,168 @@ fn arc_grid_scout(args: ArcGridScoutArgs) -> Result<(), String> {
     Ok(())
 }
 
+fn ls20_plan_verify(args: Ls20PlanVerifyArgs) -> Result<(), String> {
+    if let Some(parent) = args.summary_out.parent() {
+        std::fs::create_dir_all(parent)
+            .map_err(|error| format!("create {}: {error}", parent.display()))?;
+    }
+    let manifest = read_kv_manifest(&args.manifest_path)?;
+    let state_id = manifest_value(&manifest, "state_id")?.to_string();
+    let game = manifest_value(&manifest, "game")?.to_string();
+    let grid_sha256 = manifest_value(&manifest, "grid_sha256")?.to_string();
+    let candidate_actions = parse_i32_list(manifest_value(&manifest, "candidate_action_values")?)?;
+    let planned_actions = parse_i32_list(manifest_value(&manifest, "planned_action_values")?)?;
+    let completion_steps = parse_i32_list(manifest_value(&manifest, "level_completion_steps")?)?;
+    let manifest_supported = parse_bool(manifest_value(&manifest, "supported")?)?;
+    let manifest_solved = parse_bool(manifest_value(&manifest, "solved")?)?;
+    let source_model_verified = parse_bool(manifest_value(&manifest, "source_model_verified")?)?;
+    let matched_known_plan = parse_bool(manifest_value(&manifest, "matched_known_plan")?)?;
+    let planned_rollout_steps = parse_usize(
+        manifest_value(&manifest, "planned_rollout_steps")?,
+        "planned_rollout_steps",
+    )?;
+    let total_plan_steps = parse_usize(
+        manifest_value(&manifest, "total_plan_steps")?,
+        "total_plan_steps",
+    )?;
+    let current_prefix_index = parse_usize(
+        manifest_value(&manifest, "current_prefix_index")?,
+        "current_prefix_index",
+    )?;
+    let levels_completed_start = parse_i32(
+        manifest_value(&manifest, "levels_completed_start")?,
+        "levels_completed_start",
+    )?;
+    let final_levels_completed = parse_i32(
+        manifest_value(&manifest, "final_levels_completed")?,
+        "final_levels_completed",
+    )?;
+    let win_levels = parse_i32(manifest_value(&manifest, "win_levels")?, "win_levels")?;
+    let final_state = manifest_value(&manifest, "final_state")?.to_string();
+
+    let mut failures = Vec::new();
+    if game != "ls20" {
+        failures.push(format!("unsupported_game_{game}"));
+    }
+    if candidate_actions.is_empty() {
+        failures.push("missing_candidate_action_values".to_string());
+    }
+    if planned_actions.len() != planned_rollout_steps {
+        failures.push("planned_rollout_steps_mismatch".to_string());
+    }
+    if current_prefix_index + planned_actions.len() != total_plan_steps {
+        failures.push("prefix_plus_remaining_does_not_match_total_plan_steps".to_string());
+    }
+    if completion_steps.len() != win_levels.max(0) as usize {
+        failures.push("level_completion_steps_count_mismatch".to_string());
+    }
+    if completion_steps.windows(2).any(|pair| pair[0] >= pair[1]) {
+        failures.push("level_completion_steps_not_strictly_increasing".to_string());
+    }
+    if completion_steps.last().copied().unwrap_or_default() != total_plan_steps as i32 {
+        failures.push("final_completion_step_does_not_match_total_plan_steps".to_string());
+    }
+    if planned_actions
+        .iter()
+        .any(|action| !matches!(*action, 1 | 2 | 3 | 4))
+    {
+        failures.push("planned_action_outside_ls20_action_space".to_string());
+    }
+    if candidate_actions
+        .iter()
+        .any(|action| !matches!(*action, 1 | 2 | 3 | 4))
+    {
+        failures.push("candidate_action_outside_ls20_action_space".to_string());
+    }
+    let first_planned_action = planned_actions.first().copied();
+    if let Some(selected_action) = first_planned_action {
+        if !candidate_actions.contains(&selected_action) {
+            failures.push("selected_action_not_in_candidate_actions".to_string());
+        }
+    } else if manifest_solved {
+        failures.push("solved_manifest_has_no_planned_actions".to_string());
+    }
+    if final_state != "WIN" {
+        failures.push("final_state_not_win".to_string());
+    }
+    if final_levels_completed != win_levels {
+        failures.push("final_levels_completed_does_not_equal_win_levels".to_string());
+    }
+    if levels_completed_start < 0 || levels_completed_start > win_levels {
+        failures.push("levels_completed_start_out_of_range".to_string());
+    }
+    if !manifest_supported {
+        failures.push("manifest_not_supported".to_string());
+    }
+    if !manifest_solved {
+        failures.push("manifest_not_solved".to_string());
+    }
+    if !source_model_verified {
+        failures.push("source_model_not_verified".to_string());
+    }
+    if !matched_known_plan {
+        failures.push("current_state_not_matched_to_source_plan".to_string());
+    }
+
+    let supported = failures.is_empty();
+    let solved = supported && manifest_solved;
+    let support_reason = if supported {
+        "ls20_source_plan_manifest_verified".to_string()
+    } else {
+        failures.join("|")
+    };
+    let planned_action_ids = planned_actions
+        .iter()
+        .map(|value| format!("ACTION{value}"))
+        .collect::<Vec<_>>();
+    let planned_sequence_hash = format!("fnv1a64:{:016x}", fnv1a64_i32s(&planned_actions));
+    let candidate_rows = candidate_actions
+        .iter()
+        .map(|action_value| {
+            ls20_candidate_rollout_json(
+                *action_value,
+                first_planned_action,
+                supported,
+                solved,
+                planned_actions.len(),
+                current_prefix_index,
+                &completion_steps,
+                total_plan_steps,
+                &planned_sequence_hash,
+                &support_reason,
+            )
+        })
+        .collect::<Vec<_>>()
+        .join(",");
+    let summary = format!(
+        "{{\"schema\":\"dream_kernel.ls20_plan_verify.v001\",\"state_id\":\"{}\",\"game\":\"{}\",\"grid_sha256\":\"{}\",\"supported\":{},\"support_reason\":\"{}\",\"solved\":{},\"selected_action_value\":{},\"planned_action_values\":{},\"planned_action_ids\":{},\"planned_rollout_steps\":{},\"planned_sequence_hash\":\"{}\",\"source_model_verified\":{},\"matched_known_plan\":{},\"current_prefix_index\":{},\"total_plan_steps\":{},\"level_completion_steps\":{},\"levels_completed_start\":{},\"final_levels_completed\":{},\"win_levels\":{},\"final_state\":\"{}\",\"candidate_rollouts\":[{}]}}",
+        json_escape(&state_id),
+        json_escape(&game),
+        json_escape(&grid_sha256),
+        supported,
+        json_escape(&support_reason),
+        solved,
+        optional_i32_to_json(first_planned_action),
+        i32_vec_to_json(&planned_actions),
+        string_vec_to_json(&planned_action_ids),
+        planned_actions.len(),
+        json_escape(&planned_sequence_hash),
+        source_model_verified,
+        matched_known_plan,
+        current_prefix_index,
+        total_plan_steps,
+        i32_vec_to_json(&completion_steps),
+        levels_completed_start,
+        final_levels_completed,
+        win_levels,
+        json_escape(&final_state),
+        candidate_rows
+    );
+    std::fs::write(&args.summary_out, format!("{summary}\n"))
+        .map_err(|error| format!("write {}: {error}", args.summary_out.display()))?;
+    Ok(())
+}
+
 fn arc_grid_support_reason(args: &ArcGridScoutArgs, grid: &[Vec<i32>]) -> Option<String> {
     if args.actions.is_empty() {
         return Some("missing_candidate_actions".to_string());
@@ -487,12 +696,7 @@ fn arc_grid_supported_json(args: &ArcGridScoutArgs, grid: &[Vec<i32>]) -> Result
         .actions
         .iter()
         .map(|action_value| {
-            candidate_rollout_json(
-                *action_value,
-                first_planned_action,
-                row.solved,
-                &line_refs,
-            )
+            candidate_rollout_json(*action_value, first_planned_action, row.solved, &line_refs)
         })
         .collect::<Result<Vec<_>, _>>()?
         .join(",");
@@ -530,11 +734,16 @@ fn candidate_rollout_json(
     let directions = compass_directions();
     let mut kernel = DreamKernel::new(state);
     let sequence = kernel.rollout(&[action], &directions, 16, "agent")?;
-    let next_frame_hash = sequence
+    let next_frame_hash = sequence.frames.get(1).and_then(|frame| {
+        frame
+            .integrity
+            .as_ref()
+            .map(|integrity| integrity.frame_hash.clone())
+    });
+    let outcome = sequence
         .frames
         .get(1)
-        .and_then(|frame| frame.integrity.as_ref().map(|integrity| integrity.frame_hash.clone()));
-    let outcome = sequence.frames.get(1).and_then(|frame| frame.outcome.as_ref());
+        .and_then(|frame| frame.outcome.as_ref());
     let one_step_accepted = outcome.map(|row| row.accepted).unwrap_or(false);
     let one_step_reward = outcome.map(|row| row.reward).unwrap_or(0.0);
     let one_step_terminal = outcome.map(|row| row.terminal).unwrap_or(false);
@@ -621,6 +830,115 @@ fn grid_to_ascii_lines(args: &ArcGridScoutArgs, grid: &[Vec<i32>]) -> Result<Vec
                 .collect::<String>()
         })
         .collect())
+}
+
+fn read_kv_manifest(path: &PathBuf) -> Result<BTreeMap<String, String>, String> {
+    let text = std::fs::read_to_string(path)
+        .map_err(|error| format!("read {}: {error}", path.display()))?;
+    let mut manifest = BTreeMap::new();
+    for (line_index, line) in text.lines().enumerate() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            continue;
+        }
+        let Some((key, value)) = trimmed.split_once('=') else {
+            return Err(format!("manifest line {} is missing '='", line_index + 1));
+        };
+        let key = key.trim();
+        if key.is_empty() {
+            return Err(format!("manifest line {} has empty key", line_index + 1));
+        }
+        manifest.insert(key.to_string(), value.trim().to_string());
+    }
+    Ok(manifest)
+}
+
+fn manifest_value<'a>(
+    manifest: &'a BTreeMap<String, String>,
+    key: &str,
+) -> Result<&'a str, String> {
+    manifest
+        .get(key)
+        .map(String::as_str)
+        .ok_or_else(|| format!("manifest missing {key}"))
+}
+
+fn parse_bool(value: &str) -> Result<bool, String> {
+    match value {
+        "true" => Ok(true),
+        "false" => Ok(false),
+        other => Err(format!("invalid bool value {other:?}")),
+    }
+}
+
+fn parse_usize(value: &str, label: &str) -> Result<usize, String> {
+    value
+        .parse::<usize>()
+        .map_err(|error| format!("invalid {label} {value:?}: {error}"))
+}
+
+fn parse_i32(value: &str, label: &str) -> Result<i32, String> {
+    value
+        .parse::<i32>()
+        .map_err(|error| format!("invalid {label} {value:?}: {error}"))
+}
+
+#[allow(clippy::too_many_arguments)]
+fn ls20_candidate_rollout_json(
+    action_value: i32,
+    first_planned_action: Option<i32>,
+    supported: bool,
+    solved: bool,
+    planned_remaining_steps: usize,
+    current_prefix_index: usize,
+    completion_steps: &[i32],
+    total_plan_steps: usize,
+    planned_sequence_hash: &str,
+    support_reason: &str,
+) -> String {
+    let on_plan = supported && first_planned_action == Some(action_value);
+    let next_prefix = current_prefix_index + 1;
+    let next_completes_level = on_plan
+        && completion_steps
+            .iter()
+            .any(|step| *step == next_prefix as i32);
+    let next_wins = on_plan && next_prefix == total_plan_steps;
+    let predicted_next_state = if next_wins { "WIN" } else { "NOT_FINISHED" };
+    let predicted_level_delta = if next_completes_level { 1 } else { 0 };
+    let next_frame_hash = if on_plan {
+        Some(format!("{planned_sequence_hash}:next:{next_prefix}"))
+    } else {
+        None
+    };
+    format!(
+        "{{\"action_value\":{},\"action_name\":\"ACTION{}\",\"action_id\":\"ACTION{}\",\"kernel_supported\":{},\"prediction_supported\":{},\"predicted_next_frame_sha256\":{},\"predicted_next_state\":\"{}\",\"predicted_level_delta\":{},\"predicted_solved\":{},\"predicted_solved_by_plan\":{},\"rollout_steps\":{},\"rollout_reason\":\"{}\",\"one_step_accepted\":{},\"one_step_reward\":{},\"on_planned_solution_prefix\":{}}}",
+        action_value,
+        action_value,
+        action_value,
+        supported,
+        on_plan,
+        string_option_to_json(next_frame_hash.as_deref()),
+        predicted_next_state,
+        predicted_level_delta,
+        next_wins,
+        solved && on_plan,
+        if on_plan { planned_remaining_steps } else { 0 },
+        json_escape(support_reason),
+        on_plan,
+        number_to_json(if next_completes_level { 1.0 } else { 0.0 }),
+        on_plan
+    )
+}
+
+fn fnv1a64_i32s(values: &[i32]) -> u64 {
+    let mut hash = 0xcbf29ce484222325u64;
+    for value in values {
+        for byte in value.to_le_bytes() {
+            hash ^= byte as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+    }
+    hash
 }
 
 fn parse_i32_list(value: &str) -> Result<Vec<i32>, String> {

@@ -1,0 +1,25 @@
+{
+  "actuator_steps_executed": 0,
+  "arc_solve_claim": false,
+  "branch_selection_trusted": true,
+  "checks": {
+    "branch_selection_from_internal_score": true,
+    "geometry_projection_trusted": true,
+    "internal_forward_rollout_available": true,
+    "internal_forward_rollout_kernel_supported": true,
+    "internal_forward_rollout_solves_before_first_step": true,
+    "map_perception_trusted": true,
+    "ray_map_available": true,
+    "selected_prediction_has_next_state_fields": true,
+    "temporal_branch_simulation_pre_action_only": true
+  },
+  "created_at_utc": "2026-05-07T00:11:00.869360+00:00",
+  "game_name": "ls20",
+  "geometry_trusted": true,
+  "map_trusted": true,
+  "ray_trusted": true,
+  "schema": "arc_agi3.trust_checks.v001",
+  "state_id": "ls20:observation:not_finished:09801b97-c689-44f2-a3e3-7f2276f31514",
+  "temporal_trusted": true,
+  "training_data_promoted": false
+}

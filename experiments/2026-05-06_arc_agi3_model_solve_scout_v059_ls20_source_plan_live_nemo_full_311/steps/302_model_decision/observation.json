@@ -1,0 +1,60 @@
+{
+  "actuator_steps_executed": 0,
+  "arc_solve_claim": false,
+  "available_action_values": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "created_at_utc": "2026-05-07T00:58:58.110478+00:00",
+  "frame": {
+    "frame_stack_len": 1,
+    "latest_frame_max": 12,
+    "latest_frame_min": 0,
+    "latest_frame_sha256": "99501126758d0161440011c7cafa2adc9265745130f02e58eda6ffa3ff1096fe",
+    "latest_frame_shape": [
+      64,
+      64
+    ]
+  },
+  "full_reset": false,
+  "game_id": "ls20-9607627b",
+  "game_name": "ls20",
+  "grid": {
+    "cell_total": 4096,
+    "grid_sha256": "91935d4b55bc1bd3b91a7801913c327aafaa5316ee859ad12096439e02bbf5ff",
+    "height": 64,
+    "labels": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      8,
+      9,
+      11,
+      12
+    ],
+    "nonzero_cells": 4093,
+    "value_counts": {
+      "0": 3,
+      "1": 17,
+      "11": 37,
+      "12": 10,
+      "3": 752,
+      "4": 364,
+      "5": 2862,
+      "8": 36,
+      "9": 15
+    },
+    "width": 64
+  },
+  "guid": "f91b51fb-9b23-4464-a17a-447956363c88",
+  "levels_completed": 6,
+  "online_submission": false,
+  "schema": "arc_agi3.reset_observation_artifact.v001",
+  "state": "NOT_FINISHED",
+  "training_data_promoted": false,
+  "win_levels": 7
+}
